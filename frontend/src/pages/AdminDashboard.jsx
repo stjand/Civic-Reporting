@@ -46,7 +46,7 @@ const AdminDashboard = () => {
     const fetchReports = async () => {
       try {
         const response = await apiClient.get('/reports')
-        const fetchedReports = response.data.data // Access the correct data field
+        const fetchedReports = response.data || [] // Access the correct data field
         setReports(fetchedReports)
 
         // Calculate stats from fetched data
