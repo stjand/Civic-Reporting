@@ -83,13 +83,12 @@ const ReportForm = () => {
   ]
 
   const getAddressFromCoordinates = async (lat, lng) => {
-    // You must replace 'YOUR_REVERSE_GEOCODING_API_KEY' with a valid key.
-    // For now, this fallback provides user feedback.
-    const API_KEY = 'YOUR_REVERSE_GEOCODING_API_KEY'
+    const API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY
 
     try {
-      if (API_KEY === 'YOUR_REVERSE_GEOCODING_API_KEY') {
-        throw new Error('Placeholder API key used. Cannot fetch address.')
+      if (!API_KEY) {
+        // No API key available, return coordinates as fallback
+        return `Lat: ${lat.toFixed(4)}, Lng: ${lng.toFixed(4)}`
       }
       const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${API_KEY}`)
       const data = await response.json()
