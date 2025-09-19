@@ -16,7 +16,11 @@ import {
   CheckCircle,
   Clock,
   AlertTriangle,
-  BarChart3
+  BarChart3,
+  Mic,
+  Play,
+  Pause,
+  Volume2
 } from 'lucide-react'
 import { apiClient } from '../config/api'
 
@@ -40,6 +44,8 @@ const AdminDashboard = () => {
     resolved: 0
   })
   const [filterStatus, setFilterStatus] = useState('all')
+  const [playingAudio, setPlayingAudio] = useState(null)
+  const [audioElements, setAudioElements] = useState({})
 
   // New useEffect hook to fetch data from the API
   useEffect(() => {
@@ -173,6 +179,26 @@ const AdminDashboard = () => {
 
     // Show success message (in a real app, this would be a proper notification)
     alert(`Report #${reportId} status updated to: ${newStatus.replace('_', ' ')}`)
+  }
+
+  const playAudio = (reportId, audioUrl) => {
+    // Stop any currently playing audio
+    Object.values(audioElements).forEach(audio => {
+      audio.pause()
+      audio.currentTime = 0
+    })
+
+    if (playingAudio === reportId) {
+      setPlayingAudio(null)
+      return
+    }
+
+    const audio = new Audio(audioUrl)
+    setAudioElements(prev => ({ ...prev, [reportId]: audio }))
+    audio.play()
+    setPlayingAudio(reportId)
+    audio.onended = () => setPlayingAudio(null)
+    audio.onerror = () => setPlayingAudio(null)
   }
 
   const filteredReports = filterStatus === 'all'
@@ -311,6 +337,14 @@ const AdminDashboard = () => {
                         </div>
                         <h3 className="font-medium text-sm mb-1 text-gray-900">{report.title}</h3>
                         <p className="text-xs text-gray-600 mb-2 line-clamp-2">{report.description}</p>
+                        {/* Audio indicator */}
+                        {report.audio_url && (
+                          <div className="flex items-center space-x-1 mb-2">
+                            <Volume2 className="w-3 h-3 text-blue-600" />
+                            <span className="text-xs text-blue-600 font-medium">Voice note available</span>
+                          </div>
+                        )}
+
                         <div className="flex items-center justify-between text-xs text-gray-500">
                           <div className="flex items-center space-x-1">
                             <MapPin className="w-3 h-3" />
@@ -391,6 +425,12 @@ const AdminDashboard = () => {
                         </span>
                       </div>
                       <div className="flex justify-between">
+                        <span className="text-gray-600">Photos:</span>
+                        <span className="font-medium text-gray-900">
+                          {selectedReport.photos?.length || 0} attached
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
                         <span className="text-gray-600">Reported by:</span>
                         <span className="font-medium text-gray-900">{selectedReport.user_name}</span>
                       </div>
@@ -409,6 +449,46 @@ const AdminDashboard = () => {
                       {selectedReport.description}
                     </p>
                   </div>
+
+                  {/* Photos */}
+                  {selectedReport.photos && selectedReport.photos.length > 0 && (
+                    <div>
+                      <h3 className="text-sm font-medium text-gray-700 mb-3">Photos</h3>
+                      <div className="grid grid-cols-2 gap-2">
+                        {selectedReport.photos.map((photo, index) => (
+                          <img
+                            key={index}
+                            src={photo}
+                            alt={`Report photo ${index + 1}`}
+                            className="w-full h-24 object-cover rounded-lg border border-gray-200"
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Audio Recording */}
+                  {selectedReport.audio_url && (
+                    <div>
+                      <h3 className="text-sm font-medium text-gray-700 mb-3">Voice Note</h3>
+                      <button
+                        onClick={() => playAudio(selectedReport.id, selectedReport.audio_url)}
+                        className="flex items-center space-x-2 px-4 py-2 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition-colors duration-200"
+                      >
+                        {playingAudio === selectedReport.id ? (
+                          <>
+                            <Pause className="w-4 h-4 text-blue-600" />
+                            <span className="text-sm font-medium text-blue-600">Pause</span>
+                          </>
+                        ) : (
+                          <>
+                            <Play className="w-4 h-4 text-blue-600" />
+                            <span className="text-sm font-medium text-blue-600">Play Voice Note</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  )}
 
                   <div>
                     <h3 className="text-sm font-medium text-gray-700 mb-3">Actions</h3>

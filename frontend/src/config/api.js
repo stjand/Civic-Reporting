@@ -14,10 +14,13 @@ export const apiClient = {
   
   post: async (endpoint, data) => {
     try {
+      // Handle FormData differently
+      const isFormData = data instanceof FormData
+      
       const response = await fetch(`${API_BASE_URL}${endpoint}`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
+        headers: isFormData ? {} : { 'Content-Type': 'application/json' },
+        body: isFormData ? data : JSON.stringify(data)
       })
       if (!response.ok) throw new Error(`API Error: ${response.status}`)
       return await response.json()

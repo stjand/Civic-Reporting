@@ -15,20 +15,31 @@ import {
   Loader2,
   CheckCircle,
   ArrowLeft,
-  Shield
+  Shield,
+  Mic,
+  MicOff,
+  Play,
+  Pause,
+  Maximize2,
+  Minimize2
 } from 'lucide-react'
 import MapPicker from '../components/MapPicker'
 import { apiClient } from '../config/api'
+import { useNavigate } from 'react-router-dom'
 
 const ReportForm = () => {
+  const navigate = useNavigate()
   const fileInputRef = useRef(null)
+  const mediaRecorderRef = useRef(null)
+  const audioChunksRef = useRef([])
 
   const [formData, setFormData] = useState({
     title: '',
     description: '',
     category: 'pothole',
     location: null,
-    photo: null // Changed photos to a single photo object
+    photo: null,
+    audioRecording: null
   })
 
   const [loading, setLoading] = useState(false)
@@ -36,6 +47,13 @@ const ReportForm = () => {
   const [currentStep, setCurrentStep] = useState(1)
   const [submitted, setSubmitted] = useState(false)
   const [locationAddress, setLocationAddress] = useState('')
+  const [isRecording, setIsRecording] = useState(false)
+  const [audioBlob, setAudioBlob] = useState(null)
+  const [audioUrl, setAudioUrl] = useState(null)
+  const [isPlaying, setIsPlaying] = useState(false)
+  const [isMapFullscreen, setIsMapFullscreen] = useState(false)
+  const [reportId, setReportId] = useState(null)
+  const [redirectCountdown, setRedirectCountdown] = useState(5)
 
   const categories = [
     {
@@ -112,11 +130,79 @@ const ReportForm = () => {
     }
   }
 
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+      mediaRecorderRef.current = new MediaRecorder(stream)
+      audioChunksRef.current = []
+
+      mediaRecorderRef.current.ondataavailable = (event) => {
+        audioChunksRef.current.push(event.data)
+      }
+
+      mediaRecorderRef.current.onstop = () => {
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' })
+        setAudioBlob(audioBlob)
+        setAudioUrl(URL.createObjectURL(audioBlob))
+        setFormData(prev => ({ ...prev, audioRecording: audioBlob }))
+        
+        // Stop all tracks to release microphone
+        stream.getTracks().forEach(track => track.stop())
+      }
+
+      mediaRecorderRef.current.start()
+      setIsRecording(true)
+    } catch (error) {
+      console.error('Error accessing microphone:', error)
+      alert('Unable to access microphone. Please check your permissions.')
+    }
+  }
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop()
+      setIsRecording(false)
+    }
+  }
+
+  const playAudio = () => {
+    if (audioUrl) {
+      const audio = new Audio(audioUrl)
+      audio.play()
+      setIsPlaying(true)
+      audio.onended = () => setIsPlaying(false)
+    }
+  }
+
+  const deleteAudio = () => {
+    setAudioBlob(null)
+    setAudioUrl(null)
+    setFormData(prev => ({ ...prev, audioRecording: null }))
+  }
+
   const handleLocationSelect = async (location) => {
     setFormData(prev => ({ ...prev, location }))
     const address = await getAddressFromCoordinates(location.lat, location.lng)
     setLocationAddress(address)
   }
+
+  // Auto-redirect countdown effect
+  React.useEffect(() => {
+    if (submitted && reportId) {
+      const timer = setInterval(() => {
+        setRedirectCountdown(prev => {
+          if (prev <= 1) {
+            clearInterval(timer)
+            navigate('/')
+            return 0
+          }
+          return prev - 1
+        })
+      }, 1000)
+
+      return () => clearInterval(timer)
+    }
+  }, [submitted, reportId, navigate])
 
   const handleSubmit = async () => {
   if (!formData.location) {
@@ -135,7 +221,8 @@ const ReportForm = () => {
       title: formData.title,
       category: formData.category,
       location: formData.location,
-      hasPhoto: !!formData.photo
+      hasPhoto: !!formData.photo,
+      hasAudio: !!formData.audioRecording
     })
     
     const reportFormData = new FormData()
@@ -154,9 +241,14 @@ const ReportForm = () => {
       reportFormData.append('photo', formData.photo)
     }
 
+    if (formData.audioRecording) {
+      reportFormData.append('audio', formData.audioRecording, 'recording.wav')
+    }
+
     const response = await apiClient.post('/reports', reportFormData)
     
     console.log('Report submitted successfully:', response)
+    setReportId(response.data?.id || Math.random().toString(36).substr(2, 8).toUpperCase())
     setSubmitted(true)
     
   } catch (error) {
@@ -218,32 +310,50 @@ const ReportForm = () => {
                 <CheckCircle className="w-8 h-8 text-green-600" />
               </div>
             </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Report Submitted Successfully!</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">Thank You!</h2>
             <p className="text-gray-600 mb-6 leading-relaxed">
-              Thank you for helping improve your community. We'll review your report and provide updates on the progress.
+              Your report has been submitted successfully. We'll review it and provide updates on the progress.
             </p>
             <div className="bg-gray-50 rounded-lg p-4 mb-6">
               <p className="text-sm text-gray-600 mb-1">Report ID</p>
-              <p className="font-mono text-lg font-semibold text-gray-900">RPT-{Math.random().toString(36).substr(2, 8).toUpperCase()}</p>
+              <p className="font-mono text-lg font-semibold text-gray-900">RPT-{reportId}</p>
             </div>
-            <button
-              onClick={() => {
-                setSubmitted(false)
-                setCurrentStep(1)
-                setFormData({
-                  title: '',
-                  description: '',
-                  category: 'pothole',
-                  location: null,
-                  photo: null
-                })
-                setPreview(null)
-                setLocationAddress('')
-              }}
-              className="w-full inline-flex items-center justify-center px-6 py-3 text-base font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors duration-200 shadow-sm"
-            >
-              Submit Another Report
-            </button>
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+              <p className="text-sm text-blue-800 font-medium">
+                Redirecting to home page in {redirectCountdown} seconds...
+              </p>
+            </div>
+            <div className="flex space-x-3">
+              <button
+                onClick={() => navigate('/')}
+                className="flex-1 inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition-colors duration-200"
+              >
+                Go Home Now
+              </button>
+              <button
+                onClick={() => {
+                  setSubmitted(false)
+                  setCurrentStep(1)
+                  setReportId(null)
+                  setRedirectCountdown(5)
+                  setFormData({
+                    title: '',
+                    description: '',
+                    category: 'pothole',
+                    location: null,
+                    photo: null,
+                    audioRecording: null
+                  })
+                  setPreview(null)
+                  setLocationAddress('')
+                  setAudioBlob(null)
+                  setAudioUrl(null)
+                }}
+                className="flex-1 inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors duration-200"
+              >
+                Submit Another
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -462,6 +572,73 @@ const ReportForm = () => {
                       </div>
                     )}
                   </div>
+
+                  {/* Audio Recording */}
+                  <div className="space-y-2">
+                    <label className="block text-sm font-medium text-gray-700">
+                      Voice Note (Optional)
+                    </label>
+                    
+                    {audioUrl ? (
+                      <div className="space-y-3">
+                        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center space-x-3">
+                              <div className="p-2 bg-green-100 rounded-full">
+                                <Mic className="w-4 h-4 text-green-600" />
+                              </div>
+                              <div>
+                                <p className="text-sm font-medium text-green-800">Voice note recorded</p>
+                                <p className="text-xs text-green-600">Click play to review</p>
+                              </div>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <button
+                                type="button"
+                                onClick={playAudio}
+                                disabled={isPlaying}
+                                className="p-2 bg-green-100 text-green-600 rounded-full hover:bg-green-200 transition-colors duration-200 disabled:opacity-50"
+                              >
+                                {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+                              </button>
+                              <button
+                                type="button"
+                                onClick={deleteAudio}
+                                className="p-2 bg-red-100 text-red-600 rounded-full hover:bg-red-200 transition-colors duration-200"
+                              >
+                                <X className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        <button
+                          type="button"
+                          onClick={isRecording ? stopRecording : startRecording}
+                          className={`w-full p-4 border-2 border-dashed rounded-lg transition-all duration-200 text-center flex items-center justify-center space-x-2 ${
+                            isRecording 
+                              ? 'border-red-300 bg-red-50 hover:border-red-400' 
+                              : 'border-gray-300 hover:border-gray-400'
+                          }`}
+                        >
+                          {isRecording ? (
+                            <>
+                              <MicOff className="w-6 h-6 text-red-600 animate-pulse" />
+                              <p className="text-sm font-medium text-red-600">Stop Recording</p>
+                            </>
+                          ) : (
+                            <>
+                              <Mic className="w-6 h-6 text-gray-400" />
+                              <p className="text-sm font-medium text-gray-600">Record voice note</p>
+                            </>
+                          )}
+                        </button>
+                        <p className="text-xs text-gray-500 text-center">Optional: Add a voice description of the issue</p>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             )}
@@ -474,8 +651,40 @@ const ReportForm = () => {
                   <p className="text-gray-600">Click on the map to pinpoint the exact location</p>
                 </div>
 
-                {/* Map Component */}
-                <MapPicker onLocationSelect={handleLocationSelect} />
+                <div className="relative">
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-lg font-medium text-gray-900">Select Location</h3>
+                    <button
+                      type="button"
+                      onClick={() => setIsMapFullscreen(!isMapFullscreen)}
+                      className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors duration-200"
+                    >
+                      {isMapFullscreen ? <Minimize2 className="w-5 h-5" /> : <Maximize2 className="w-5 h-5" />}
+                    </button>
+                  </div>
+                  
+                  <div className={`transition-all duration-300 ${
+                    isMapFullscreen 
+                      ? 'fixed inset-0 z-50 bg-white p-4' 
+                      : 'relative'
+                  }`}>
+                    {isMapFullscreen && (
+                      <div className="flex justify-between items-center mb-4">
+                        <h3 className="text-xl font-semibold text-gray-900">Select Report Location</h3>
+                        <button
+                          onClick={() => setIsMapFullscreen(false)}
+                          className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors duration-200"
+                        >
+                          <X className="w-6 h-6" />
+                        </button>
+                      </div>
+                    )}
+                    <MapPicker 
+                      onLocationSelect={handleLocationSelect} 
+                      isFullscreen={isMapFullscreen}
+                    />
+                  </div>
+                </div>
 
                 {formData.location && (
                   <div className="bg-green-50 border border-green-200 rounded-lg p-4">
@@ -523,6 +732,17 @@ const ReportForm = () => {
                     <div className="bg-gray-50 rounded-lg p-4">
                       <h3 className="text-sm font-medium text-gray-700 mb-2">Photo</h3>
                       <img src={preview} alt="Report" className="w-24 h-24 object-cover rounded-lg" />
+                    </div>
+                  )}
+
+                  {/* Audio */}
+                  {audioUrl && (
+                    <div className="bg-gray-50 rounded-lg p-4">
+                      <h3 className="text-sm font-medium text-gray-700 mb-2">Voice Note</h3>
+                      <div className="flex items-center space-x-2">
+                        <Mic className="w-4 h-4 text-gray-500" />
+                        <span className="text-sm text-gray-900">Voice recording attached</span>
+                      </div>
                     </div>
                   )}
 

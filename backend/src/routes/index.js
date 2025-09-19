@@ -68,12 +68,19 @@ export default (upload) => {
   })
 
   // Add the multer middleware directly to the route
-  router.post('/reports', upload.single('photo'), (req, res) => {
+  router.post('/reports', upload.fields([
+    { name: 'photo', maxCount: 1 },
+    { name: 'audio', maxCount: 1 }
+  ]), (req, res) => {
     try {
       const { title, description, category, location, address, user_name } = req.body
 
       // Ensure location is parsed correctly from the string
       const parsedLocation = location ? JSON.parse(location) : null;
+
+      // Handle file uploads
+      const photoFile = req.files?.photo?.[0]
+      const audioFile = req.files?.audio?.[0]
 
       const newReport = {
         id: Date.now(),
@@ -85,7 +92,8 @@ export default (upload) => {
         user_name: user_name || 'Anonymous',
         status: 'new',
         created_at: new Date().toISOString(),
-        photos: req.file ? [`/uploads/${req.file.filename}`] : [], // Store the file path
+        photos: photoFile ? [`/uploads/${photoFile.filename}`] : [],
+        audio_url: audioFile ? `/uploads/${audioFile.filename}` : null,
         priority: 'low', // Added a default value
         urgency_score: 5, // Added a default value
       }
