@@ -8,7 +8,7 @@
     "ml"
   ],
   "scripts": {
-    "dev": "concurrently \"yarn workspace backend dev\" \"yarn workspace frontend dev\"",
+    "dev": "concurrently \"npm run --workspace=backend dev\" \"npm run --workspace=frontend dev\"",
     "build": "yarn workspace frontend build && yarn workspace backend build",
     "test": "yarn workspace backend test && yarn workspace frontend test",
     "docker:up": "docker compose up --build",
