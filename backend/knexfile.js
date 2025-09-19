@@ -1,4 +1,7 @@
-// File: backend/knexfile.js
+import path from 'path';
+
+const baseDir = path.resolve('./backend'); // ensures paths work both locally and on Render
+
 export default {
   development: {
     client: 'postgresql',
@@ -10,13 +13,13 @@ export default {
       password: 'dev123'
     },
     migrations: {
-      directory: './migrations'
+      directory: path.join(baseDir, 'migrations')
     },
     seeds: {
-      directory: './seeds'
+      directory: path.join(baseDir, 'seeds')
     }
   },
-  
+
   test: {
     client: 'postgresql',
     connection: process.env.TEST_DATABASE_URL || {
@@ -27,18 +30,18 @@ export default {
       password: 'dev123'
     },
     migrations: {
-      directory: './migrations'
+      directory: path.join(baseDir, 'migrations')
     }
   },
-  
+
   production: {
     client: 'postgresql',
     connection: process.env.DATABASE_URL,
     migrations: {
-      directory: './migrations'
+      directory: path.join(baseDir, 'migrations')
     },
     seeds: {
-      directory: './seeds'
+      directory: path.join(baseDir, 'seeds')
     }
   }
-}
+};
