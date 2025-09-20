@@ -130,3 +130,10 @@
 {"level":"\u001b[31merror\u001b[39m","message":"Health check failed: getaddrinfo ENOTFOUND postgres","timestamp":"2025-09-20 12:20:58"}
 {"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /health","timestamp":"2025-09-20 12:20:58"}
 {"level":"\u001b[31merror\u001b[39m","message":"Health check failed: getaddrinfo ENOTFOUND postgres","timestamp":"2025-09-20 12:21:01"}
+{"level":"\u001b[32minfo\u001b[39m","message":"==========================================","timestamp":"2025-09-20 11:48:14"}
+{"level":"\u001b[32minfo\u001b[39m","message":"🚀 Civic Reporter Backend Started","timestamp":"2025-09-20 11:48:14"}
+{"level":"\u001b[32minfo\u001b[39m","message":"==========================================","timestamp":"2025-09-20 11:48:14"}
+{"level":"\u001b[32minfo\u001b[39m","message":"📡 Server running at: http://localhost:3001","timestamp":"2025-09-20 11:48:14"}
+{"level":"\u001b[32minfo\u001b[39m","message":"🏥 Health check: http://localhost:3001/health","timestamp":"2025-09-20 11:48:14"}
+{"level":"\u001b[32minfo\u001b[39m","message":"📊 Reports API: http://localhost:3001/api/reports","timestamp":"2025-09-20 11:48:14"}
+{"level":"\u001b[32minfo\u001b[39m","message":"==========================================","timestamp":"2025-09-20 11:48:14"}
