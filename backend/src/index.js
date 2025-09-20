@@ -121,6 +121,21 @@ app.get('/health', async (req, res) => {
   }
 });
 
+// New GET endpoint to retrieve all departments
+app.get('/api/departments', async (req, res) => {
+  try {
+    const departments = await knex('departments').select('*');
+    res.status(200).json({ success: true, data: departments });
+  } catch (error) {
+    logger.error(`Failed to retrieve departments: ${error.message}`);
+    res.status(500).json({ 
+      success: false, 
+      error: 'Failed to retrieve departments',
+      details: error.message 
+    });
+  }
+});
+
 // GET endpoint to retrieve all reports
 app.get('/api/reports', async (req, res) => {
   try {

@@ -40,13 +40,23 @@ import {
   Send
 } from 'lucide-react'
 
-// Fix for default markers in Leaflet
-delete L.Icon.Default.prototype._getIconUrl
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
-  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
-})
+// Correct fix for default markers in Leaflet
+import icon from 'leaflet/dist/images/marker-icon.png';
+import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+import iconRetina from 'leaflet/dist/images/marker-icon-2x.png';
+
+let DefaultIcon = L.icon({
+    iconUrl: icon,
+    iconRetinaUrl: iconRetina,
+    shadowUrl: iconShadow,
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    tooltipAnchor: [16, -28],
+    shadowSize: [41, 41]
+});
+
+L.Marker.prototype.options.icon = DefaultIcon;
 
 const AdminDashboard = () => {
   const mapRef = useRef(null)
@@ -55,6 +65,7 @@ const AdminDashboard = () => {
   
   const [selectedReport, setSelectedReport] = useState(null)
   const [reports, setReports] = useState([])
+  const [departments, setDepartments] = useState([])
   const [selectedDepartment, setSelectedDepartment] = useState('all')
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [rightPanelOpen, setRightPanelOpen] = useState(false)
@@ -69,38 +80,36 @@ const AdminDashboard = () => {
   // New state to manage loading status
   const [isLoading, setIsLoading] = useState(true)
 
-  // Mock departments data
-  const departments = [
-    { id: 'all', name: 'All Departments', icon: Building2, color: 'bg-blue-600', count: 247 },
-    { id: 'roads', name: 'Public Works', icon: Construction, color: 'bg-orange-600', count: 89 },
-    { id: 'sanitation', name: 'Sanitation', icon: Trash2, color: 'bg-green-600', count: 64 },
-    { id: 'utilities', name: 'Utilities', icon: Zap, color: 'bg-yellow-600', count: 45 },
-    { id: 'transport', name: 'Transportation', icon: Truck, color: 'bg-purple-600', count: 32 },
-    { id: 'environment', name: 'Environment', icon: TreePine, color: 'bg-teal-600', count: 17 }
-  ]
-
-  // === CORRECTED CODE HERE ===
-  // New useEffect to fetch real data from the backend
+  // Fetch departments and reports from backend
   useEffect(() => {
-    const fetchReports = async () => {
+    const fetchData = async () => {
       try {
-        const response = await fetch('http://localhost:3001/api/reports')
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`)
+        // Fetch departments
+        const departmentsResponse = await fetch('http://localhost:3001/api/departments');
+        if (!departmentsResponse.ok) {
+          throw new Error(`HTTP error! status: ${departmentsResponse.status}`);
         }
-        const result = await response.json()
-        setReports(result.data)
-      } catch (error) {
-        console.error('Failed to fetch reports:', error)
-        // Optionally handle error state
-      } finally {
-        setIsLoading(false)
-      }
-    }
+        const departmentsResult = await departmentsResponse.json();
+        setDepartments([{ id: 'all', name: 'All Departments', icon: Building2, color: 'bg-blue-600' }, ...departmentsResult.data.map(d => ({
+          ...d,
+          icon: getDepartmentIcon(d.name)
+        }))]);
 
-    fetchReports()
-  }, [])
-  // ==========================
+        // Fetch reports
+        const reportsResponse = await fetch('http://localhost:3001/api/reports');
+        if (!reportsResponse.ok) {
+          throw new Error(`HTTP error! status: ${reportsResponse.status}`);
+        }
+        const reportsResult = await reportsResponse.json();
+        setReports(reportsResult.data);
+      } catch (error) {
+        console.error('Failed to fetch data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
 
   // Initialize map
   useEffect(() => {
@@ -212,12 +221,20 @@ const AdminDashboard = () => {
     }
     return icons[category] || MoreHorizontal
   }
+  
+  const getDepartmentIcon = (departmentName) => {
+    switch (departmentName) {
+      case 'Roads & Infrastructure': return Construction;
+      case 'Sanitation': return Trash2;
+      case 'Electrical': return Zap;
+      case 'Water Supply': return Droplets;
+      default: return Building2;
+    }
+  }
 
   const handleStatusChange = async (reportId, newStatus) => {
     setIsUpdating(true)
     try {
-      console.log(`Updating report ${reportId} to status: ${newStatus}`)
-      
       const response = await fetch(`http://localhost:3001/api/reports/${reportId}`, {
         method: 'PATCH',
         headers: {
@@ -233,7 +250,6 @@ const AdminDashboard = () => {
       const result = await response.json()
       
       if (result.success) {
-        // Update local state
         setReports(prevReports => 
           prevReports.map(report => 
             report.id === reportId 
@@ -248,20 +264,6 @@ const AdminDashboard = () => {
             : prev
         )
         
-        // Recalculate stats
-        const updatedReports = reports.map(r => 
-          r.id === reportId ? { ...r, status: newStatus } : r
-        )
-        const newStats = {
-          total: updatedReports.length,
-          new: updatedReports.filter(r => r.status === 'new').length,
-          inProgress: updatedReports.filter(r => ['acknowledged', 'in_progress'].includes(r.status)).length,
-          resolved: updatedReports.filter(r => r.status === 'resolved').length
-        }
-        // Assuming there's a setStats function, which is not in this code but would be needed
-        // setStats(newStats)
-        
-        console.log('Report updated successfully')
       } else {
         console.error('Failed to update report:', result.error)
         alert('Failed to update report status')
@@ -316,7 +318,7 @@ const AdminDashboard = () => {
 
   // Filter reports based on department, status, priority, and search
   const filteredReports = reports.filter(report => {
-    const matchesDepartment = selectedDepartment === 'all' || report.department === selectedDepartment
+    const matchesDepartment = selectedDepartment === 'all' || report.department_id === parseInt(selectedDepartment);
     const matchesStatus = statusFilter === 'all' || report.status === statusFilter
     const matchesPriority = priorityFilter === 'all' || report.priority === priorityFilter
     const matchesSearch = searchTerm === '' || 
@@ -328,8 +330,7 @@ const AdminDashboard = () => {
   })
 
   const getSelectedDepartment = () => {
-    // This function will still rely on the mock data's department list.
-    return departments.find(dept => dept.id === selectedDepartment)
+    return departments.find(dept => String(dept.id) === String(selectedDepartment))
   }
   
   // Conditionally render based on loading state
@@ -439,7 +440,8 @@ const AdminDashboard = () => {
           <div className="p-2">
             {departments.map((department) => {
               const IconComponent = department.icon
-              const isSelected = selectedDepartment === department.id
+              const isSelected = String(selectedDepartment) === String(department.id);
+              const reportsForDepartment = department.id === 'all' ? reports : reports.filter(r => r.department_id === department.id);
               return (
                 <button
                   key={department.id}
@@ -456,14 +458,14 @@ const AdminDashboard = () => {
                   {!sidebarCollapsed && (
                     <div className="flex-1 text-left">
                       <div className="font-medium text-sm">{department.name}</div>
-                      <div className="text-xs text-gray-500">{department.count} reports</div>
+                      <div className="text-xs text-gray-500">{reportsForDepartment.length} reports</div>
                     </div>
                   )}
                   {!sidebarCollapsed && (
                     <div className={`px-2 py-1 rounded-full text-xs font-medium ${
                       isSelected ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-600'
                     }`}>
-                      {filteredReports.filter(r => department.id === 'all' || r.department === department.id).length}
+                      {filteredReports.length}
                     </div>
                   )}
                 </button>
@@ -504,7 +506,7 @@ const AdminDashboard = () => {
         <div className="absolute top-4 left-4 bg-white rounded-lg shadow-lg border border-gray-200 p-4">
           <div className="flex items-center space-x-3">
             {React.createElement(getSelectedDepartment()?.icon, { 
-              className: `w-5 h-5 ${getSelectedDepartment()?.color} text-white p-1 rounded` 
+              className: `w-5 h-5 text-white p-1 rounded ${getSelectedDepartment()?.color}` 
             })}
             <div>
               <h3 className="font-semibold text-gray-900">{getSelectedDepartment()?.name}</h3>
