@@ -6,7 +6,7 @@
     "dev": "nodemon src/index.js",
     "start": "node src/index.js",
     "test": "jest",
-    "migrate": "knex migrate:latest",
+    "migrate": "node run_migrations.js",
     "seed": "knex seed:run",
     "migrate:make": "knex migrate:make"
   },
