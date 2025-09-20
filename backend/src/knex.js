@@ -1,7 +1,7 @@
-import knex from 'knex';
-import config from '../knexfile.js'; // points to backend/knexfile.js
+import knexLib from 'knex';
+import knexConfig from '../knexfile.js'; // go up one level from src/
 
 const environment = process.env.NODE_ENV || 'development';
-const db = knex(config[environment]);
+const knex = knexLib(knexConfig[environment]);
 
-export default db;
+export default knex;
