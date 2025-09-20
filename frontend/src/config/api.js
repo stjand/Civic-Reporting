@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api'
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://89dde6d1-d9ff-4b76-b663-f9ac9f7bba61-00-1f667y9lpjqfn.sisko.replit.dev:3001/api'
 
 export const apiClient = {
   get: async (endpoint) => {

@@ -75,7 +75,9 @@ app.get('/api/reports', async (req, res) => {
     
     const processedReports = allReports.map(report => ({
       ...report,
-      location: report.location ? { lat: report.location.y, lng: report.location.x } : null,
+      location: report.latitude && report.longitude 
+        ? { lat: report.latitude, lng: report.longitude } 
+        : null,
       image_urls: report.image_urls || [],
       audio_url: report.audio_url || null
     }));
@@ -103,7 +105,8 @@ app.post('/api/reports', upload.fields([{ name: 'photo', maxCount: 1 }, { name: 
       description: description || '',
       category: category || 'other',
       status: 'new',
-      location: knex.raw(`ST_SetSRID(ST_MakePoint(${parsedLocation.lng}, ${parsedLocation.lat}), 4326)`),
+      latitude: parsedLocation ? parsedLocation.lat : null,
+      longitude: parsedLocation ? parsedLocation.lng : null,
       address: address || 'Location not specified',
       user_name: user_name || 'Anonymous',
       urgency_score: urgency_score || 5,
@@ -117,7 +120,9 @@ app.post('/api/reports', upload.fields([{ name: 'photo', maxCount: 1 }, { name: 
     
     const processedReport = {
       ...insertedReport,
-      location: insertedReport.location ? { lat: insertedReport.location.y, lng: insertedReport.location.x } : null,
+      location: insertedReport.latitude && insertedReport.longitude 
+        ? { lat: insertedReport.latitude, lng: insertedReport.longitude } 
+        : null,
       image_urls: insertedReport.image_urls || [],
       audio_url: insertedReport.audio_url || null
     };
@@ -145,7 +150,9 @@ app.get('/api/reports/:id', async (req, res) => {
 
     const processedReport = {
       ...report,
-      location: report.location ? { lat: report.location.y, lng: report.location.x } : null,
+      location: report.latitude && report.longitude 
+        ? { lat: report.latitude, lng: report.longitude } 
+        : null,
       image_urls: report.image_urls || [],
       audio_url: report.audio_url || null
     };
@@ -174,7 +181,9 @@ app.patch('/api/reports/:id', async (req, res) => {
 
     const processedReport = {
       ...updatedReport,
-      location: updatedReport.location ? { lat: updatedReport.location.y, lng: updatedReport.location.x } : null,
+      location: updatedReport.latitude && updatedReport.longitude 
+        ? { lat: updatedReport.latitude, lng: updatedReport.longitude } 
+        : null,
       image_urls: updatedReport.image_urls || [],
       audio_url: updatedReport.audio_url || null
     };
@@ -200,7 +209,9 @@ app.get('/api/admin/dashboard', async (req, res) => {
 
     const processedReports = allReports.map(report => ({
       ...report,
-      location: report.location ? { lat: report.location.y, lng: report.location.x } : null,
+      location: report.latitude && report.longitude 
+        ? { lat: report.latitude, lng: report.longitude } 
+        : null,
       image_urls: report.image_urls || [],
       audio_url: report.audio_url || null
     }));

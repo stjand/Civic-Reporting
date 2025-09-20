@@ -7,10 +7,11 @@ export default defineConfig({
     react()
   ],
   server: {
-    host: true,          // allows access from other devices
-    port: 5173,
+    host: '0.0.0.0',     // bind to all interfaces for Replit
+    port: 5000,          // Replit standard port
+    allowedHosts: 'all', // allow all hosts for Replit proxy
     watch: {
-      usePolling: true,  // critical for Docker to detect file changes
+      usePolling: true,  // critical for file system changes
       interval: 100
     }
   },
