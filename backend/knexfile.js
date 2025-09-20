@@ -1,49 +1,29 @@
-// knexfile.js
-import 'dotenv/config'; // Load environment variables from .env
+import 'dotenv/config';
 import path from 'path';
+import { fileURLToPath } from 'url';
 
-const baseDir = process.cwd();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export default {
   development: {
     client: 'pg',
-    connection: process.env.DATABASE_URL, // Supabase connection string
-    pool: {
-      min: 2,
-      max: 10,
-    },
-    migrations: {
-      directory: path.join(baseDir, 'migrations'), // Your migrations folder
-    },
-    seeds: {
-      directory: path.join(baseDir, 'seeds'), // Your seeds folder
-    },
+    connection: process.env.DATABASE_URL,
+    pool: { min: 2, max: 10 },
+    migrations: { directory: path.join(__dirname, 'migrations') },
+    seeds: { directory: path.join(__dirname, 'seeds') }
   },
-
   test: {
     client: 'pg',
     connection: process.env.DATABASE_URL,
-    pool: {
-      min: 2,
-      max: 10,
-    },
-    migrations: {
-      directory: path.join(baseDir, 'migrations'),
-    },
+    pool: { min: 2, max: 10 },
+    migrations: { directory: path.join(__dirname, 'migrations') }
   },
-
   production: {
     client: 'pg',
     connection: process.env.DATABASE_URL,
-    pool: {
-      min: 2,
-      max: 20,
-    },
-    migrations: {
-      directory: path.join(baseDir, 'migrations'),
-    },
-    seeds: {
-      directory: path.join(baseDir, 'seeds'),
-    },
-  },
+    pool: { min: 2, max: 20 },
+    migrations: { directory: path.join(__dirname, 'migrations') },
+    seeds: { directory: path.join(__dirname, 'seeds') }
+  }
 };
