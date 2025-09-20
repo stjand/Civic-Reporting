@@ -28,8 +28,7 @@ services:
     depends_on:
       - postgres
     volumes:
-      - ./backend:/app:cached
-      - /app/node_modules
+      - ./backend:/app
     command: sh -c "sleep 10 && npm run migrate && npm run seed && npm run dev"
 
   frontend:
@@ -45,11 +44,8 @@ services:
     depends_on:
       - backend
     volumes:
-      - ./frontend:/app:cached   # local folder mounted
-      - /app/node_modules        # node_modules inside container
-
-
-
+      - ./frontend:/app:cached
+      - /app/node_modules
 
   minio:
     image: minio/minio:latest
