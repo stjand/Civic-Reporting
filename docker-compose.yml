@@ -1,6 +1,6 @@
 services:
   postgres:
-    image: postgis/postgis:15-3.3
+    image: postgres:15
     environment:
       POSTGRES_DB: civic_reporter
       POSTGRES_USER: dev
@@ -9,7 +9,12 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./backend/migrations:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dev -d civic_reporter"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
   backend:
     build:
       context: ./backend
@@ -18,19 +23,26 @@ services:
       - "3001:3001"
     environment:
       NODE_ENV: development
-      DATABASE_URL: postgresql://dev:dev123@postgres:5432/civic_reporter
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: dev
+      DB_PASSWORD: dev123
+      DB_NAME: civic_reporter
       S3_ENDPOINT: http://minio:9000
       S3_ACCESS_KEY: minioadmin
       S3_SECRET_KEY: minioadmin123
       S3_BUCKET: civic-reports
       JWT_SECRET: dev-secret-change-in-production
     depends_on:
-      - postgres
-      - minio
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_started
     volumes:
       - ./backend:/app
       - ./backend/uploads:/app/uploads
-    command: sh -c "./wait-for-it.sh postgres 5432 && ./wait-for-it.sh minio 9000 && yarn migrate && yarn seed && yarn dev"
+    command: sh -c "npm run migrate && npm run dev"
+
   frontend:
     build:
       context: ./frontend
@@ -38,7 +50,7 @@ services:
     ports:
       - "5173:5173"
     environment:
-      VITE_API_BASE_URL: http://backend:3001
+      VITE_API_BASE_URL: http://localhost:3001
       VITE_MAPBOX_TOKEN: your-mapbox-token-here
       VITE_GOOGLE_MAPS_API_KEY: your-google-maps-api-key-here
     depends_on:
@@ -46,6 +58,7 @@ services:
     volumes:
       - ./frontend:/app:cached
       - /app/node_modules
+
   minio:
     image: minio/minio:latest
     command: server /data --console-address ":9001"
@@ -57,12 +70,14 @@ services:
       - "9001:9001"
     volumes:
       - minio_data:/data
+
   redis:
     image: redis:7-alpine
     ports:
       - "6379:6379"
     volumes:
       - redis_data:/data
+
 volumes:
   postgres_data:
   minio_data:

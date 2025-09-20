@@ -2,12 +2,24 @@
  * @param { import("knex").Knex } knex
  */
 export async function seed(knex) {
-  // Clear tables respecting foreign key order
-  await knex('report_status_history').del()
-  await knex('notifications').del()
-  await knex('reports').del()
-  await knex('departments').del()
-  await knex('users').del()
+  // -------------------------------
+  // 0️⃣ Clear tables respecting foreign key order
+  // -------------------------------
+  if (await knex.schema.hasTable('report_status_history')) {
+    await knex('report_status_history').del();
+  }
+  if (await knex.schema.hasTable('notifications')) {
+    await knex('notifications').del();
+  }
+  if (await knex.schema.hasTable('reports')) {
+    await knex('reports').del();
+  }
+  if (await knex.schema.hasTable('departments')) {
+    await knex('departments').del();
+  }
+  if (await knex.schema.hasTable('users')) {
+    await knex('users').del();
+  }
 
   // -------------------------------
   // 1️⃣ Insert Departments
@@ -20,9 +32,9 @@ export async function seed(knex) {
       { name: 'Water Supply', description: 'Water leaks, supply issues, drainage problems', contact_phone: '+911234567893', contact_email: 'water@civic.gov' },
       { name: 'Parks & Environment', description: 'Tree maintenance, park facilities, environmental issues', contact_phone: '+911234567894', contact_email: 'parks@civic.gov' }
     ])
-    .returning('id')
+    .returning('id');
 
-  const deptIds = deptRows.map(d => d.id)
+  const deptIds = deptRows.map(d => d.id ?? d); // For PostgreSQL, d.id may exist or just d
 
   // -------------------------------
   // 2️⃣ Insert Users
@@ -35,9 +47,9 @@ export async function seed(knex) {
       { phone: '+919876543213', name: 'John Citizen', role: 'citizen', is_verified: true, reputation_score: 75 },
       { phone: '+919876543214', name: 'Jane Reporter', role: 'citizen', is_verified: true, reputation_score: 80 }
     ])
-    .returning('id')
+    .returning('id');
 
-  const userIds = userRows.map(u => u.id)
+  const userIds = userRows.map(u => u.id ?? u);
 
   // -------------------------------
   // 3️⃣ Insert Reports
@@ -51,9 +63,8 @@ export async function seed(knex) {
       category: 'pothole',
       status: 'new',
       priority: 'high',
-      location: knex.raw("ST_GeomFromText('POINT(77.5946 12.9716)', 4326)"),
       address: 'Main Street, near City Center',
-      image_urls: ['https://example.com/pothole1.jpg'],
+      image_urls: JSON.stringify(['https://example.com/pothole1.jpg']),
       user_name: 'John Citizen',
       urgency_score: 8
     },
@@ -65,9 +76,8 @@ export async function seed(knex) {
       category: 'garbage',
       status: 'acknowledged',
       priority: 'medium',
-      location: knex.raw("ST_GeomFromText('POINT(77.5845 12.9616)', 4326)"),
       address: 'Park Road, Sector 12',
-      image_urls: ['https://example.com/garbage1.jpg'],
+      image_urls: JSON.stringify(['https://example.com/garbage1.jpg']),
       assigned_to: userIds[1],
       user_name: 'Jane Reporter',
       urgency_score: 7
@@ -80,14 +90,14 @@ export async function seed(knex) {
       category: 'streetlight',
       status: 'in_progress',
       priority: 'medium',
-      location: knex.raw("ST_GeomFromText('POINT(77.6045 12.9816)', 4326)"),
       address: 'Oak Avenue, Block C',
       assigned_to: userIds[2],
       estimated_resolution_date: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000),
+      image_urls: JSON.stringify([]),
       user_name: 'John Citizen',
       urgency_score: 5
     }
-  ])
+  ]);
 
   // -------------------------------
   // 4️⃣ Insert Notifications
@@ -105,7 +115,7 @@ export async function seed(knex) {
       message: 'You have a new assignment for report #2',
       is_read: false
     }
-  ])
+  ]);
 
-  console.log('✅ Seed data inserted successfully')
+  console.log('✅ Seed data inserted successfully');
 }

@@ -3,17 +3,20 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "nodemon src/index.js",
-    "start": "node src/index.js",
-    "test": "jest",
-    "migrate": "node run_migrations.js",
-    "seed": "knex seed:run",
-    "migrate:make": "knex migrate:make"
+    "dev": "nodemon -r dotenv/config src/index.js",
+    "start": "node -r dotenv/config src/index.js",
+    "test": "node -r dotenv/config jest",
+    "migrate": "node -r dotenv/config run_migrations.js",
+    "migrate:make": "node -r dotenv/config knex migrate:make --knexfile knexfile.js",
+    "migrate:rollback": "node -r dotenv/config knex migrate:rollback --knexfile knexfile.js",
+    "seed": "node -r dotenv/config knex seed:run --knexfile knexfile.js",
+    "db:reset": "knex migrate:rollback --all --knexfile knexfile.js && knex migrate:latest --knexfile knexfile.js && knex seed:run --knexfile knexfile.js"
   },
   "dependencies": {
     "aws-sdk": "^2.1400.0",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
     "express": "^4.21.2",
     "express-rate-limit": "^6.8.1",
     "helmet": "^7.2.0",
@@ -32,9 +35,9 @@
     "nodemon": "^3.1.10",
     "supertest": "^6.3.4"
   },
-  "main": "knexfile.js",
-  "keywords": [],
+  "main": "src/index.js",
+  "keywords": ["civic", "reporting", "api", "express", "postgresql"],
   "author": "",
   "license": "ISC",
-  "description": ""
+  "description": "Backend API for Civic Reporter application"
 }

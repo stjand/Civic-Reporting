@@ -1,16 +1,14 @@
 import path from 'path';
 
-const baseDir = path.resolve('./backend'); // ensures paths work both locally and on Render
+const baseDir = process.cwd();
 
 export default {
   development: {
-    client: 'postgis',
-    connection: process.env.DATABASE_URL || {
-      host: 'postgres',
-      port: 5432,
-      database: 'civic_reporter',
-      user: 'dev',
-      password: 'dev123'
+    client: 'pg',
+    connection: process.env.DATABASE_URL,
+    pool: {
+      min: 2,
+      max: 10
     },
     migrations: {
       directory: path.join(baseDir, 'migrations')
@@ -21,13 +19,11 @@ export default {
   },
 
   test: {
-    client: 'postgis',
-    connection: process.env.TEST_DATABASE_URL || {
-      host: 'localhost',
-      port: 5432,
-      database: 'civic_reporter_test',
-      user: 'dev',
-      password: 'dev123'
+    client: 'pg',
+    connection: process.env.DATABASE_URL,
+    pool: {
+      min: 2,
+      max: 10
     },
     migrations: {
       directory: path.join(baseDir, 'migrations')
@@ -35,8 +31,12 @@ export default {
   },
 
   production: {
-    client: 'postgis',
+    client: 'pg',
     connection: process.env.DATABASE_URL,
+    pool: {
+      min: 2,
+      max: 20
+    },
     migrations: {
       directory: path.join(baseDir, 'migrations')
     },

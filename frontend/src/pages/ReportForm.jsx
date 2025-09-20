@@ -119,7 +119,7 @@ const ReportForm = () => {
     }
   }
 
-  const handlePhotoSelect = async (e) => {
+  const handlePhotoSelect = (e) => {
     const file = e.target.files[0]
     if (file) {
       const reader = new FileReader()
@@ -203,77 +203,81 @@ const ReportForm = () => {
     }
   }, [submitted, reportId, navigate])
 
-  const handleSubmit = async () => {
-  if (!formData.location) {
-    alert('Please select a location on the map')
-    return
+const handleSubmit = async () => {
+    if (!formData.location) {
+      alert('Please select a location on the map')
+      return
+    }
+    if (!formData.title.trim()) {
+      alert('Please enter a title for your report')
+      return
+    }
+
+    setLoading(true)
+    
+    try {
+      const reportFormData = new FormData()
+      reportFormData.append('title', formData.title)
+      reportFormData.append('description', formData.description)
+      reportFormData.append('category', formData.category)
+      
+      if (formData.location) {
+        reportFormData.append('location', JSON.stringify(formData.location))
+      }
+      
+      reportFormData.append('address', locationAddress)
+      reportFormData.append('user_name', 'Anonymous')
+      
+      if (formData.photo) {
+        reportFormData.append('photo', formData.photo)
+      }
+
+      if (formData.audioRecording) {
+        reportFormData.append('audio', formData.audioRecording, 'recording.wav')
+      }
+
+      const response = await apiClient.post('/reports', reportFormData)
+      
+      // Corrected line: Access the id directly from the data object
+      if (response.data && response.data.id) {
+          setReportId(response.data.id);
+          setSubmitted(true)
+      } else {
+          throw new Error('Invalid response from server. Report ID not found.')
+      }
+      
+      // Reset form data after successful submission
+      setFormData({
+        title: '',
+        description: '',
+        category: 'pothole',
+        location: null,
+        photo: null,
+        audioRecording: null
+      })
+      setPreview(null)
+      setLocationAddress('')
+      setAudioBlob(null)
+      setAudioUrl(null)
+      
+    } catch (error) {
+      console.error('Submit error details:', {
+        message: error.message,
+        stack: error.stack
+      })
+      
+      // More specific error message
+      if (error.message.includes('Failed to fetch')) {
+        alert('Cannot connect to server. Please check if the backend is running on port 3001.')
+      } else if (error.message.includes('API Error: 404')) {
+        alert('API endpoint not found. Please check your backend routes.')
+      } else {
+        alert(`Failed to submit report: ${error.message}`)
+      }
+    } finally {
+      setLoading(false)
+    }
   }
-  if (!formData.title.trim()) {
-    alert('Please enter a title for your report')
-    return
-  }
-
-  setLoading(true)
-  
-  try {
-    const reportFormData = new FormData()
-    reportFormData.append('title', formData.title)
-    reportFormData.append('description', formData.description)
-    reportFormData.append('category', formData.category)
-    
-    if (formData.location) {
-      reportFormData.append('location', JSON.stringify(formData.location))
-    }
-    
-    reportFormData.append('address', locationAddress)
-    reportFormData.append('user_name', 'Anonymous')
-    
-    if (formData.photo) {
-      reportFormData.append('photo', formData.photo)
-    }
-
-    if (formData.audioRecording) {
-      reportFormData.append('audio', formData.audioRecording, 'recording.wav')
-    }
-
-    const response = await apiClient.post('/reports', reportFormData)
-    
-    setReportId(response.data.data.id);
-    setSubmitted(true)
-    
-    // Reset form data after successful submission
-    setFormData({
-      title: '',
-      description: '',
-      category: 'pothole',
-      location: null,
-      photo: null,
-      audioRecording: null
-    })
-    setPreview(null)
-    setLocationAddress('')
-    setAudioBlob(null)
-    setAudioUrl(null)
-    
-  } catch (error) {
-    console.error('Submit error details:', {
-      message: error.message,
-      stack: error.stack
-    })
-    
-    // More specific error message
-    if (error.message.includes('Failed to fetch')) {
-      alert('Cannot connect to server. Please check if the backend is running on port 3001.')
-    } else if (error.message.includes('API Error: 404')) {
-      alert('API endpoint not found. Please check your backend routes.')
-    } else {
-      alert(`Failed to submit report: ${error.message}`)
-    }
-  } finally {
-    setLoading(false)
-  }
-}
-
 
 
   const nextStep = () => {
