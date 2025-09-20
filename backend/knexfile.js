@@ -6,7 +6,7 @@ export default {
   development: {
     client: 'postgresql',
     connection: process.env.DATABASE_URL || {
-      host: 'localhost',
+      host: 'postgres',
       port: 5432,
       database: 'civic_reporter',
       user: 'dev',

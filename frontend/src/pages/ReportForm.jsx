@@ -1,4 +1,3 @@
-// File: frontend/src/pages/ReportForm.jsx
 import React, { useState, useRef } from 'react'
 import {
   Camera,
@@ -217,14 +216,6 @@ const ReportForm = () => {
   setLoading(true)
   
   try {
-    console.log('Submitting form with data:', {
-      title: formData.title,
-      category: formData.category,
-      location: formData.location,
-      hasPhoto: !!formData.photo,
-      hasAudio: !!formData.audioRecording
-    })
-    
     const reportFormData = new FormData()
     reportFormData.append('title', formData.title)
     reportFormData.append('description', formData.description)
@@ -247,8 +238,7 @@ const ReportForm = () => {
 
     const response = await apiClient.post('/reports', reportFormData)
     
-    console.log('Report submitted successfully:', response)
-    setReportId(response.data?.id || Math.random().toString(36).substr(2, 8).toUpperCase())
+    setReportId(response.data.data.id);
     setSubmitted(true)
     
   } catch (error) {
@@ -681,6 +671,7 @@ const ReportForm = () => {
                     )}
                     <MapPicker 
                       onLocationSelect={handleLocationSelect} 
+                      initialLocation={formData.location}
                       isFullscreen={isMapFullscreen}
                     />
                   </div>

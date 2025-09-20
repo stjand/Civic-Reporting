@@ -1,0 +1,5 @@
+{"level":"\u001b[31merror\u001b[39m","message":"Failed to add report: getaddrinfo ENOTFOUND postgres","timestamp":"2025-09-20 11:59:35"}
+{"level":"\u001b[31merror\u001b[39m","message":"Health check failed: getaddrinfo ENOTFOUND postgres","timestamp":"2025-09-20 12:14:15"}
+{"level":"\u001b[31merror\u001b[39m","message":"Failed to retrieve reports: getaddrinfo ENOTFOUND postgres","timestamp":"2025-09-20 12:14:49"}
+{"level":"\u001b[31merror\u001b[39m","message":"Health check failed: getaddrinfo ENOTFOUND postgres","timestamp":"2025-09-20 12:20:58"}
+{"level":"\u001b[31merror\u001b[39m","message":"Health check failed: getaddrinfo ENOTFOUND postgres","timestamp":"2025-09-20 12:21:01"}

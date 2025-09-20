@@ -1,4 +1,4 @@
-# File: backend/Dockerfile
+# Use Node 18 for backend services
 FROM node:18-alpine
 
 WORKDIR /app
@@ -15,8 +15,11 @@ COPY package*.json ./
 # Install dependencies
 RUN npm install
 
-# Copy all files
-COPY . .
+# Copy all essential files and folders
+COPY ./src ./src
+COPY ./migrations ./migrations
+COPY ./seeds ./seeds
+COPY .env .env
 
 # Create logs directory
 RUN mkdir -p logs && chmod 755 logs
@@ -24,11 +27,11 @@ RUN mkdir -p logs && chmod 755 logs
 # Create S3 bucket
 # Minio requires an explicit bucket creation
 # This will wait for Minio service to be healthy
-RUN /usr/local/bin/mc alias set local http://s3-storage:9000 minioadmin minioadmin123 && \
+RUN /usr/local/bin/mc alias set local http://minio:9000 minioadmin minioadmin123 && \
     /usr/local/bin/mc mb local/civic-reports || true
 
 # Expose port
 EXPOSE 3001
 
-# Start command
-CMD ["node", "src/index.js"]
+# Start command (consistent with docker-compose)
+CMD ["npm", "run", "dev"]

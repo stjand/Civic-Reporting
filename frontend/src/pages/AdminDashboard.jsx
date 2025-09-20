@@ -49,31 +49,32 @@ const AdminDashboard = () => {
 
   // New useEffect hook to fetch data from the API
   useEffect(() => {
-    const fetchReports = async () => {
+    const fetchDashboardData = async () => {
       try {
-        const response = await apiClient.get('/reports')
-        const fetchedReports = response.data || [] // Access the correct data field
-        setReports(fetchedReports)
+        const response = await apiClient.get('/admin/dashboard')
+        const { reports, stats } = response.data.data
+        setReports(reports)
 
         // Calculate stats from fetched data
-        const newReports = fetchedReports.filter(r => r.status === 'new').length
-        const acknowledged = fetchedReports.filter(r => r.status === 'acknowledged').length
-        const inProgress = fetchedReports.filter(r => r.status === 'in_progress').length
-        const resolved = fetchedReports.filter(r => r.status === 'resolved').length
+        const newReports = reports.filter(r => r.status === 'new').length
+        const inProgress = reports.filter(r => r.status === 'in_progress').length
+        const acknowledged = reports.filter(r => r.status === 'acknowledged').length
+        const resolved = reports.filter(r => r.status === 'resolved').length
 
         setStats({
-          total: fetchedReports.length,
+          total: reports.length,
           new: newReports,
           inProgress: acknowledged + inProgress,
           resolved: resolved
         })
       } catch (error) {
-        console.error('Failed to fetch reports:', error)
+        console.error('Failed to fetch dashboard data:', error)
       }
     }
 
-    fetchReports()
+    fetchDashboardData()
   }, [])
+
 
   // Initialize map
   useEffect(() => {
@@ -165,21 +166,20 @@ const AdminDashboard = () => {
     }
   }
 
-  const handleStatusChange = (reportId, newStatus) => {
-    setReports(reports.map(report =>
-      report.id === reportId
-        ? { ...report, status: newStatus }
-        : report
-    ))
-
-    // Update selected report if it's the one being changed
-    if (selectedReport?.id === reportId) {
-      setSelectedReport(prev => ({ ...prev, status: newStatus }))
+  const handleStatusChange = async (reportId, newStatus) => {
+    try {
+      await apiClient.patch(`/reports/${reportId}`, { status: newStatus });
+      // Refetch reports to update the UI
+      const response = await apiClient.get('/admin/dashboard');
+      const { reports: updatedReports } = response.data.data;
+      setReports(updatedReports);
+      setSelectedReport(updatedReports.find(r => r.id === reportId));
+    } catch (error) {
+      console.error('Failed to update report status:', error);
+      alert('Failed to update report status.');
     }
-
-    // Show success message (in a real app, this would be a proper notification)
-    alert(`Report #${reportId} status updated to: ${newStatus.replace('_', ' ')}`)
   }
+
 
   const playAudio = (reportId, audioUrl) => {
     // Stop any currently playing audio
@@ -451,11 +451,11 @@ const AdminDashboard = () => {
                   </div>
 
                   {/* Photos */}
-                  {selectedReport.photos && selectedReport.photos.length > 0 && (
+                  {selectedReport.image_urls && selectedReport.image_urls.length > 0 && (
                     <div>
                       <h3 className="text-sm font-medium text-gray-700 mb-3">Photos</h3>
                       <div className="grid grid-cols-2 gap-2">
-                        {selectedReport.photos.map((photo, index) => (
+                        {selectedReport.image_urls.map((photo, index) => (
                           <img
                             key={index}
                             src={photo}

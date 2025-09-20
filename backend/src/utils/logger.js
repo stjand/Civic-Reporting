@@ -1,5 +1,13 @@
-// File: backend/src/utils/logger.js
 import winston from 'winston'
+import fs from 'fs'
+import path from 'path'
+
+const logsDir = path.join(process.cwd(), 'logs');
+
+// Create logs directory if it doesn't exist
+if (!fs.existsSync(logsDir)) {
+  fs.mkdirSync(logsDir);
+}
 
 // Create a simple logger configuration
 const logger = winston.createLogger({
@@ -24,7 +32,7 @@ const logger = winston.createLogger({
     }),
     // File output for errors
     new winston.transports.File({
-      filename: 'logs/error.log',
+      filename: path.join(logsDir, 'error.log'),
       level: 'error',
       format: winston.format.combine(
         winston.format.timestamp(),
@@ -33,7 +41,7 @@ const logger = winston.createLogger({
     }),
     // File output for all logs
     new winston.transports.File({
-      filename: 'logs/combined.log',
+      filename: path.join(logsDir, 'combined.log'),
       format: winston.format.combine(
         winston.format.timestamp(),
         winston.format.json()
@@ -41,11 +49,5 @@ const logger = winston.createLogger({
     })
   ]
 })
-
-// Create logs directory if it doesn't exist
-import fs from 'fs'
-if (!fs.existsSync('logs')) {
-  fs.mkdirSync('logs')
-}
 
 export default logger

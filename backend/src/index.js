@@ -8,22 +8,20 @@ import fs from 'fs';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
 
 // Create uploads directory
-if (!fs.existsSync('uploads')) {
-  fs.mkdirSync('uploads');
+const uploadsDir = path.join(process.cwd(), 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir);
 }
 
 // Configure multer for file uploads
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'uploads/')
+    cb(null, uploadsDir);
   },
   filename: function (req, file, cb) {
-    cb(null, Date.now() + path.extname(file.originalname))
+    cb(null, Date.now() + path.extname(file.originalname));
   }
 });
 
@@ -75,11 +73,11 @@ app.get('/api/reports', async (req, res) => {
   try {
     const allReports = await knex('reports').select('*').orderBy('created_at', 'desc');
     
-    // Parse JSON fields
     const processedReports = allReports.map(report => ({
       ...report,
-      location: typeof report.location === 'string' ? JSON.parse(report.location) : report.location,
-      photos: typeof report.photos === 'string' ? JSON.parse(report.photos) : report.photos
+      location: report.location ? { lat: report.location.y, lng: report.location.x } : null,
+      image_urls: report.image_urls || [],
+      audio_url: report.audio_url || null
     }));
 
     logger.info(`Retrieved ${processedReports.length} reports`);
@@ -91,38 +89,42 @@ app.get('/api/reports', async (req, res) => {
 });
 
 // POST endpoint to add a new report
-app.post('/api/reports', upload.single('photo'), async (req, res) => {
+app.post('/api/reports', upload.fields([{ name: 'photo', maxCount: 1 }, { name: 'audio', maxCount: 1 }]), async (req, res) => {
   try {
-    const reportId = 'RPT' + Date.now();
     const { title, description, category, location, address, user_name } = req.body;
-
-    // Parse location if it's a string
-    const parsedLocation = typeof location === 'string' ? JSON.parse(location) : location;
+    
+    // Parse location
+    const parsedLocation = location ? JSON.parse(location) : null;
+    const photoFile = req.files?.photo?.[0];
+    const audioFile = req.files?.audio?.[0];
     
     const newReport = {
-      report_id: reportId,
       title: title || 'Untitled Report',
       description: description || '',
       category: category || 'other',
       status: 'new',
-      location: JSON.stringify(parsedLocation),
+      location: knex.raw(`ST_SetSRID(ST_MakePoint(${parsedLocation.lng}, ${parsedLocation.lat}), 4326)`),
       address: address || 'Location not specified',
       user_name: user_name || 'Anonymous',
-      photos: JSON.stringify(req.file ? [`/uploads/${req.file.filename}`] : []),
+      image_urls: photoFile ? [`/uploads/${photoFile.filename}`] : [],
+      audio_url: audioFile ? `/uploads/${audioFile.filename}` : null,
       priority: 'medium',
-      urgency_score: 5
+      urgency_score: 5,
+      // Placeholder for foreign keys since frontend doesn't provide them yet
+      user_id: 1, // Assume a default user
+      department_id: 1 // Assume a default department
     };
 
     const [insertedReport] = await knex('reports').insert(newReport).returning('*');
     
-    // Parse JSON fields for response
     const processedReport = {
       ...insertedReport,
-      location: JSON.parse(insertedReport.location),
-      photos: JSON.parse(insertedReport.photos)
+      location: insertedReport.location ? { lat: insertedReport.location.y, lng: insertedReport.location.x } : null,
+      image_urls: insertedReport.image_urls || [],
+      audio_url: insertedReport.audio_url || null
     };
 
-    logger.info(`Report added with ID: ${reportId}`);
+    logger.info(`Report added with ID: ${processedReport.id}`);
     res.status(201).json({ 
       success: true, 
       message: 'Report submitted successfully',
@@ -137,17 +139,17 @@ app.post('/api/reports', upload.single('photo'), async (req, res) => {
 // GET endpoint to retrieve a specific report by ID
 app.get('/api/reports/:id', async (req, res) => {
   try {
-    const report = await knex('reports').where('report_id', req.params.id).first();
+    const report = await knex('reports').where('id', req.params.id).first();
     
     if (!report) {
       return res.status(404).json({ success: false, error: 'Report not found' });
     }
 
-    // Parse JSON fields
     const processedReport = {
       ...report,
-      location: typeof report.location === 'string' ? JSON.parse(report.location) : report.location,
-      photos: typeof report.photos === 'string' ? JSON.parse(report.photos) : report.photos
+      location: report.location ? { lat: report.location.y, lng: report.location.x } : null,
+      image_urls: report.image_urls || [],
+      audio_url: report.audio_url || null
     };
 
     res.status(200).json({ success: true, data: processedReport });
@@ -164,7 +166,7 @@ app.patch('/api/reports/:id', async (req, res) => {
     const updateData = req.body;
 
     const [updatedReport] = await knex('reports')
-      .where('report_id', reportId)
+      .where('id', reportId)
       .update({ ...updateData, updated_at: knex.fn.now() })
       .returning('*');
 
@@ -172,11 +174,11 @@ app.patch('/api/reports/:id', async (req, res) => {
       return res.status(404).json({ success: false, error: 'Report not found' });
     }
 
-    // Parse JSON fields
     const processedReport = {
       ...updatedReport,
-      location: JSON.parse(updatedReport.location),
-      photos: JSON.parse(updatedReport.photos)
+      location: updatedReport.location ? { lat: updatedReport.location.y, lng: updatedReport.location.x } : null,
+      image_urls: updatedReport.image_urls || [],
+      audio_url: updatedReport.audio_url || null
     };
 
     res.status(200).json({ success: true, data: processedReport });
@@ -198,18 +200,18 @@ app.get('/api/admin/dashboard', async (req, res) => {
       resolved: allReports.filter(r => r.status === 'resolved').length
     };
 
-    // Parse JSON fields for recent reports
-    const recentReports = allReports.slice(0, 5).map(report => ({
+    const processedReports = allReports.map(report => ({
       ...report,
-      location: JSON.parse(report.location),
-      photos: JSON.parse(report.photos)
+      location: report.location ? { lat: report.location.y, lng: report.location.x } : null,
+      image_urls: report.image_urls || [],
+      audio_url: report.audio_url || null
     }));
 
     res.status(200).json({
       success: true,
       data: {
         stats,
-        recent_reports: recentReports
+        reports: processedReports
       }
     });
   } catch (error) {
@@ -219,13 +221,13 @@ app.get('/api/admin/dashboard', async (req, res) => {
 });
 
 // Start server
-app.listen(port, '0.0.0.0', () => {
+app.listen(PORT, '0.0.0.0', () => {
   logger.info('==========================================');
-  logger.info('🚀 Civic Reporter Backend Started (Docker)');
+  logger.info('🚀 Civic Reporter Backend Started');
   logger.info('==========================================');
-  logger.info(`📡 Server running at: http://localhost:${port}`);
-  logger.info(`🏥 Health check: http://localhost:${port}/api/health`);
-  logger.info(`📊 Reports API: http://localhost:${port}/api/reports`);
+  logger.info(`📡 Server running at: http://localhost:${PORT}`);
+  logger.info(`🏥 Health check: http://localhost:${PORT}/health`);
+  logger.info(`📊 Reports API: http://localhost:${PORT}/api/reports`);
   logger.info('==========================================');
 });
 
