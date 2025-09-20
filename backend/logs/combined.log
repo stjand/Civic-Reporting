@@ -151,3 +151,13 @@
 {"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /","timestamp":"2025-09-20 11:55:23"}
 {"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /","timestamp":"2025-09-20 11:56:44"}
 {"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /","timestamp":"2025-09-20 11:59:03"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /","timestamp":"2025-09-20 12:02:12"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /favicon.ico","timestamp":"2025-09-20 12:02:12"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /","timestamp":"2025-09-20 12:03:38"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /health","timestamp":"2025-09-20 12:04:37"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/reports","timestamp":"2025-09-20 12:04:39"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Retrieved 3 reports","timestamp":"2025-09-20 12:04:39"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/reports","timestamp":"2025-09-20 12:15:20"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Retrieved 3 reports","timestamp":"2025-09-20 12:15:20"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /","timestamp":"2025-09-20 12:15:24"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /","timestamp":"2025-09-20 12:15:24"}
