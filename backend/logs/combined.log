@@ -161,3 +161,6 @@
 {"level":"\u001b[32minfo\u001b[39m","message":"Retrieved 3 reports","timestamp":"2025-09-20 12:15:20"}
 {"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /","timestamp":"2025-09-20 12:15:24"}
 {"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /","timestamp":"2025-09-20 12:15:24"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /","timestamp":"2025-09-20 12:16:35"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /","timestamp":"2025-09-20 12:17:13"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /","timestamp":"2025-09-20 12:17:14"}
