@@ -2020,7 +2020,7 @@ ci-info@^3.2.0:
   resolved "https://registry.npmjs.org/ci-info/-/ci-info-3.9.0.tgz"
   integrity sha512-NIxF55hv4nSqQswkAeiOi1r83xy8JldOFDTWiug55KBu9Jnblncd2U6ViHmYgHf01TPZS77NJBhBMKdWj9HQMQ==
 
-"civic-reporter-backend@file:/home/runner/workspace/backend":
+"civic-reporter-backend@file:/home/project/backend":
   version "0.1.0"
   resolved "file:backend"
   dependencies:
@@ -2039,7 +2039,7 @@ ci-info@^3.2.0:
     redis "^4.6.7"
     winston "^3.10.0"
 
-"civic-reporter-frontend@file:/home/runner/workspace/frontend":
+"civic-reporter-frontend@file:/home/project/frontend":
   version "0.1.0"
   resolved "file:frontend"
   dependencies:
