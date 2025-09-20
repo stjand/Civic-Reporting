@@ -429,3 +429,61 @@
 {"level":"\u001b[32minfo\u001b[39m","message":"Files received:","timestamp":"2025-09-20 23:13:57"}
 {"address":"Lat: 14.0673, Lng: 78.4187","audio_url":null,"category":"garbage","created_at":"2025-09-20T17:43:57.786Z","department_id":17,"description":"","image_urls":[],"latitude":14.067316587876158,"level":"\u001b[32minfo\u001b[39m","longitude":78.41867584930235,"message":"📊 Inserting report into database:","priority":"medium","status":"new","timestamp":"2025-09-20 23:13:57","title":"garbage dump","updated_at":"2025-09-20T17:43:57.786Z","urgency_score":5,"user_id":null,"user_name":"Anonymous"}
 {"level":"\u001b[32minfo\u001b[39m","message":"✅ Report added successfully with ID: 23","timestamp":"2025-09-20 23:13:57"}
+{"level":"\u001b[32minfo\u001b[39m","message":"✅ Database connection successful","timestamp":"2025-09-20 23:20:12"}
+{"level":"\u001b[32minfo\u001b[39m","message":"📊 Found 8 tables in database","timestamp":"2025-09-20 23:20:12"}
+{"level":"\u001b[32minfo\u001b[39m","message":"==========================================","timestamp":"2025-09-20 23:20:12"}
+{"level":"\u001b[32minfo\u001b[39m","message":"🚀 Civic Reporter Backend Started","timestamp":"2025-09-20 23:20:12"}
+{"level":"\u001b[32minfo\u001b[39m","message":"==========================================","timestamp":"2025-09-20 23:20:12"}
+{"level":"\u001b[32minfo\u001b[39m","message":"📡 Server running at: http://localhost:3001","timestamp":"2025-09-20 23:20:12"}
+{"level":"\u001b[32minfo\u001b[39m","message":"🏥 Health check: http://localhost:3001/health","timestamp":"2025-09-20 23:20:12"}
+{"level":"\u001b[32minfo\u001b[39m","message":"📊 Reports API: http://localhost:3001/api/reports","timestamp":"2025-09-20 23:20:12"}
+{"level":"\u001b[32minfo\u001b[39m","message":"==========================================","timestamp":"2025-09-20 23:20:12"}
+{"level":"\u001b[32minfo\u001b[39m","message":"✅ Database connection successful","timestamp":"2025-09-20 23:27:05"}
+{"level":"\u001b[32minfo\u001b[39m","message":"📊 Found 8 tables in database","timestamp":"2025-09-20 23:27:05"}
+{"level":"\u001b[32minfo\u001b[39m","message":"==========================================","timestamp":"2025-09-20 23:27:05"}
+{"level":"\u001b[32minfo\u001b[39m","message":"🚀 Civic Reporter Backend Started","timestamp":"2025-09-20 23:27:05"}
+{"level":"\u001b[32minfo\u001b[39m","message":"==========================================","timestamp":"2025-09-20 23:27:05"}
+{"level":"\u001b[32minfo\u001b[39m","message":"📡 Server running at: http://localhost:3001","timestamp":"2025-09-20 23:27:05"}
+{"level":"\u001b[32minfo\u001b[39m","message":"🏥 Health check: http://localhost:3001/health","timestamp":"2025-09-20 23:27:05"}
+{"level":"\u001b[32minfo\u001b[39m","message":"📊 Reports API: http://localhost:3001/api/reports","timestamp":"2025-09-20 23:27:05"}
+{"level":"\u001b[32minfo\u001b[39m","message":"==========================================","timestamp":"2025-09-20 23:27:05"}
+{"level":"\u001b[32minfo\u001b[39m","message":"✅ Database connection successful","timestamp":"2025-09-20 23:27:56"}
+{"level":"\u001b[32minfo\u001b[39m","message":"📊 Found 8 tables in database","timestamp":"2025-09-20 23:27:56"}
+{"level":"\u001b[32minfo\u001b[39m","message":"==========================================","timestamp":"2025-09-20 23:27:56"}
+{"level":"\u001b[32minfo\u001b[39m","message":"🚀 Civic Reporter Backend Started","timestamp":"2025-09-20 23:27:56"}
+{"level":"\u001b[32minfo\u001b[39m","message":"==========================================","timestamp":"2025-09-20 23:27:56"}
+{"level":"\u001b[32minfo\u001b[39m","message":"📡 Server running at: http://localhost:3001","timestamp":"2025-09-20 23:27:56"}
+{"level":"\u001b[32minfo\u001b[39m","message":"🏥 Health check: http://localhost:3001/health","timestamp":"2025-09-20 23:27:56"}
+{"level":"\u001b[32minfo\u001b[39m","message":"📊 Reports API: http://localhost:3001/api/reports","timestamp":"2025-09-20 23:27:56"}
+{"level":"\u001b[32minfo\u001b[39m","message":"==========================================","timestamp":"2025-09-20 23:27:56"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/reports","timestamp":"2025-09-21 00:01:32"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Retrieved 12 reports","timestamp":"2025-09-21 00:01:32"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/reports","timestamp":"2025-09-21 00:01:32"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Retrieved 12 reports","timestamp":"2025-09-21 00:01:32"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/reports","timestamp":"2025-09-21 00:02:45"}
+{"level":"\u001b[32minfo\u001b[39m","message":"📝 Processing new report submission...","timestamp":"2025-09-21 00:02:45"}
+{"address":"Lat: 16.8466, Lng: 78.5515","category":"pothole","description":"pothole on main road","level":"\u001b[32minfo\u001b[39m","location":"{\"lat\":16.846605106396304,\"lng\":78.55150842944042}","message":"Request body:","timestamp":"2025-09-21 00:02:45","title":"pothole","user_name":"Anonymous"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Files received:","photo":[{"destination":"D:\\my-civic-app\\backend\\uploads","encoding":"7bit","fieldname":"photo","filename":"photo-1758393165751-776115749.jpg","mimetype":"image/jpeg","originalname":"WhatsApp Image 2025-09-20 at 10.31.35_84da0d4a.jpg","path":"D:\\my-civic-app\\backend\\uploads\\photo-1758393165751-776115749.jpg","size":101370}],"timestamp":"2025-09-21 00:02:45"}
+{"address":"Lat: 16.8466, Lng: 78.5515","audio_url":null,"category":"pothole","created_at":"2025-09-20T18:32:45.771Z","department_id":16,"description":"pothole on main road","image_urls":["/uploads/photo-1758393165751-776115749.jpg"],"latitude":16.846605106396304,"level":"\u001b[32minfo\u001b[39m","longitude":78.55150842944042,"message":"📊 Inserting report into database:","priority":"medium","status":"new","timestamp":"2025-09-21 00:02:45","title":"pothole","updated_at":"2025-09-20T18:32:45.771Z","urgency_score":5,"user_id":null,"user_name":"Anonymous"}
+{"level":"\u001b[31merror\u001b[39m","message":"❌ Failed to add report: insert into \"reports\" (\"address\", \"audio_url\", \"category\", \"created_at\", \"department_id\", \"description\", \"image_urls\", \"latitude\", \"longitude\", \"priority\", \"status\", \"title\", \"updated_at\", \"urgency_score\", \"user_id\", \"user_name\") values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16) returning * - invalid input syntax for type json","timestamp":"2025-09-21 00:02:45"}
+{"level":"\u001b[31merror\u001b[39m","message":"Stack trace:","timestamp":"2025-09-21 00:02:45"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/reports","timestamp":"2025-09-21 00:03:16"}
+{"level":"\u001b[32minfo\u001b[39m","message":"📝 Processing new report submission...","timestamp":"2025-09-21 00:03:16"}
+{"address":"Lat: 16.8466, Lng: 78.5515","category":"pothole","description":"pothole on main road","level":"\u001b[32minfo\u001b[39m","location":"{\"lat\":16.846605106396304,\"lng\":78.55150842944042}","message":"Request body:","timestamp":"2025-09-21 00:03:16","title":"pothole","user_name":"Anonymous"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Files received:","timestamp":"2025-09-21 00:03:16"}
+{"address":"Lat: 16.8466, Lng: 78.5515","audio_url":null,"category":"pothole","created_at":"2025-09-20T18:33:16.062Z","department_id":16,"description":"pothole on main road","image_urls":[],"latitude":16.846605106396304,"level":"\u001b[32minfo\u001b[39m","longitude":78.55150842944042,"message":"📊 Inserting report into database:","priority":"medium","status":"new","timestamp":"2025-09-21 00:03:16","title":"pothole","updated_at":"2025-09-20T18:33:16.062Z","urgency_score":5,"user_id":null,"user_name":"Anonymous"}
+{"level":"\u001b[32minfo\u001b[39m","message":"✅ Report added successfully with ID: 24","timestamp":"2025-09-21 00:03:16"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/reports","timestamp":"2025-09-21 00:03:24"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Retrieved 13 reports","timestamp":"2025-09-21 00:03:24"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/reports","timestamp":"2025-09-21 00:03:24"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Retrieved 13 reports","timestamp":"2025-09-21 00:03:24"}
+{"level":"\u001b[32minfo\u001b[39m","message":"✅ Database connection successful","timestamp":"2025-09-21 00:04:03"}
+{"level":"\u001b[32minfo\u001b[39m","message":"📊 Found 8 tables in database","timestamp":"2025-09-21 00:04:03"}
+{"level":"\u001b[32minfo\u001b[39m","message":"✅ Database connection successful","timestamp":"2025-09-21 00:04:57"}
+{"level":"\u001b[32minfo\u001b[39m","message":"📊 Found 8 tables in database","timestamp":"2025-09-21 00:04:57"}
+{"level":"\u001b[32minfo\u001b[39m","message":"✅ Database connection successful","timestamp":"2025-09-21 00:06:30"}
+{"level":"\u001b[32minfo\u001b[39m","message":"📊 Found 8 tables in database","timestamp":"2025-09-21 00:06:30"}
+{"level":"\u001b[32minfo\u001b[39m","message":"✅ Database connection successful","timestamp":"2025-09-21 00:06:35"}
+{"level":"\u001b[32minfo\u001b[39m","message":"📊 Found 8 tables in database","timestamp":"2025-09-21 00:06:35"}
+{"level":"\u001b[32minfo\u001b[39m","message":"✅ Database connection successful","timestamp":"2025-09-21 00:07:58"}
+{"level":"\u001b[32minfo\u001b[39m","message":"📊 Found 8 tables in database","timestamp":"2025-09-21 00:07:58"}

@@ -65,6 +65,9 @@ const AdminDashboard = () => {
   const [playingAudio, setPlayingAudio] = useState(null)
   const [updateMessage, setUpdateMessage] = useState('')
   const [isUpdating, setIsUpdating] = useState(false)
+  
+  // New state to manage loading status
+  const [isLoading, setIsLoading] = useState(true)
 
   // Mock departments data
   const departments = [
@@ -76,83 +79,28 @@ const AdminDashboard = () => {
     { id: 'environment', name: 'Environment', icon: TreePine, color: 'bg-teal-600', count: 17 }
   ]
 
-  // Mock reports data
-  const mockReports = [
-    {
-      id: 1,
-      title: 'Large pothole on MG Road',
-      description: 'Deep pothole causing vehicle damage near the traffic signal intersection. Multiple vehicles have been damaged.',
-      category: 'pothole',
-      department: 'roads',
-      status: 'new',
-      priority: 'high',
-      urgency_score: 8,
-      location: { lat: 12.9716, lng: 77.5946 },
-      address: 'MG Road, Bengaluru, Karnataka',
-      user_name: 'Rajesh Kumar',
-      created_at: '2024-01-20T10:30:00Z',
-      image_urls: ['https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400', 'https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=400'],
-      audio_url: 'https://www.soundjay.com/misc/sounds/bell-ringing-05.wav',
-      updates: []
-    },
-    {
-      id: 2,
-      title: 'Overflowing garbage bins',
-      description: 'Multiple garbage bins overflowing for the past 3 days. Creating hygiene issues.',
-      category: 'garbage',
-      department: 'sanitation',
-      status: 'in_progress',
-      priority: 'medium',
-      urgency_score: 6,
-      location: { lat: 12.9352, lng: 77.6245 },
-      address: 'Brigade Road, Bengaluru, Karnataka',
-      user_name: 'Priya Sharma',
-      created_at: '2024-01-19T14:45:00Z',
-      image_urls: ['https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?w=400'],
-      updates: [
-        { message: 'Team dispatched to location', timestamp: '2024-01-20T09:00:00Z', officer: 'Municipal Officer' }
-      ]
-    },
-    {
-      id: 3,
-      title: 'Street light not working',
-      description: 'Street light has been non-functional for over a week, creating safety concerns.',
-      category: 'streetlight',
-      department: 'utilities',
-      status: 'acknowledged',
-      priority: 'low',
-      urgency_score: 4,
-      location: { lat: 12.9279, lng: 77.6271 },
-      address: 'Koramangala 5th Block, Bengaluru, Karnataka',
-      user_name: 'Amit Patel',
-      created_at: '2024-01-18T20:15:00Z',
-      image_urls: ['https://images.unsplash.com/photo-1518709268805-4e9042af2ac1?w=400'],
-      updates: []
-    },
-    {
-      id: 4,
-      title: 'Water pipe burst',
-      description: 'Major water pipe burst causing road flooding and water wastage.',
-      category: 'water_leak',
-      department: 'utilities',
-      status: 'resolved',
-      priority: 'high',
-      urgency_score: 9,
-      location: { lat: 12.9698, lng: 77.7500 },
-      address: 'Whitefield Main Road, Bengaluru, Karnataka',
-      user_name: 'Sunita Reddy',
-      created_at: '2024-01-17T08:30:00Z',
-      image_urls: ['https://images.unsplash.com/photo-1581833971358-2c8b550f87b3?w=400'],
-      updates: [
-        { message: 'Emergency team dispatched', timestamp: '2024-01-17T09:00:00Z', officer: 'Water Department' },
-        { message: 'Repair completed successfully', timestamp: '2024-01-17T15:30:00Z', officer: 'Water Department' }
-      ]
-    }
-  ]
-
+  // === CORRECTED CODE HERE ===
+  // New useEffect to fetch real data from the backend
   useEffect(() => {
-    setReports(mockReports)
+    const fetchReports = async () => {
+      try {
+        const response = await fetch('http://localhost:3001/api/reports')
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`)
+        }
+        const result = await response.json()
+        setReports(result.data)
+      } catch (error) {
+        console.error('Failed to fetch reports:', error)
+        // Optionally handle error state
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchReports()
   }, [])
+  // ==========================
 
   // Initialize map
   useEffect(() => {
@@ -310,7 +258,8 @@ const AdminDashboard = () => {
           inProgress: updatedReports.filter(r => ['acknowledged', 'in_progress'].includes(r.status)).length,
           resolved: updatedReports.filter(r => r.status === 'resolved').length
         }
-        setStats(newStats)
+        // Assuming there's a setStats function, which is not in this code but would be needed
+        // setStats(newStats)
         
         console.log('Report updated successfully')
       } else {
@@ -360,16 +309,6 @@ const AdminDashboard = () => {
   }
 
   const playAudio = (reportId, audioUrl) => {
-    Object.values(audioElements || {}).forEach(audio => {
-      audio.pause()
-      audio.currentTime = 0
-    })
-
-    if (playingAudio === reportId) {
-      setPlayingAudio(null)
-      return
-    }
-
     // For demo purposes, we'll just simulate audio playback
     setPlayingAudio(reportId)
     setTimeout(() => setPlayingAudio(null), 3000)
@@ -389,7 +328,20 @@ const AdminDashboard = () => {
   })
 
   const getSelectedDepartment = () => {
+    // This function will still rely on the mock data's department list.
     return departments.find(dept => dept.id === selectedDepartment)
+  }
+  
+  // Conditionally render based on loading state
+  if (isLoading) {
+    return (
+      <div className="h-screen w-full flex items-center justify-center bg-gray-50">
+        <div className="flex items-center space-x-3">
+          <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-xl font-medium text-gray-900">Loading reports...</p>
+        </div>
+      </div>
+    )
   }
 
   return (
