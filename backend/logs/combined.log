@@ -415,3 +415,17 @@
 {"level":"\u001b[32minfo\u001b[39m","message":"Files received:","timestamp":"2025-09-20 23:10:19"}
 {"address":"Lat: 12.9707, Lng: 77.6105","audio_url":null,"category":"pothole","created_at":"2025-09-20T17:40:19.399Z","department_id":16,"description":"","image_urls":[],"latitude":12.97068556163851,"level":"\u001b[32minfo\u001b[39m","longitude":77.61050165116207,"message":"📊 Inserting report into database:","priority":"medium","status":"new","timestamp":"2025-09-20 23:10:19","title":"pothole","updated_at":"2025-09-20T17:40:19.399Z","urgency_score":5,"user_id":null,"user_name":"Anonymous"}
 {"level":"\u001b[32minfo\u001b[39m","message":"✅ Report added successfully with ID: 21","timestamp":"2025-09-20 23:10:19"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/reports","timestamp":"2025-09-20 23:12:05"}
+{"level":"\u001b[32minfo\u001b[39m","message":"📝 Processing new report submission...","timestamp":"2025-09-20 23:12:05"}
+{"address":"Lat: 12.9526, Lng: 77.6084","category":"pothole","description":"","level":"\u001b[32minfo\u001b[39m","location":"{\"lat\":12.952618510129158,\"lng\":77.60843998888377}","message":"Request body:","timestamp":"2025-09-20 23:12:05","title":"pothole","user_name":"Anonymous"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Files received:","timestamp":"2025-09-20 23:12:05"}
+{"address":"Lat: 12.9526, Lng: 77.6084","audio_url":null,"category":"pothole","created_at":"2025-09-20T17:42:05.691Z","department_id":16,"description":"","image_urls":[],"latitude":12.952618510129158,"level":"\u001b[32minfo\u001b[39m","longitude":77.60843998888377,"message":"📊 Inserting report into database:","priority":"medium","status":"new","timestamp":"2025-09-20 23:12:05","title":"pothole","updated_at":"2025-09-20T17:42:05.691Z","urgency_score":5,"user_id":null,"user_name":"Anonymous"}
+{"level":"\u001b[32minfo\u001b[39m","message":"✅ Report added successfully with ID: 22","timestamp":"2025-09-20 23:12:05"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a PATCH request for /api/reports/1","timestamp":"2025-09-20 23:13:25"}
+{"level":"\u001b[32minfo\u001b[39m","message":"📝 Updating report 1 with data:","status":"acknowledged","timestamp":"2025-09-20 23:13:25"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/reports","timestamp":"2025-09-20 23:13:57"}
+{"level":"\u001b[32minfo\u001b[39m","message":"📝 Processing new report submission...","timestamp":"2025-09-20 23:13:57"}
+{"address":"Lat: 14.0673, Lng: 78.4187","category":"garbage","description":"","level":"\u001b[32minfo\u001b[39m","location":"{\"lat\":14.067316587876158,\"lng\":78.41867584930235}","message":"Request body:","timestamp":"2025-09-20 23:13:57","title":"garbage dump","user_name":"Anonymous"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Files received:","timestamp":"2025-09-20 23:13:57"}
+{"address":"Lat: 14.0673, Lng: 78.4187","audio_url":null,"category":"garbage","created_at":"2025-09-20T17:43:57.786Z","department_id":17,"description":"","image_urls":[],"latitude":14.067316587876158,"level":"\u001b[32minfo\u001b[39m","longitude":78.41867584930235,"message":"📊 Inserting report into database:","priority":"medium","status":"new","timestamp":"2025-09-20 23:13:57","title":"garbage dump","updated_at":"2025-09-20T17:43:57.786Z","urgency_score":5,"user_id":null,"user_name":"Anonymous"}
+{"level":"\u001b[32minfo\u001b[39m","message":"✅ Report added successfully with ID: 23","timestamp":"2025-09-20 23:13:57"}
