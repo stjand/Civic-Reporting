@@ -4,13 +4,20 @@
 set -e
 
 host="$1"
-shift
+port="$2"
+shift 2
 cmd="$@"
 
-until PGPASSWORD=$POSTGRES_PASSWORD psql -h "$host" -U "$POSTGRES_USER" -c '\q'; do
-  >&2 echo "Postgres is unavailable - sleeping"
+# Install netcat if not present
+if ! command -v nc &> /dev/null; then
+    >&2 echo "netcat not found, installing..."
+    apk add --no-cache netcat-openbsd
+fi
+
+until nc -z "$host" "$port"; do
+  >&2 echo "Service at $host:$port is unavailable - sleeping"
   sleep 1
 done
 
->&2 echo "Postgres is up - executing command"
+>&2 echo "Service at $host:$port is up - executing command"
 exec $cmd

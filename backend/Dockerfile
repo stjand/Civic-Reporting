@@ -2,8 +2,8 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-# Install curl and minio client
-RUN apk add --no-cache curl postgresql-client && \
+# Install curl and netcat
+RUN apk add --no-cache curl postgresql-client netcat-openbsd && \
     wget https://dl.min.io/client/mc/release/linux-amd64/mc && \
     chmod +x mc && \
     mv mc /usr/local/bin/
