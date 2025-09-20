@@ -1,20 +1,17 @@
-// File: frontend/vite.config.js
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
 export default defineConfig({
-  plugins: [
-    react()
-  ],
+  plugins: [react()],
   server: {
-    host: true,          // allows access from other devices
+    host: true,           // allows access from other devices
     port: 5173,
     watch: {
-      usePolling: true,  // critical for Docker to detect file changes
+      usePolling: true,   // critical for Docker or certain file systems
       interval: 100
     }
   },
   css: {
-    devSourcemap: true   // helps browser pick up CSS changes immediately
+    devSourcemap: true
   }
 })
