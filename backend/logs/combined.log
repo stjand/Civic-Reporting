@@ -137,3 +137,17 @@
 {"level":"\u001b[32minfo\u001b[39m","message":"🏥 Health check: http://localhost:3001/health","timestamp":"2025-09-20 11:48:14"}
 {"level":"\u001b[32minfo\u001b[39m","message":"📊 Reports API: http://localhost:3001/api/reports","timestamp":"2025-09-20 11:48:14"}
 {"level":"\u001b[32minfo\u001b[39m","message":"==========================================","timestamp":"2025-09-20 11:48:14"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /health","timestamp":"2025-09-20 11:48:59"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/reports","timestamp":"2025-09-20 11:49:00"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Retrieved 3 reports","timestamp":"2025-09-20 11:49:00"}
+{"level":"\u001b[32minfo\u001b[39m","message":"==========================================","timestamp":"2025-09-20 11:50:07"}
+{"level":"\u001b[32minfo\u001b[39m","message":"🚀 Civic Reporter Backend Started","timestamp":"2025-09-20 11:50:07"}
+{"level":"\u001b[32minfo\u001b[39m","message":"==========================================","timestamp":"2025-09-20 11:50:07"}
+{"level":"\u001b[32minfo\u001b[39m","message":"📡 Server running at: http://localhost:3001","timestamp":"2025-09-20 11:50:07"}
+{"level":"\u001b[32minfo\u001b[39m","message":"🏥 Health check: http://localhost:3001/health","timestamp":"2025-09-20 11:50:07"}
+{"level":"\u001b[32minfo\u001b[39m","message":"📊 Reports API: http://localhost:3001/api/reports","timestamp":"2025-09-20 11:50:07"}
+{"level":"\u001b[32minfo\u001b[39m","message":"==========================================","timestamp":"2025-09-20 11:50:07"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /","timestamp":"2025-09-20 11:52:19"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /","timestamp":"2025-09-20 11:55:23"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /","timestamp":"2025-09-20 11:56:44"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /","timestamp":"2025-09-20 11:59:03"}
