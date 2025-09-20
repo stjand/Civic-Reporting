@@ -5,9 +5,14 @@ import logger from './utils/logger.js';
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
+import knexLib from 'knex';
+import knexConfig from '../knexfile.js';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+
+const environment = process.env.NODE_ENV || 'development';
+const connectedKnex = knexLib(knexConfig[environment]);
 
 // Create uploads directory
 const uploadsDir = path.join(process.cwd(), 'uploads');
@@ -51,7 +56,7 @@ app.get('/', (req, res) => {
 app.get('/health', async (req, res) => {
   try {
     // Test database connection
-    await knex.raw('SELECT 1');
+    await connectedKnex.raw('SELECT 1');
     res.status(200).json({ 
       status: 'OK', 
       timestamp: new Date().toISOString(),
@@ -71,7 +76,7 @@ app.get('/health', async (req, res) => {
 // GET endpoint to retrieve all reports
 app.get('/api/reports', async (req, res) => {
   try {
-    const allReports = await knex('reports').select('*').orderBy('created_at', 'desc');
+    const allReports = await connectedKnex('reports').select('*').orderBy('created_at', 'desc');
     
     const processedReports = allReports.map(report => ({
       ...report,
@@ -103,7 +108,7 @@ app.post('/api/reports', upload.fields([{ name: 'photo', maxCount: 1 }, { name: 
       description: description || '',
       category: category || 'other',
       status: 'new',
-      location: knex.raw(`ST_SetSRID(ST_MakePoint(${parsedLocation.lng}, ${parsedLocation.lat}), 4326)`),
+      location: connectedKnex.raw(`ST_SetSRID(ST_MakePoint(${parsedLocation.lng}, ${parsedLocation.lat}), 4326)`),
       address: address || 'Location not specified',
       user_name: user_name || 'Anonymous',
       urgency_score: urgency_score || 5,
@@ -113,7 +118,7 @@ app.post('/api/reports', upload.fields([{ name: 'photo', maxCount: 1 }, { name: 
       department_id: 1 // Assume a default department
     };
 
-    const [insertedReport] = await knex('reports').insert(newReport).returning('*');
+    const [insertedReport] = await connectedKnex('reports').insert(newReport).returning('*');
     
     const processedReport = {
       ...insertedReport,
@@ -137,7 +142,7 @@ app.post('/api/reports', upload.fields([{ name: 'photo', maxCount: 1 }, { name: 
 // GET endpoint to retrieve a specific report by ID
 app.get('/api/reports/:id', async (req, res) => {
   try {
-    const report = await knex('reports').where('id', req.params.id).first();
+    const report = await connectedKnex('reports').where('id', req.params.id).first();
     
     if (!report) {
       return res.status(404).json({ success: false, error: 'Report not found' });
@@ -163,9 +168,9 @@ app.patch('/api/reports/:id', async (req, res) => {
     const reportId = req.params.id;
     const updateData = req.body;
 
-    const [updatedReport] = await knex('reports')
+    const [updatedReport] = await connectedKnex('reports')
       .where('id', reportId)
-      .update({ ...updateData, updated_at: knex.fn.now() })
+      .update({ ...updateData, updated_at: connectedKnex.fn.now() })
       .returning('*');
 
     if (!updatedReport) {
@@ -189,7 +194,7 @@ app.patch('/api/reports/:id', async (req, res) => {
 // Admin dashboard endpoint
 app.get('/api/admin/dashboard', async (req, res) => {
   try {
-    const allReports = await knex('reports').select('*').orderBy('created_at', 'desc');
+    const allReports = await connectedKnex('reports').select('*').orderBy('created_at', 'desc');
     
     const stats = {
       total: allReports.length,

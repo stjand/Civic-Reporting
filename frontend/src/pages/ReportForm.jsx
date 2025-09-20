@@ -241,6 +241,20 @@ const ReportForm = () => {
     setReportId(response.data.data.id);
     setSubmitted(true)
     
+    // Reset form data after successful submission
+    setFormData({
+      title: '',
+      description: '',
+      category: 'pothole',
+      location: null,
+      photo: null,
+      audioRecording: null
+    })
+    setPreview(null)
+    setLocationAddress('')
+    setAudioBlob(null)
+    setAudioUrl(null)
+    
   } catch (error) {
     console.error('Submit error details:', {
       message: error.message,
