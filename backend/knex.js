@@ -1,8 +1,7 @@
 import knexLib from 'knex';
-import config from '../knexfile.js'; // go up one level from src/
-
+import config from '../knexfile.js';
 
 const environment = process.env.NODE_ENV || 'development';
-const knex = knexLib(knexConfig[environment]);
+const knex = knexLib(config[environment]);
 
 export default knex;

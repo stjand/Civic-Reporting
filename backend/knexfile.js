@@ -4,7 +4,7 @@ const baseDir = path.resolve('./backend'); // ensures paths work both locally an
 
 export default {
   development: {
-    client: 'postgresql',
+    client: 'postgis',
     connection: process.env.DATABASE_URL || {
       host: 'postgres',
       port: 5432,
@@ -21,7 +21,7 @@ export default {
   },
 
   test: {
-    client: 'postgresql',
+    client: 'postgis',
     connection: process.env.TEST_DATABASE_URL || {
       host: 'localhost',
       port: 5432,
@@ -35,7 +35,7 @@ export default {
   },
 
   production: {
-    client: 'postgresql',
+    client: 'postgis',
     connection: process.env.DATABASE_URL,
     migrations: {
       directory: path.join(baseDir, 'migrations')

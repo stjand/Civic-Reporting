@@ -10,7 +10,6 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./backend/migrations:/docker-entrypoint-initdb.d
-
   backend:
     build:
       context: ./backend
@@ -27,10 +26,11 @@ services:
       JWT_SECRET: dev-secret-change-in-production
     depends_on:
       - postgres
+      - minio
     volumes:
       - ./backend:/app
-    command: sh -c "sleep 10 && npm run migrate && npm run seed && npm run dev"
-
+      - ./backend/uploads:/app/uploads
+    command: sh -c "./wait-for-it.sh postgres:5432 --timeout=60 --strict -- npm run migrate && ./wait-for-it.sh minio:9000 --timeout=60 --strict -- npm run seed && npm run dev"
   frontend:
     build:
       context: ./frontend
@@ -46,7 +46,6 @@ services:
     volumes:
       - ./frontend:/app:cached
       - /app/node_modules
-
   minio:
     image: minio/minio:latest
     command: server /data --console-address ":9001"
@@ -58,14 +57,12 @@ services:
       - "9001:9001"
     volumes:
       - minio_data:/data
-
   redis:
     image: redis:7-alpine
     ports:
       - "6379:6379"
     volumes:
       - redis_data:/data
-
 volumes:
   postgres_data:
   minio_data:

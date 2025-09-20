@@ -38,6 +38,9 @@ CREATE TABLE reports (
   location GEOMETRY(Point, 4326) NOT NULL,
   address TEXT,
   image_urls TEXT[], -- Array of S3 URLs
+  audio_url VARCHAR(255),
+  user_name VARCHAR(100) DEFAULT 'Anonymous',
+  urgency_score INTEGER DEFAULT 5,
   assigned_to INTEGER REFERENCES users(id),
   resolution_comment TEXT,
   estimated_resolution_date DATE,

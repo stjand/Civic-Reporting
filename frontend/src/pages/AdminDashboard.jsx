@@ -427,7 +427,7 @@ const AdminDashboard = () => {
                       <div className="flex justify-between">
                         <span className="text-gray-600">Photos:</span>
                         <span className="font-medium text-gray-900">
-                          {selectedReport.photos?.length || 0} attached
+                          {selectedReport.image_urls?.length || 0} attached
                         </span>
                       </div>
                       <div className="flex justify-between">

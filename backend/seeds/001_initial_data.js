@@ -53,7 +53,9 @@ export async function seed(knex) {
       priority: 'high',
       location: knex.raw("ST_GeomFromText('POINT(77.5946 12.9716)', 4326)"),
       address: 'Main Street, near City Center',
-      image_urls: ['https://example.com/pothole1.jpg']
+      image_urls: ['https://example.com/pothole1.jpg'],
+      user_name: 'John Citizen',
+      urgency_score: 8
     },
     {
       user_id: userIds[4],
@@ -66,7 +68,9 @@ export async function seed(knex) {
       location: knex.raw("ST_GeomFromText('POINT(77.5845 12.9616)', 4326)"),
       address: 'Park Road, Sector 12',
       image_urls: ['https://example.com/garbage1.jpg'],
-      assigned_to: userIds[1]
+      assigned_to: userIds[1],
+      user_name: 'Jane Reporter',
+      urgency_score: 7
     },
     {
       user_id: userIds[3],
@@ -79,7 +83,9 @@ export async function seed(knex) {
       location: knex.raw("ST_GeomFromText('POINT(77.6045 12.9816)', 4326)"),
       address: 'Oak Avenue, Block C',
       assigned_to: userIds[2],
-      estimated_resolution_date: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000)
+      estimated_resolution_date: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000),
+      user_name: 'John Citizen',
+      urgency_score: 5
     }
   ])
 

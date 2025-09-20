@@ -1,8 +1,8 @@
 import knexLib from 'knex';
-import knexConfig from './knexfile.js';
+import config from './knexfile.js';
 
 const environment = process.env.NODE_ENV || 'development';
-const knex = knexLib(knexConfig[environment]);
+const knex = knexLib(config[environment]);
 
 console.log('Attempting to run database migrations...');
 
@@ -16,4 +16,3 @@ knex.migrate.latest()
     knex.destroy();
     process.exit(1);
   });
-  

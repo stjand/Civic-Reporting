@@ -91,7 +91,7 @@ app.get('/api/reports', async (req, res) => {
 // POST endpoint to add a new report
 app.post('/api/reports', upload.fields([{ name: 'photo', maxCount: 1 }, { name: 'audio', maxCount: 1 }]), async (req, res) => {
   try {
-    const { title, description, category, location, address, user_name } = req.body;
+    const { title, description, category, location, address, user_name, urgency_score, priority } = req.body;
     
     // Parse location
     const parsedLocation = location ? JSON.parse(location) : null;
@@ -106,10 +106,8 @@ app.post('/api/reports', upload.fields([{ name: 'photo', maxCount: 1 }, { name: 
       location: knex.raw(`ST_SetSRID(ST_MakePoint(${parsedLocation.lng}, ${parsedLocation.lat}), 4326)`),
       address: address || 'Location not specified',
       user_name: user_name || 'Anonymous',
-      image_urls: photoFile ? [`/uploads/${photoFile.filename}`] : [],
-      audio_url: audioFile ? `/uploads/${audioFile.filename}` : null,
-      priority: 'medium',
-      urgency_score: 5,
+      urgency_score: urgency_score || 5,
+      priority: priority || 'medium',
       // Placeholder for foreign keys since frontend doesn't provide them yet
       user_id: 1, // Assume a default user
       department_id: 1 // Assume a default department
