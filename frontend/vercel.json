@@ -1,18 +1,17 @@
 {
-  "version": 2,
-  "builds": [
+  "rewrites": [
     {
-      "src": "package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "dist"
-      }
+      "source": "/(.*)",
+      "destination": "/frontend/dist/index.html"
     }
   ],
-  "routes": [
+  "builds": [
     {
-      "src": "/(.*)",
-      "dest": "/"
+      "src": "frontend/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "outputDirectory": "dist"
+      }
     }
   ]
 }
