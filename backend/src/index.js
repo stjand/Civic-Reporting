@@ -32,55 +32,41 @@ const upload = multer({
     fileSize: 10 * 1024 * 1024 // 10MB limit
   },
   fileFilter: function (req, file, cb) {
-    // Accept images and audio files
-    if (file.fieldname === 'photo') {
-      if (file.mimetype.startsWith('image/')) {
-        cb(null, true);
-      } else {
-        cb(new Error('Only image files are allowed for photos'), false);
-      }
-    } else if (file.fieldname === 'audio') {
-      if (file.mimetype.startsWith('audio/')) {
-        cb(null, true);
-      } else {
-        cb(new Error('Only audio files are allowed for audio'), false);
-      }
-    } else {
-      cb(null, true);
+    if (file.fieldname === 'photo' && !file.mimetype.startsWith('image/')) {
+      return cb(new Error('Only image files are allowed for photos'), false);
     }
+    if (file.fieldname === 'audio' && !file.mimetype.startsWith('audio/')) {
+      return cb(new Error('Only audio files are allowed for audio'), false);
+    }
+    cb(null, true);
   }
 });
 
-// Enable CORS for all routes and origins
+// Enable CORS
 app.use(cors({
   origin: '*',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-// Middleware to parse JSON bodies
+// Middleware
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
-
-// Serve uploaded files
 app.use('/uploads', express.static('uploads'));
 
-// Middleware to log incoming requests
+// Logger middleware
 app.use((req, res, next) => {
   logger.info(`Received a ${req.method} request for ${req.url}`);
   next();
 });
 
-// Test database connection on startup
+// DB check
 const testDatabaseConnection = async () => {
   try {
     await knex.raw('SELECT 1');
     logger.info('✅ Database connection successful');
-    
-    // Check if tables exist
     const tables = await knex.raw("SELECT tablename FROM pg_tables WHERE schemaname = 'public'");
     logger.info(`📊 Found ${tables.rows.length} tables in database`);
-    
   } catch (error) {
     logger.error(`❌ Database connection failed: ${error.message}`);
     process.exit(1);
@@ -100,117 +86,68 @@ app.get('/', (req, res) => {
   });
 });
 
-// GET endpoint for health check
+// Health
 app.get('/health', async (req, res) => {
   try {
     await knex.raw('SELECT 1');
-    res.status(200).json({ 
-      status: 'OK', 
-      timestamp: new Date().toISOString(),
-      database: 'Connected',
-      uptime: process.uptime()
-    });
+    res.status(200).json({ status: 'OK', timestamp: new Date().toISOString(), database: 'Connected', uptime: process.uptime() });
   } catch (error) {
     logger.error(`Health check failed: ${error.message}`);
-    res.status(500).json({ 
-      status: 'ERROR', 
-      timestamp: new Date().toISOString(),
-      database: 'Disconnected',
-      error: error.message
-    });
+    res.status(500).json({ status: 'ERROR', database: 'Disconnected', error: error.message });
   }
 });
 
-// New GET endpoint to retrieve all departments
+// Departments
 app.get('/api/departments', async (req, res) => {
   try {
     const departments = await knex('departments').select('*');
     res.status(200).json({ success: true, data: departments });
   } catch (error) {
     logger.error(`Failed to retrieve departments: ${error.message}`);
-    res.status(500).json({ 
-      success: false, 
-      error: 'Failed to retrieve departments',
-      details: error.message 
-    });
+    res.status(500).json({ success: false, error: 'Failed to retrieve departments', details: error.message });
   }
 });
 
-// GET endpoint to retrieve all reports
+// Reports list
 app.get('/api/reports', async (req, res) => {
   try {
-    const allReports = await knex('reports')
-      .select('*')
-      .orderBy('created_at', 'desc');
-    
+    const allReports = await knex('reports').select('*').orderBy('created_at', 'desc');
     const processedReports = allReports.map(report => ({
       ...report,
-      location: report.latitude && report.longitude 
-        ? { lat: parseFloat(report.latitude), lng: parseFloat(report.longitude) } 
-        : null,
-      image_urls: report.image_urls,
-      audio_url: report.audio_url || null
+      location: report.latitude && report.longitude ? { lat: parseFloat(report.latitude), lng: parseFloat(report.longitude) } : null
     }));
-
-    logger.info(`Retrieved ${processedReports.length} reports`);
-    res.status(200).json({ 
-      success: true, 
-      data: processedReports, 
-      total: processedReports.length 
-    });
+    res.status(200).json({ success: true, data: processedReports, total: processedReports.length });
   } catch (error) {
     logger.error(`Failed to retrieve reports: ${error.message}`);
-    res.status(500).json({ 
-      success: false, 
-      error: 'Failed to retrieve reports',
-      details: error.message 
-    });
+    res.status(500).json({ success: false, error: 'Failed to retrieve reports', details: error.message });
   }
 });
 
-// POST endpoint to add a new report
+// Report submission
 app.post('/api/reports', upload.fields([{ name: 'photo', maxCount: 5 }, { name: 'audio', maxCount: 1 }]), async (req, res) => {
   try {
-    logger.info('📝 Processing new report submission...');
-    logger.info('Request body:', req.body);
-    logger.info('Files received:', req.files);
-
     const { title, description, category, location, address, user_name, urgency_score, priority } = req.body;
-    
-    // Parse location
+
     let parsedLocation = null;
     if (location) {
-      try {
-        parsedLocation = typeof location === 'string' ? JSON.parse(location) : location;
-      } catch (e) {
-        logger.error('Failed to parse location:', e);
-      }
+      try { parsedLocation = typeof location === 'string' ? JSON.parse(location) : location; } catch (e) { logger.error('Failed to parse location:', e); }
     }
 
-    // Handle file uploads
-    const photoFiles = req.files?.photo || [];
-    const audioFile = req.files?.audio?.[0];
+    const imageUrls = (req.files?.photo || []).map(file => `/uploads/${file.filename}`);
+    const audioUrl = req.files?.audio?.[0] ? `/uploads/${req.files.audio[0].filename}` : null;
 
-    // Create URLs for uploaded files
-    const imageUrls = photoFiles.map(file => `/uploads/${file.filename}`);
-    const audioUrl = audioFile ? `/uploads/${audioFile.filename}` : null;
-
-    // Dynamically get the correct department ID based on category
     const categoryToDepartmentMap = {
       pothole: 'Roads & Infrastructure',
       garbage: 'Sanitation',
       streetlight: 'Electrical',
       water_leak: 'Water Supply',
-      other: 'Roads & Infrastructure' // Default department
+      other: 'Roads & Infrastructure'
     };
-
     const departmentName = categoryToDepartmentMap[category] || 'Roads & Infrastructure';
     const department = await knex('departments').where({ name: departmentName }).first();
     const departmentId = department ? department.id : null;
 
-    if (!departmentId) {
-      throw new Error(`Department not found for category: ${category}`);
-    }
+    if (!departmentId) throw new Error(`Department not found for category: ${category}`);
 
     const newReport = {
       title: title || 'Untitled Report',
@@ -226,179 +163,93 @@ app.post('/api/reports', upload.fields([{ name: 'photo', maxCount: 5 }, { name: 
       image_urls: imageUrls,
       audio_url: audioUrl,
       user_id: null,
-      department_id: departmentId, 
+      department_id: departmentId,
       created_at: new Date(),
       updated_at: new Date()
     };
 
-    logger.info('📊 Inserting report into database:', newReport);
-
-    const [insertedReport] = await knex('reports')
-      .insert(newReport)
-      .returning('*');
-    
-    const processedReport = {
-      ...insertedReport,
-      location: insertedReport.latitude && insertedReport.longitude 
-        ? { lat: parseFloat(insertedReport.latitude), lng: parseFloat(insertedReport.longitude) } 
-        : null,
-      image_urls: insertedReport.image_urls,
-      audio_url: insertedReport.audio_url || null
-    };
-
-    logger.info(`✅ Report added successfully with ID: ${processedReport.id}`);
-    res.status(201).json({ 
-      success: true, 
-      message: 'Report submitted successfully',
-      data: processedReport
-    });
-
+    const [insertedReport] = await knex('reports').insert(newReport).returning('*');
+    res.status(201).json({ success: true, message: 'Report submitted successfully', data: insertedReport });
   } catch (error) {
     logger.error(`❌ Failed to add report: ${error.message}`);
-    logger.error('Stack trace:', error.stack);
-    res.status(500).json({ 
-      success: false, 
-      error: 'Failed to add report',
-      details: error.message 
-    });
+    res.status(500).json({ success: false, error: 'Failed to add report', details: error.message });
   }
 });
 
-// GET endpoint to retrieve a specific report by ID
+// Single report
 app.get('/api/reports/:id', async (req, res) => {
   try {
     const report = await knex('reports').where('id', req.params.id).first();
-    
-    if (!report) {
-      return res.status(404).json({ success: false, error: 'Report not found' });
-    }
-
-    const processedReport = {
-      ...report,
-      location: report.latitude && report.longitude 
-        ? { lat: parseFloat(report.latitude), lng: parseFloat(report.longitude) } 
-        : null,
-      image_urls: report.image_urls,
-      audio_url: report.audio_url || null
-    };
-
-    res.status(200).json({ success: true, data: processedReport });
+    if (!report) return res.status(404).json({ success: false, error: 'Report not found' });
+    res.status(200).json({ success: true, data: report });
   } catch (error) {
     logger.error(`Failed to retrieve report: ${error.message}`);
     res.status(500).json({ success: false, error: 'Failed to retrieve report' });
   }
 });
 
-// PATCH endpoint to update report status
+// PATCH update
 app.patch('/api/reports/:id', async (req, res) => {
   try {
-    const reportId = req.params.id;
-    const updateData = req.body;
-
-    logger.info(`📝 Updating report ${reportId} with data:`, updateData);
-
-    const [updatedReport] = await knex('reports')
-      .where('id', reportId)
-      .update({ ...updateData, updated_at: new Date() })
-      .returning('*');
-
-    if (!updatedReport) {
-      return res.status(404).json({ success: false, error: 'Report not found' });
-    }
-
-    const processedReport = {
-      ...updatedReport,
-      location: updatedReport.latitude && updatedReport.longitude 
-        ? { lat: parseFloat(updatedReport.latitude), lng: parseFloat(updatedReport.longitude) } 
-        : null,
-      image_urls: updatedReport.image_urls,
-      audio_url: updatedReport.audio_url || null
-    };
-
-    logger.info(`✅ Report ${reportId} updated successfully`);
-    res.status(200).json({ success: true, data: processedReport });
+    const [updatedReport] = await knex('reports').where('id', req.params.id).update({ ...req.body, updated_at: new Date() }).returning('*');
+    if (!updatedReport) return res.status(404).json({ success: false, error: 'Report not found' });
+    res.status(200).json({ success: true, data: updatedReport });
   } catch (error) {
     logger.error(`Failed to update report: ${error.message}`);
     res.status(500).json({ success: false, error: 'Failed to update report' });
   }
 });
 
-// Admin dashboard endpoint
+// ✅ PUT update (fix for frontend apiClient.put)
+app.put('/api/reports/:id', async (req, res) => {
+  try {
+    const [updatedReport] = await knex('reports').where('id', req.params.id).update({ ...req.body, updated_at: new Date() }).returning('*');
+    if (!updatedReport) return res.status(404).json({ success: false, error: 'Report not found' });
+    res.status(200).json({ success: true, data: updatedReport });
+  } catch (error) {
+    logger.error(`Failed to update report: ${error.message}`);
+    res.status(500).json({ success: false, error: 'Failed to update report' });
+  }
+});
+
+// Admin dashboard
 app.get('/api/admin/dashboard', async (req, res) => {
   try {
-    const allReports = await knex('reports')
-      .select('*')
-      .orderBy('created_at', 'desc');
-    
+    const allReports = await knex('reports').select('*').orderBy('created_at', 'desc');
     const stats = {
       total: allReports.length,
       new: allReports.filter(r => r.status === 'new').length,
       in_progress: allReports.filter(r => ['acknowledged', 'in_progress'].includes(r.status)).length,
       resolved: allReports.filter(r => r.status === 'resolved').length
     };
-
-    const processedReports = allReports.map(report => ({
-      ...report,
-      location: report.latitude && report.longitude 
-        ? { lat: parseFloat(report.latitude), lng: parseFloat(report.longitude) } 
-        : null,
-      image_urls: report.image_urls,
-      audio_url: report.audio_url || null
-    }));
-
-    res.status(200).json({
-      success: true,
-      data: {
-        stats,
-        reports: processedReports
-      }
-    });
+    res.status(200).json({ success: true, data: { stats, reports: allReports } });
   } catch (error) {
     logger.error(`Failed to retrieve admin dashboard: ${error.message}`);
     res.status(500).json({ success: false, error: 'Failed to retrieve dashboard data' });
   }
 });
 
-// Error handling middleware
+// Error handler
 app.use((error, req, res, next) => {
   logger.error('Express error handler:', error);
-  
-  if (error instanceof multer.MulterError) {
-    if (error.code === 'LIMIT_FILE_SIZE') {
-      return res.status(400).json({
-        success: false,
-        error: 'File too large. Maximum size is 10MB.'
-      });
-    }
+  if (error instanceof multer.MulterError && error.code === 'LIMIT_FILE_SIZE') {
+    return res.status(400).json({ success: false, error: 'File too large. Maximum size is 10MB.' });
   }
-  
-  res.status(500).json({
-    success: false,
-    error: 'Internal server error',
-    details: error.message
-  });
+  res.status(500).json({ success: false, error: 'Internal server error', details: error.message });
 });
 
 // Start server
 const startServer = async () => {
   try {
     await testDatabaseConnection();
-    
     app.listen(PORT, '0.0.0.0', () => {
-      logger.info('==========================================');
-      logger.info('🚀 Civic Reporter Backend Started');
-      logger.info('==========================================');
-      logger.info(`📡 Server running at: http://localhost:${PORT}`);
-      logger.info(`🏥 Health check: http://localhost:${PORT}/health`);
-      logger.info(`📊 Reports API: http://localhost:${PORT}/api/reports`);
-      logger.info('==========================================');
+      logger.info(`🚀 Civic Reporter Backend running at http://localhost:${PORT}`);
     });
   } catch (error) {
     logger.error('Failed to start server:', error);
     process.exit(1);
   }
 };
-
 startServer();
 
 export default app;
