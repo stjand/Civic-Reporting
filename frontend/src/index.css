@@ -1,4 +1,7 @@
 /* File: frontend/src/index.css - Fixed Version */
+@import 'leaflet/dist/leaflet.css';
+@import './leafletFix';
+
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
