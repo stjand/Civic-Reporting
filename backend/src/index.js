@@ -160,7 +160,7 @@ app.post('/api/reports', upload.fields([{ name: 'photo', maxCount: 5 }, { name: 
       user_name: user_name || 'Anonymous',
       urgency_score: parseInt(urgency_score) || 5,
       priority: priority || 'medium',
-      image_urls: imageUrls,
+      image_urls: JSON.stringify(imageUrls),
       audio_url: audioUrl,
       user_id: null,
       department_id: departmentId,
