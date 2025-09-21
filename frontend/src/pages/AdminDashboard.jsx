@@ -172,21 +172,22 @@ const ModernAdminDashboard = () => {
   }, [])
 
   // Filter logic - moved to useMemo to avoid initialization issues
-  const filteredReports = useMemo(() => {
-    if (!reports || !Array.isArray(reports)) return []
+  // ✅ Keep this one
+const filteredReports = useMemo(() => {
+  if (!reports || !Array.isArray(reports)) return []
+  
+  return reports.filter(report => {
+    if (!report) return false
     
-    return reports.filter(report => {
-      if (!report) return false
-      
-      const matchesDepartment = selectedDepartment === 'all' || report.department === selectedDepartment
-      const matchesSearch = searchTerm === '' || 
-        (report.title && report.title.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (report.address && report.address.toLowerCase().includes(searchTerm.toLowerCase()))
-      const matchesStatus = statusFilter === 'all' || report.status === statusFilter
-      
-      return matchesDepartment && matchesSearch && matchesStatus
-    })
-  }, [reports, selectedDepartment, searchTerm, statusFilter])
+    const matchesDepartment = selectedDepartment === 'all' || report.department === selectedDepartment
+    const matchesSearch = searchTerm === '' || 
+      (report.title && report.title.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (report.address && report.address.toLowerCase().includes(searchTerm.toLowerCase()))
+    const matchesStatus = statusFilter === 'all' || report.status === statusFilter
+    
+    return matchesDepartment && matchesSearch && matchesStatus
+  })
+}, [reports, selectedDepartment, searchTerm, statusFilter])
 
   // Custom map rendering
   useEffect(() => {
