@@ -3,15 +3,16 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [react()],
+  build: {
+    outDir: 'dist',
+    emptyOutDir: true
+  },
   server: {
-    host: true,           // allows access from other devices
     port: 5173,
+    host: true,
     watch: {
-      usePolling: true,   // critical for Docker or certain file systems
+      usePolling: true,
       interval: 100
     }
-  },
-  css: {
-    devSourcemap: true
   }
 })
