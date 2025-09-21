@@ -41,7 +41,7 @@ services:
     volumes:
       - ./backend:/app
       - ./backend/uploads:/app/uploads
-    command: sh -c "npm run migrate && npm run dev"
+    command: sh -c "/app/wait-for-it.sh postgres:5432 -- npm run migrate && npm run dev"
 
   frontend:
     build:
