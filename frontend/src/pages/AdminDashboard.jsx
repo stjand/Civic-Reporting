@@ -101,10 +101,10 @@ const ModernAdminDashboard = () => {
       created_at: '2024-01-19T14:45:00Z',
       image_urls: ['https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?w=400&h=300&fit=crop'],
       updates: [
-        {
+        { 
           message: 'Cleanup crew dispatched to location',
-          timestamp: '2024-01-20T09:00:00Z',
-          officer: 'Sanitation Team'
+          timestamp: '2024-01-20T09:00:00Z', 
+          officer: 'Sanitation Team' 
         }
       ]
     },
@@ -123,10 +123,10 @@ const ModernAdminDashboard = () => {
       created_at: '2024-01-18T20:15:00Z',
       image_urls: ['https://images.unsplash.com/photo-1518709268805-4e9042af2ac1?w=400&h=300&fit=crop'],
       updates: [
-        {
+        { 
           message: 'Issue resolved - new LED lights installed',
-          timestamp: '2024-01-19T16:00:00Z',
-          officer: 'Electrical Department'
+          timestamp: '2024-01-19T16:00:00Z', 
+          officer: 'Electrical Department' 
         }
       ]
     },
@@ -154,11 +154,11 @@ const ModernAdminDashboard = () => {
       setIsLoading(true)
       await new Promise(resolve => setTimeout(resolve, 1500))
       setReports(mockReports)
-
+      
       const newCount = mockReports.filter(r => r.status === 'new').length
       const inProgressCount = mockReports.filter(r => r.status === 'in_progress').length
       const resolvedCount = mockReports.filter(r => r.status === 'resolved').length
-
+      
       setStats({
         total: mockReports.length,
         new: newCount,
@@ -167,192 +167,217 @@ const ModernAdminDashboard = () => {
       })
       setIsLoading(false)
     }
-
+    
     loadData()
   }, [])
 
-  // Filter logic - using useMemo for performance
+  // Filter logic - moved to useMemo to avoid initialization issues
   const filteredReports = useMemo(() => {
+    if (!reports || !Array.isArray(reports)) return []
+    
     return reports.filter(report => {
+      if (!report) return false
+      
       const matchesDepartment = selectedDepartment === 'all' || report.department === selectedDepartment
-      const matchesSearch = searchTerm === '' ||
-        report.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        report.address.toLowerCase().includes(searchTerm.toLowerCase())
+      const matchesSearch = searchTerm === '' || 
+        (report.title && report.title.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (report.address && report.address.toLowerCase().includes(searchTerm.toLowerCase()))
       const matchesStatus = statusFilter === 'all' || report.status === statusFilter
-
+      
       return matchesDepartment && matchesSearch && matchesStatus
     })
   }, [reports, selectedDepartment, searchTerm, statusFilter])
 
   // Custom map rendering
   useEffect(() => {
-    if (!canvasRef.current || isLoading) return
+    if (!canvasRef.current || isLoading || !filteredReports) return
 
     const canvas = canvasRef.current
     const ctx = canvas.getContext('2d')
+    if (!ctx) return
+    
     const rect = canvas.getBoundingClientRect()
-
+    if (rect.width === 0 || rect.height === 0) return
+    
     // Set canvas size to match display size
-    canvas.width = rect.width * window.devicePixelRatio
-    canvas.height = rect.height * window.devicePixelRatio
-    ctx.scale(window.devicePixelRatio, window.devicePixelRatio)
+    const dpr = window.devicePixelRatio || 1
+    canvas.width = rect.width * dpr
+    canvas.height = rect.height * dpr
+    ctx.scale(dpr, dpr)
 
-    // Clear canvas
-    ctx.clearRect(0, 0, rect.width, rect.height)
+    try {
+      // Clear canvas
+      ctx.clearRect(0, 0, rect.width, rect.height)
 
-    // Draw map background with grid
-    ctx.fillStyle = '#f8fafc'
-    ctx.fillRect(0, 0, rect.width, rect.height)
+      // Draw map background with grid
+      ctx.fillStyle = '#f8fafc'
+      ctx.fillRect(0, 0, rect.width, rect.height)
 
-    // Draw grid lines
-    ctx.strokeStyle = '#e2e8f0'
-    ctx.lineWidth = 1
+      // Draw grid lines
+      ctx.strokeStyle = '#e2e8f0'
+      ctx.lineWidth = 1
+      
+      const gridSize = 50
+      for (let x = 0; x < rect.width; x += gridSize) {
+        ctx.beginPath()
+        ctx.moveTo(x, 0)
+        ctx.lineTo(x, rect.height)
+        ctx.stroke()
+      }
+      
+      for (let y = 0; y < rect.height; y += gridSize) {
+        ctx.beginPath()
+        ctx.moveTo(0, y)
+        ctx.lineTo(rect.width, y)
+        ctx.stroke()
+      }
 
-    const gridSize = 50
-    for (let x = 0; x < rect.width; x += gridSize) {
+      // Draw streets
+      ctx.strokeStyle = '#94a3b8'
+      ctx.lineWidth = 3
+      
+      // Main horizontal streets
       ctx.beginPath()
-      ctx.moveTo(x, 0)
-      ctx.lineTo(x, rect.height)
+      ctx.moveTo(0, rect.height * 0.3)
+      ctx.lineTo(rect.width, rect.height * 0.3)
       ctx.stroke()
+      
+      ctx.beginPath()
+      ctx.moveTo(0, rect.height * 0.6)
+      ctx.lineTo(rect.width, rect.height * 0.6)
+      ctx.stroke()
+      
+      // Main vertical streets
+      ctx.beginPath()
+      ctx.moveTo(rect.width * 0.3, 0)
+      ctx.lineTo(rect.width * 0.3, rect.height)
+      ctx.stroke()
+      
+      ctx.beginPath()
+      ctx.moveTo(rect.width * 0.7, 0)
+      ctx.lineTo(rect.width * 0.7, rect.height)
+      ctx.stroke()
+
+      // Convert lat/lng to canvas coordinates
+      const latToY = (lat) => {
+        const minLat = mapCenter.lat - 0.02
+        const maxLat = mapCenter.lat + 0.02
+        return rect.height - ((lat - minLat) / (maxLat - minLat)) * rect.height
+      }
+      
+      const lngToX = (lng) => {
+        const minLng = mapCenter.lng - 0.02
+        const maxLng = mapCenter.lng + 0.02
+        return ((lng - minLng) / (maxLng - minLng)) * rect.width
+      }
+
+      // Draw report markers
+      filteredReports.forEach((report) => {
+        if (report && report.location && typeof report.location.lat === 'number' && typeof report.location.lng === 'number') {
+          const x = lngToX(report.location.lng)
+          const y = latToY(report.location.lat)
+          
+          if (isNaN(x) || isNaN(y)) return
+          
+          const statusColors = {
+            'new': '#ef4444',
+            'in_progress': '#3b82f6',
+            'resolved': '#10b981'
+          }
+          
+          const prioritySizes = {
+            'high': 12,
+            'medium': 10,
+            'low': 8
+          }
+
+          const radius = prioritySizes[report.priority] || 10
+
+          // Draw marker shadow
+          ctx.fillStyle = 'rgba(0, 0, 0, 0.2)'
+          ctx.beginPath()
+          ctx.arc(x + 2, y + 2, radius, 0, 2 * Math.PI)
+          ctx.fill()
+
+          // Draw marker
+          ctx.fillStyle = statusColors[report.status] || '#6b7280'
+          ctx.beginPath()
+          ctx.arc(x, y, radius, 0, 2 * Math.PI)
+          ctx.fill()
+
+          // Draw marker border
+          ctx.strokeStyle = '#ffffff'
+          ctx.lineWidth = 2
+          ctx.stroke()
+
+          // Draw pulse effect for new reports
+          if (report.status === 'new') {
+            ctx.strokeStyle = statusColors[report.status]
+            ctx.lineWidth = 1
+            ctx.globalAlpha = 0.5
+            ctx.beginPath()
+            ctx.arc(x, y, radius + 5, 0, 2 * Math.PI)
+            ctx.stroke()
+            ctx.globalAlpha = 1
+          }
+        }
+      })
+    } catch (error) {
+      console.error('Canvas rendering error:', error)
     }
 
-    for (let y = 0; y < rect.height; y += gridSize) {
-      ctx.beginPath()
-      ctx.moveTo(0, y)
-      ctx.lineTo(rect.width, y)
-      ctx.stroke()
-    }
+  }, [filteredReports, mapCenter, mapZoom, isLoading])
 
-    // Draw streets
-    ctx.strokeStyle = '#94a3b8'
-    ctx.lineWidth = 3
+  // Handle canvas click with better error handling
+  const handleCanvasClick = (event) => {
+    try {
+      if (isLoading || !filteredReports || !Array.isArray(filteredReports)) return
+      
+      const canvas = canvasRef.current
+      if (!canvas) return
+      
+      const rect = canvas.getBoundingClientRect()
+      const x = event.clientX - rect.left
+      const y = event.clientY - rect.top
 
-    // Main horizontal streets
-    ctx.beginPath()
-    ctx.moveTo(0, rect.height * 0.3)
-    ctx.lineTo(rect.width, rect.height * 0.3)
-    ctx.stroke()
-
-    ctx.beginPath()
-    ctx.moveTo(0, rect.height * 0.6)
-    ctx.lineTo(rect.width, rect.height * 0.6)
-    ctx.stroke()
-
-    // Main vertical streets
-    ctx.beginPath()
-    ctx.moveTo(rect.width * 0.3, 0)
-    ctx.lineTo(rect.width * 0.3, rect.height)
-    ctx.stroke()
-
-    ctx.beginPath()
-    ctx.moveTo(rect.width * 0.7, 0)
-    ctx.lineTo(rect.width * 0.7, rect.height)
-    ctx.stroke()
-
-    // Convert lat/lng to canvas coordinates
-    const latToY = (lat) => {
+      // Convert canvas coordinates back to lat/lng
       const minLat = mapCenter.lat - 0.02
       const maxLat = mapCenter.lat + 0.02
-      return rect.height - ((lat - minLat) / (maxLat - minLat)) * rect.height
-    }
-
-    const lngToX = (lng) => {
       const minLng = mapCenter.lng - 0.02
       const maxLng = mapCenter.lng + 0.02
-      return ((lng - minLng) / (maxLng - minLng)) * rect.width
-    }
+      
+      const clickLat = maxLat - ((y / rect.height) * (maxLat - minLat))
+      const clickLng = minLng + ((x / rect.width) * (maxLng - minLng))
 
-    // Draw report markers
-    filteredReports.forEach((report) => {
-      if (report.location) {
-        const x = lngToX(report.location.lng)
-        const y = latToY(report.location.lat)
+      // Find closest report
+      let closestReport = null
+      let minDistance = Infinity
 
-        const statusColors = {
-          'new': '#ef4444',
-          'in_progress': '#3b82f6',
-          'resolved': '#10b981'
+      filteredReports.forEach((report) => {
+        if (report && report.location && 
+            typeof report.location.lat === 'number' && 
+            typeof report.location.lng === 'number') {
+          const distance = Math.sqrt(
+            Math.pow(report.location.lat - clickLat, 2) + 
+            Math.pow(report.location.lng - clickLng, 2)
+          )
+          if (distance < minDistance && distance < 0.002) { // Within click threshold
+            minDistance = distance
+            closestReport = report
+          }
         }
+      })
 
-        const prioritySizes = {
-          'high': 12,
-          'medium': 10,
-          'low': 8
-        }
-
-        const radius = prioritySizes[report.priority] || 10
-
-        // Draw marker shadow
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.2)'
-        ctx.beginPath()
-        ctx.arc(x + 2, y + 2, radius, 0, 2 * Math.PI)
-        ctx.fill()
-
-        // Draw marker
-        ctx.fillStyle = statusColors[report.status] || '#6b7280'
-        ctx.beginPath()
-        ctx.arc(x, y, radius, 0, 2 * Math.PI)
-        ctx.fill()
-
-        // Draw marker border
-        ctx.strokeStyle = '#ffffff'
-        ctx.lineWidth = 2
-        ctx.stroke()
-
-        // Draw pulse effect for new reports
-        if (report.status === 'new') {
-          ctx.strokeStyle = statusColors[report.status]
-          ctx.lineWidth = 1
-          ctx.globalAlpha = 0.5
-          ctx.beginPath()
-          ctx.arc(x, y, radius + 5, 0, 2 * Math.PI)
-          ctx.stroke()
-          ctx.globalAlpha = 1
-        }
+      if (closestReport) {
+        setSelectedReport(closestReport)
       }
-    })
-
-  }, [mapCenter, mapZoom, filteredReports, isLoading])
-
-  // Handle canvas click
-  const handleCanvasClick = (event) => {
-    if (isLoading) return
-
-    const canvas = canvasRef.current
-    const rect = canvas.getBoundingClientRect()
-    const x = event.clientX - rect.left
-    const y = event.clientY - rect.top
-
-    // Convert canvas coordinates back to lat/lng
-    const minLat = mapCenter.lat - 0.02
-    const maxLat = mapCenter.lat + 0.02
-    const minLng = mapCenter.lng - 0.02
-    const maxLng = mapCenter.lng + 0.02
-
-    const clickLat = maxLat - ((y / rect.height) * (maxLat - minLat))
-    const clickLng = minLng + ((x / rect.width) * (maxLng - minLng))
-
-    // Find closest report
-    let closestReport = null
-    let minDistance = Infinity
-
-    filteredReports.forEach((report) => {
-      if (report.location) {
-        const distance = Math.sqrt(
-          Math.pow(report.location.lat - clickLat, 2) +
-          Math.pow(report.location.lng - clickLng, 2)
-        )
-        if (distance < minDistance && distance < 0.002) { // Within click threshold
-          minDistance = distance
-          closestReport = report
-        }
-      }
-    })
-
-    if (closestReport) {
-      setSelectedReport(closestReport)
+    } catch (error) {
+      console.error('Canvas click handler error:', error)
     }
   }
+
+  // Filter logic
+  // (removed duplicate filteredReports declaration)
 
   const getStatusColor = (status) => {
     const colors = {
@@ -373,10 +398,10 @@ const ModernAdminDashboard = () => {
   }
 
   const handleStatusUpdate = (reportId, newStatus) => {
-    setReports(prev => prev.map(report =>
+    setReports(prev => prev.map(report => 
       report.id === reportId ? { ...report, status: newStatus } : report
     ))
-
+    
     if (selectedReport?.id === reportId) {
       setSelectedReport(prev => ({ ...prev, status: newStatus }))
     }
@@ -442,7 +467,7 @@ const ModernAdminDashboard = () => {
                 className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
-
+            
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
@@ -462,10 +487,10 @@ const ModernAdminDashboard = () => {
               {departments.map((dept) => {
                 const IconComponent = dept.icon
                 const isSelected = selectedDepartment === dept.id
-                const count = dept.id === 'all'
-                  ? filteredReports.length
+                const count = dept.id === 'all' 
+                  ? filteredReports.length 
                   : filteredReports.filter(r => r.department === dept.id).length
-
+                
                 return (
                   <button
                     key={dept.id}
@@ -687,24 +712,24 @@ const ModernAdminDashboard = () => {
                 <button
                   onClick={() => {
                     if (!updateMessage.trim()) return
-
+                    
                     const newUpdate = {
                       message: updateMessage,
                       timestamp: new Date().toISOString(),
                       officer: officialProfile.name
                     }
-
-                    setReports(prev => prev.map(report =>
-                      report.id === selectedReport.id
+                    
+                    setReports(prev => prev.map(report => 
+                      report.id === selectedReport.id 
                         ? { ...report, updates: [...(report.updates || []), newUpdate] }
                         : report
                     ))
-
+                    
                     setSelectedReport(prev => ({
                       ...prev,
                       updates: [...(prev.updates || []), newUpdate]
                     }))
-
+                    
                     setUpdateMessage('')
                   }}
                   disabled={!updateMessage.trim()}
