@@ -1,3 +1,5 @@
+// File: AdminDashboard.jsx - Refactored Version
+
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { 
   Shield, MapPin, Calendar, User, Construction, Trash2, Lightbulb, 
@@ -7,119 +9,132 @@ import {
   ChevronDown, UserCircle, Eye, Download, Plus, Minus, Menu,
   ExternalLink, Star, MessageSquare, Maximize2
 } from 'lucide-react';
+import MapPicker from './MapPicker'; // Import the MapPicker component
+
+// Mock data (moved outside component for performance)
+const mockReports = [
+  {
+    id: 1,
+    title: 'Severe pothole on Main Street',
+    description: 'Large pothole causing traffic delays and vehicle damage. Located near the downtown intersection, affecting daily commuters.',
+    category: 'pothole',
+    department: 'roads',
+    status: 'new',
+    priority: 'high',
+    urgency_score: 9,
+    location: { lat: 12.9716, lng: 77.5946 },
+    address: 'Main Street, Downtown District',
+    user_name: 'John Smith',
+    created_at: '2024-01-20T10:30:00Z',
+    image_urls: ['https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop'],
+    updates: []
+  },
+  {
+    id: 2,
+    title: 'Overflowing waste containers',
+    description: 'Multiple garbage bins overflowing in residential area creating health hazards.',
+    category: 'garbage',
+    department: 'sanitation',
+    status: 'in_progress',
+    priority: 'medium',
+    urgency_score: 6,
+    location: { lat: 12.9652, lng: 77.6045 },
+    address: 'Oak Avenue, Residential Area',
+    user_name: 'Maria Garcia',
+    created_at: '2024-01-19T14:45:00Z',
+    image_urls: ['https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?w=400&h=300&fit=crop'],
+    updates: [
+      { message: 'Cleanup crew dispatched to location', timestamp: '2024-01-20T09:00:00Z', officer: 'Sanitation Team' }
+    ]
+  },
+  {
+    id: 3,
+    title: 'Street light malfunction',
+    description: 'Non-functional street lighting creating safety concerns for residents.',
+    category: 'streetlight',
+    department: 'electrical',
+    status: 'resolved',
+    priority: 'medium',
+    urgency_score: 5,
+    location: { lat: 12.9779, lng: 77.5871 },
+    address: 'Pine Street, Suburb Area',
+    user_name: 'David Wilson',
+    created_at: '2024-01-18T20:15:00Z',
+    image_urls: ['https://images.unsplash.com/photo-1518709268805-4e9042af2ac1?w=400&h=300&fit=crop'],
+    updates: [
+      { message: 'Issue resolved - new LED lights installed', timestamp: '2024-01-19T16:00:00Z', officer: 'Electrical Department' }
+    ]
+  },
+  {
+    id: 4,
+    title: 'Water pipe burst emergency',
+    description: 'Major pipeline burst causing flooding and traffic disruption.',
+    category: 'water_leak',
+    department: 'water',
+    status: 'new',
+    priority: 'high',
+    urgency_score: 8,
+    location: { lat: 12.9598, lng: 77.6097 },
+    address: 'Elm Street, Commercial District',
+    user_name: 'Lisa Brown',
+    created_at: '2024-01-21T08:15:00Z',
+    image_urls: ['https://images.unsplash.com/photo-1581833971358-2c8b550f87b3?w=400&h=300&fit=crop'],
+    updates: []
+  }
+];
+
+// Official profile
+const officialProfile = {
+  name: "Dr. Sarah Johnson",
+  designation: "Municipal Administrator", 
+  department: "City Government",
+  avatar: "https://images.unsplash.com/photo-1494790108755-2616b332c8b8?w=150&h=150&fit=crop&crop=face"
+};
+
+// Departments
+const departments = [
+  { id: 'all', name: 'All Departments', icon: Building2, color: 'indigo', count: 0 },
+  { id: 'municipal', name: 'Municipal Services', icon: Building2, color: 'blue', count: 0 },
+  { id: 'electrical', name: 'Electrical', icon: Zap, color: 'yellow', count: 0 },
+  { id: 'roads', name: 'Roads & Infrastructure', icon: Construction, color: 'orange', count: 0 },
+  { id: 'sanitation', name: 'Sanitation', icon: Trash2, color: 'green', count: 0 },
+  { id: 'water', name: 'Water & Drainage', icon: Droplets, color: 'cyan', count: 0 }
+];
+
+const getStatusStyles = (status) => {
+  const styles = {
+    'new': 'bg-red-50 text-red-700 border-red-200',
+    'in_progress': 'bg-blue-50 text-blue-700 border-blue-200',
+    'resolved': 'bg-green-50 text-green-700 border-green-200'
+  };
+  return styles[status] || 'bg-gray-50 text-gray-700 border-gray-200';
+};
+
+const getPriorityStyles = (priority) => {
+  const styles = {
+    'high': 'bg-red-100 text-red-800',
+    'medium': 'bg-yellow-100 text-yellow-800', 
+    'low': 'bg-green-100 text-green-800'
+  };
+  return styles[priority] || 'bg-gray-100 text-gray-800';
+};
 
 const ModernAdminDashboard = () => {
-  const canvasRef = useRef(null);
   const [selectedReport, setSelectedReport] = useState(null);
   const [reports, setReports] = useState([]);
   const [selectedDepartment, setSelectedDepartment] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [updateMessage, setUpdateMessage] = useState('');
   const [stats, setStats] = useState({ total: 0, new: 0, inProgress: 0, resolved: 0 });
-  const [mapCenter, setMapCenter] = useState({ lat: 12.9716, lng: 77.5946 });
-  const [mapZoom, setMapZoom] = useState(12);
   const [viewMode, setViewMode] = useState('grid');
 
-  // Official profile
-  const officialProfile = {
-    name: "Dr. Sarah Johnson",
-    designation: "Municipal Administrator", 
-    department: "City Government",
-    avatar: "https://images.unsplash.com/photo-1494790108755-2616b332c8b8?w=150&h=150&fit=crop&crop=face"
-  };
-
-  // Departments
-  const departments = [
-    { id: 'all', name: 'All Departments', icon: Building2, color: 'indigo', count: 0 },
-    { id: 'municipal', name: 'Municipal Services', icon: Building2, color: 'blue', count: 0 },
-    { id: 'electrical', name: 'Electrical', icon: Zap, color: 'yellow', count: 0 },
-    { id: 'roads', name: 'Roads & Infrastructure', icon: Construction, color: 'orange', count: 0 },
-    { id: 'sanitation', name: 'Sanitation', icon: Trash2, color: 'green', count: 0 },
-    { id: 'water', name: 'Water & Drainage', icon: Droplets, color: 'cyan', count: 0 }
-  ];
-
-  // Mock data
-  const mockReports = [
-    {
-      id: 1,
-      title: 'Severe pothole on Main Street',
-      description: 'Large pothole causing traffic delays and vehicle damage. Located near the downtown intersection, affecting daily commuters.',
-      category: 'pothole',
-      department: 'roads',
-      status: 'new',
-      priority: 'high',
-      urgency_score: 9,
-      location: { lat: 12.9716, lng: 77.5946 },
-      address: 'Main Street, Downtown District',
-      user_name: 'John Smith',
-      created_at: '2024-01-20T10:30:00Z',
-      image_urls: ['https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop'],
-      updates: []
-    },
-    {
-      id: 2,
-      title: 'Overflowing waste containers',
-      description: 'Multiple garbage bins overflowing in residential area creating health hazards.',
-      category: 'garbage',
-      department: 'sanitation',
-      status: 'in_progress',
-      priority: 'medium',
-      urgency_score: 6,
-      location: { lat: 12.9652, lng: 77.6045 },
-      address: 'Oak Avenue, Residential Area',
-      user_name: 'Maria Garcia',
-      created_at: '2024-01-19T14:45:00Z',
-      image_urls: ['https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?w=400&h=300&fit=crop'],
-      updates: [
-        { message: 'Cleanup crew dispatched to location', timestamp: '2024-01-20T09:00:00Z', officer: 'Sanitation Team' }
-      ]
-    },
-    {
-      id: 3,
-      title: 'Street light malfunction',
-      description: 'Non-functional street lighting creating safety concerns for residents.',
-      category: 'streetlight',
-      department: 'electrical',
-      status: 'resolved',
-      priority: 'medium',
-      urgency_score: 5,
-      location: { lat: 12.9779, lng: 77.5871 },
-      address: 'Pine Street, Suburb Area',
-      user_name: 'David Wilson',
-      created_at: '2024-01-18T20:15:00Z',
-      image_urls: ['https://images.unsplash.com/photo-1518709268805-4e9042af2ac1?w=400&h=300&fit=crop'],
-      updates: [
-        { message: 'Issue resolved - new LED lights installed', timestamp: '2024-01-19T16:00:00Z', officer: 'Electrical Department' }
-      ]
-    },
-    {
-      id: 4,
-      title: 'Water pipe burst emergency',
-      description: 'Major pipeline burst causing flooding and traffic disruption.',
-      category: 'water_leak',
-      department: 'water',
-      status: 'new',
-      priority: 'high',
-      urgency_score: 8,
-      location: { lat: 12.9598, lng: 77.6097 },
-      address: 'Elm Street, Commercial District',
-      user_name: 'Lisa Brown',
-      created_at: '2024-01-21T08:15:00Z',
-      image_urls: ['https://images.unsplash.com/photo-1581833971358-2c8b550f87b3?w=400&h=300&fit=crop'],
-      updates: []
-    }
-  ];
-
-  // Load data
   useEffect(() => {
     const loadData = async () => {
       setIsLoading(true);
       await new Promise(resolve => setTimeout(resolve, 1000));
       setReports(mockReports);
-
       const newCount = mockReports.filter(r => r.status === 'new').length;
       const inProgressCount = mockReports.filter(r => r.status === 'in_progress').length;
       const resolvedCount = mockReports.filter(r => r.status === 'resolved').length;
@@ -130,13 +145,11 @@ const ModernAdminDashboard = () => {
         inProgress: inProgressCount,
         resolved: resolvedCount
       });
-
       setIsLoading(false);
     };
     loadData();
   }, []);
 
-  // Filter reports
   const filteredReports = useMemo(() => {
     if (!reports || !Array.isArray(reports)) return [];
     return reports.filter(report => {
@@ -150,214 +163,15 @@ const ModernAdminDashboard = () => {
     });
   }, [reports, selectedDepartment, searchTerm, statusFilter]);
 
-  // Map rendering
-  useEffect(() => {
-    if (!canvasRef.current || isLoading || !filteredReports) return;
-
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    const rect = canvas.getBoundingClientRect();
-    if (rect.width === 0 || rect.height === 0) return;
-
-    const dpr = window.devicePixelRatio || 1;
-    canvas.width = rect.width * dpr;
-    canvas.height = rect.height * dpr;
-    ctx.scale(dpr, dpr);
-
-    try {
-      // Clear canvas
-      ctx.clearRect(0, 0, rect.width, rect.height);
-
-      // Draw modern gradient background
-      const gradient = ctx.createLinearGradient(0, 0, rect.width, rect.height);
-      gradient.addColorStop(0, '#f8fafc');
-      gradient.addColorStop(1, '#e2e8f0');
-      ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, rect.width, rect.height);
-
-      // Draw subtle grid
-      ctx.strokeStyle = '#e2e8f0';
-      ctx.lineWidth = 0.5;
-      const gridSize = 30;
-
-      for (let x = 0; x < rect.width; x += gridSize) {
-        ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, rect.height);
-        ctx.stroke();
-      }
-
-      for (let y = 0; y < rect.height; y += gridSize) {
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(rect.width, y);
-        ctx.stroke();
-      }
-
-      // Draw stylized streets
-      ctx.strokeStyle = '#94a3b8';
-      ctx.lineWidth = 2;
-
-      // Create street network
-      const streets = [
-        { x1: 0, y1: rect.height * 0.2, x2: rect.width, y2: rect.height * 0.2 },
-        { x1: 0, y1: rect.height * 0.5, x2: rect.width, y2: rect.height * 0.5 },
-        { x1: 0, y1: rect.height * 0.8, x2: rect.width, y2: rect.height * 0.8 },
-        { x1: rect.width * 0.25, y1: 0, x2: rect.width * 0.25, y2: rect.height },
-        { x1: rect.width * 0.5, y1: 0, x2: rect.width * 0.5, y2: rect.height },
-        { x1: rect.width * 0.75, y1: 0, x2: rect.width * 0.75, y2: rect.height }
-      ];
-
-      streets.forEach(street => {
-        ctx.beginPath();
-        ctx.moveTo(street.x1, street.y1);
-        ctx.lineTo(street.x2, street.y2);
-        ctx.stroke();
-      });
-
-      // Convert lat/lng to canvas coordinates
-      const latToY = (lat) => {
-        const minLat = mapCenter.lat - 0.02;
-        const maxLat = mapCenter.lat + 0.02;
-        return rect.height - ((lat - minLat) / (maxLat - minLat)) * rect.height;
-      };
-
-      const lngToX = (lng) => {
-        const minLng = mapCenter.lng - 0.02;
-        const maxLng = mapCenter.lng + 0.02;
-        return ((lng - minLng) / (maxLng - minLng)) * rect.width;
-      };
-
-      // Draw report markers with modern styling
-      filteredReports.forEach((report) => {
-        if (report && report.location && typeof report.location.lat === 'number' && typeof report.location.lng === 'number') {
-          const x = lngToX(report.location.lng);
-          const y = latToY(report.location.lat);
-
-          if (isNaN(x) || isNaN(y)) return;
-
-          const statusColors = {
-            'new': '#ef4444',
-            'in_progress': '#3b82f6', 
-            'resolved': '#10b981'
-          };
-
-          const prioritySizes = { 'high': 14, 'medium': 11, 'low': 8 };
-          const radius = prioritySizes[report.priority] || 11;
-
-          // Draw glow effect
-          const glowGradient = ctx.createRadialGradient(x, y, 0, x, y, radius + 8);
-          glowGradient.addColorStop(0, statusColors[report.status] + '40');
-          glowGradient.addColorStop(1, statusColors[report.status] + '00');
-          ctx.fillStyle = glowGradient;
-          ctx.beginPath();
-          ctx.arc(x, y, radius + 8, 0, 2 * Math.PI);
-          ctx.fill();
-
-          // Draw main marker
-          ctx.fillStyle = statusColors[report.status] || '#6b7280';
-          ctx.beginPath();
-          ctx.arc(x, y, radius, 0, 2 * Math.PI);
-          ctx.fill();
-
-          // Draw white border
-          ctx.strokeStyle = '#ffffff';
-          ctx.lineWidth = 3;
-          ctx.stroke();
-
-          // Draw pulse for new reports
-          if (report.status === 'new') {
-            ctx.strokeStyle = statusColors[report.status];
-            ctx.lineWidth = 2;
-            ctx.globalAlpha = 0.6;
-            ctx.beginPath();
-            ctx.arc(x, y, radius + 8, 0, 2 * Math.PI);
-            ctx.stroke();
-            ctx.globalAlpha = 1;
-          }
-        }
-      });
-    } catch (error) {
-      console.error('Canvas rendering error:', error);
-    }
-  }, [filteredReports, mapCenter, mapZoom, isLoading]);
-
-  // Handle canvas click
-  const handleCanvasClick = (event) => {
-    try {
-      if (isLoading || !filteredReports || !Array.isArray(filteredReports)) return;
-
-      const canvas = canvasRef.current;
-      if (!canvas) return;
-
-      const rect = canvas.getBoundingClientRect();
-      const x = event.clientX - rect.left;
-      const y = event.clientY - rect.top;
-
-      const minLat = mapCenter.lat - 0.02;
-      const maxLat = mapCenter.lat + 0.02;
-      const minLng = mapCenter.lng - 0.02;
-      const maxLng = mapCenter.lng + 0.02;
-
-      const clickLat = maxLat - ((y / rect.height) * (maxLat - minLat));
-      const clickLng = minLng + ((x / rect.width) * (maxLng - minLng));
-
-      let closestReport = null;
-      let minDistance = Infinity;
-
-      filteredReports.forEach((report) => {
-        if (report && report.location && typeof report.location.lat === 'number' && typeof report.location.lng === 'number') {
-          const distance = Math.sqrt(
-            Math.pow(report.location.lat - clickLat, 2) + 
-            Math.pow(report.location.lng - clickLng, 2)
-          );
-
-          if (distance < minDistance && distance < 0.003) {
-            minDistance = distance;
-            closestReport = report;
-          }
-        }
-      });
-
-      if (closestReport) {
-        setSelectedReport(closestReport);
-      }
-    } catch (error) {
-      console.error('Canvas click handler error:', error);
-    }
-  };
-
-  const getStatusStyles = (status) => {
-    const styles = {
-      'new': 'bg-red-50 text-red-700 border-red-200',
-      'in_progress': 'bg-blue-50 text-blue-700 border-blue-200',
-      'resolved': 'bg-green-50 text-green-700 border-green-200'
-    };
-    return styles[status] || 'bg-gray-50 text-gray-700 border-gray-200';
-  };
-
-  const getPriorityStyles = (priority) => {
-    const styles = {
-      'high': 'bg-red-100 text-red-800',
-      'medium': 'bg-yellow-100 text-yellow-800', 
-      'low': 'bg-green-100 text-green-800'
-    };
-    return styles[priority] || 'bg-gray-100 text-gray-800';
-  };
-
   const handleStatusUpdate = (reportId, newStatus) => {
     setReports(prev => prev.map(report => 
       report.id === reportId ? { ...report, status: newStatus } : report
     ));
-
     if (selectedReport?.id === reportId) {
       setSelectedReport(prev => ({ ...prev, status: newStatus }));
     }
   };
 
-  // Loading state
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex items-center justify-center">
@@ -378,9 +192,9 @@ const ModernAdminDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-gray-100">
       {/* Mobile Header */}
-      <div className="lg:hidden bg-white shadow-sm border-b border-gray-200 p-4 flex items-center justify-between">
+      <div className="lg:hidden bg-white shadow-sm border-b border-gray-200 p-4 flex items-center justify-between sticky top-0 z-20">
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
           className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
@@ -439,7 +253,7 @@ const ModernAdminDashboard = () => {
               Reports Overview
             </h3>
             <div className="grid grid-cols-2 gap-3">
-              <div className="bg-gradient-to-br from-red-50 to-red-100 p-3 rounded-xl">
+              <div className="bg-red-50 p-3 rounded-xl border border-red-200">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-2xl font-bold text-red-700">{stats.new}</p>
@@ -448,7 +262,7 @@ const ModernAdminDashboard = () => {
                   <AlertTriangle className="w-5 h-5 text-red-500" />
                 </div>
               </div>
-              <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-3 rounded-xl">
+              <div className="bg-blue-50 p-3 rounded-xl border border-blue-200">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-2xl font-bold text-blue-700">{stats.inProgress}</p>
@@ -457,7 +271,7 @@ const ModernAdminDashboard = () => {
                   <Clock className="w-5 h-5 text-blue-500" />
                 </div>
               </div>
-              <div className="bg-gradient-to-br from-green-50 to-green-100 p-3 rounded-xl">
+              <div className="bg-green-50 p-3 rounded-xl border border-green-200">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-2xl font-bold text-green-700">{stats.resolved}</p>
@@ -466,7 +280,7 @@ const ModernAdminDashboard = () => {
                   <CheckCircle className="w-5 h-5 text-green-500" />
                 </div>
               </div>
-              <div className="bg-gradient-to-br from-indigo-50 to-indigo-100 p-3 rounded-xl">
+              <div className="bg-indigo-50 p-3 rounded-xl border border-indigo-200">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-2xl font-bold text-indigo-700">{stats.total}</p>
@@ -553,7 +367,7 @@ const ModernAdminDashboard = () => {
         {/* Main Content */}
         <div className="flex-1 flex flex-col min-h-screen">
           {/* Top Bar */}
-          <div className="bg-white shadow-sm border-b border-gray-200 p-4 lg:p-6">
+          <div className="bg-white shadow-sm border-b border-gray-200 p-4 lg:p-6 sticky top-0 z-10">
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
               <div className="flex items-center space-x-4">
                 <div className="relative flex-1 lg:w-96">
@@ -603,8 +417,7 @@ const ModernAdminDashboard = () => {
                 </button>
               </div>
             </div>
-
-            {/* Results Info */}
+            
             <div className="mt-4 flex items-center justify-between">
               <p className="text-sm text-gray-600">
                 Showing <span className="font-semibold text-gray-900">{filteredReports.length}</span> of{' '}
@@ -626,7 +439,6 @@ const ModernAdminDashboard = () => {
                   </span>
                 </div>
 
-                {/* Reports Grid/List */}
                 <div className="space-y-3 max-h-[calc(100vh-300px)] overflow-y-auto pr-2">
                   {filteredReports.map((report) => (
                     <div
@@ -639,7 +451,6 @@ const ModernAdminDashboard = () => {
                         }`}
                     >
                       <div className="flex items-start space-x-4">
-                        {/* Report Image */}
                         <div className="flex-shrink-0">
                           <img
                             src={report.image_urls[0]}
@@ -648,7 +459,6 @@ const ModernAdminDashboard = () => {
                           />
                         </div>
 
-                        {/* Report Details */}
                         <div className="flex-1 min-w-0">
                           <div className="flex items-start justify-between mb-2">
                             <h3 className="font-semibold text-gray-900 text-base leading-tight 
@@ -704,29 +514,11 @@ const ModernAdminDashboard = () => {
                       <Maximize2 className="w-4 h-4 text-gray-600" />
                     </button>
                   </div>
-
-                  <div className="relative bg-gray-50 rounded-xl overflow-hidden">
-                    <canvas
-                      ref={canvasRef}
-                      onClick={handleCanvasClick}
-                      className="w-full h-64 cursor-pointer"
-                      style={{ display: 'block' }}
+                  <div className="map-container rounded-xl overflow-hidden h-64">
+                    <MapPicker 
+                      initialLocation={selectedReport?.location || { lat: 12.9716, lng: 77.5946 }} 
+                      onLocationSelect={() => {}} 
                     />
-                  </div>
-
-                  <div className="mt-4 flex items-center justify-center space-x-6 text-xs">
-                    <div className="flex items-center space-x-2">
-                      <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                      <span className="text-gray-600">New</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <div className="w-3 h-3 rounded-full bg-blue-500"></div>
-                      <span className="text-gray-600">In Progress</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                      <span className="text-gray-600">Resolved</span>
-                    </div>
                   </div>
                 </div>
 
@@ -745,14 +537,12 @@ const ModernAdminDashboard = () => {
                       </div>
 
                       <div className="space-y-4">
-                        {/* Image */}
                         <img
                           src={selectedReport.image_urls[0]}
                           alt={selectedReport.title}
                           className="w-full h-32 rounded-xl object-cover border border-gray-200"
                         />
 
-                        {/* Title and Status */}
                         <div>
                           <h4 className="font-semibold text-gray-900 mb-2">
                             {selectedReport.title}
@@ -770,12 +560,10 @@ const ModernAdminDashboard = () => {
                           </div>
                         </div>
 
-                        {/* Description */}
                         <p className="text-sm text-gray-600 leading-relaxed">
                           {selectedReport.description}
                         </p>
 
-                        {/* Details */}
                         <div className="space-y-2 text-sm">
                           <div className="flex items-center space-x-2 text-gray-600">
                             <MapPin className="w-4 h-4" />
@@ -795,7 +583,6 @@ const ModernAdminDashboard = () => {
                           </div>
                         </div>
 
-                        {/* Action Buttons */}
                         <div className="flex space-x-2 pt-4">
                           {selectedReport.status !== 'resolved' && (
                             <>
@@ -823,7 +610,6 @@ const ModernAdminDashboard = () => {
                           )}
                         </div>
 
-                        {/* Updates */}
                         {selectedReport.updates && selectedReport.updates.length > 0 && (
                           <div className="pt-4 border-t border-gray-100">
                             <h5 className="text-sm font-semibold text-gray-900 mb-3">Updates</h5>
