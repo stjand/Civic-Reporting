@@ -1,15 +1,16 @@
 // File: AdminDashboard.jsx - Refactored Version
 
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { 
-  Shield, MapPin, Calendar, User, Construction, Trash2, Lightbulb, 
-  Droplets, CheckCircle, Clock, AlertTriangle, BarChart3, Filter, 
-  Search, X, Building2, Zap, Bell, Settings, LogOut, FileText, 
-  Image, Send, Home, Users, Activity, TrendingUp, RefreshCw, 
+import {
+  Shield, MapPin, Calendar, User, Construction, Trash2, Lightbulb,
+  Droplets, CheckCircle, Clock, AlertTriangle, BarChart3, Filter,
+  Search, X, Building2, Zap, Bell, Settings, LogOut, FileText,
+  Image, Send, Home, Users, Activity, TrendingUp, RefreshCw,
   ChevronDown, UserCircle, Eye, Download, Plus, Minus, Menu,
   ExternalLink, Star, MessageSquare, Maximize2
 } from 'lucide-react';
-import MapPicker from './MapPicker'; // Import the MapPicker component
+import MapPicker from '../components/MapPicker'; // Corrected import path
+
 
 // Mock data (moved outside component for performance)
 const mockReports = [
