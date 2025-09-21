@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useMemo } from 'react'
 import {
   Shield,
   MapPin,
@@ -101,10 +101,10 @@ const ModernAdminDashboard = () => {
       created_at: '2024-01-19T14:45:00Z',
       image_urls: ['https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?w=400&h=300&fit=crop'],
       updates: [
-        { 
+        {
           message: 'Cleanup crew dispatched to location',
-          timestamp: '2024-01-20T09:00:00Z', 
-          officer: 'Sanitation Team' 
+          timestamp: '2024-01-20T09:00:00Z',
+          officer: 'Sanitation Team'
         }
       ]
     },
@@ -123,10 +123,10 @@ const ModernAdminDashboard = () => {
       created_at: '2024-01-18T20:15:00Z',
       image_urls: ['https://images.unsplash.com/photo-1518709268805-4e9042af2ac1?w=400&h=300&fit=crop'],
       updates: [
-        { 
+        {
           message: 'Issue resolved - new LED lights installed',
-          timestamp: '2024-01-19T16:00:00Z', 
-          officer: 'Electrical Department' 
+          timestamp: '2024-01-19T16:00:00Z',
+          officer: 'Electrical Department'
         }
       ]
     },
@@ -154,11 +154,11 @@ const ModernAdminDashboard = () => {
       setIsLoading(true)
       await new Promise(resolve => setTimeout(resolve, 1500))
       setReports(mockReports)
-      
+
       const newCount = mockReports.filter(r => r.status === 'new').length
       const inProgressCount = mockReports.filter(r => r.status === 'in_progress').length
       const resolvedCount = mockReports.filter(r => r.status === 'resolved').length
-      
+
       setStats({
         total: mockReports.length,
         new: newCount,
@@ -167,9 +167,22 @@ const ModernAdminDashboard = () => {
       })
       setIsLoading(false)
     }
-    
+
     loadData()
   }, [])
+
+  // Filter logic - using useMemo for performance
+  const filteredReports = useMemo(() => {
+    return reports.filter(report => {
+      const matchesDepartment = selectedDepartment === 'all' || report.department === selectedDepartment
+      const matchesSearch = searchTerm === '' ||
+        report.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        report.address.toLowerCase().includes(searchTerm.toLowerCase())
+      const matchesStatus = statusFilter === 'all' || report.status === statusFilter
+
+      return matchesDepartment && matchesSearch && matchesStatus
+    })
+  }, [reports, selectedDepartment, searchTerm, statusFilter])
 
   // Custom map rendering
   useEffect(() => {
@@ -178,7 +191,7 @@ const ModernAdminDashboard = () => {
     const canvas = canvasRef.current
     const ctx = canvas.getContext('2d')
     const rect = canvas.getBoundingClientRect()
-    
+
     // Set canvas size to match display size
     canvas.width = rect.width * window.devicePixelRatio
     canvas.height = rect.height * window.devicePixelRatio
@@ -194,7 +207,7 @@ const ModernAdminDashboard = () => {
     // Draw grid lines
     ctx.strokeStyle = '#e2e8f0'
     ctx.lineWidth = 1
-    
+
     const gridSize = 50
     for (let x = 0; x < rect.width; x += gridSize) {
       ctx.beginPath()
@@ -202,7 +215,7 @@ const ModernAdminDashboard = () => {
       ctx.lineTo(x, rect.height)
       ctx.stroke()
     }
-    
+
     for (let y = 0; y < rect.height; y += gridSize) {
       ctx.beginPath()
       ctx.moveTo(0, y)
@@ -213,24 +226,24 @@ const ModernAdminDashboard = () => {
     // Draw streets
     ctx.strokeStyle = '#94a3b8'
     ctx.lineWidth = 3
-    
+
     // Main horizontal streets
     ctx.beginPath()
     ctx.moveTo(0, rect.height * 0.3)
     ctx.lineTo(rect.width, rect.height * 0.3)
     ctx.stroke()
-    
+
     ctx.beginPath()
     ctx.moveTo(0, rect.height * 0.6)
     ctx.lineTo(rect.width, rect.height * 0.6)
     ctx.stroke()
-    
+
     // Main vertical streets
     ctx.beginPath()
     ctx.moveTo(rect.width * 0.3, 0)
     ctx.lineTo(rect.width * 0.3, rect.height)
     ctx.stroke()
-    
+
     ctx.beginPath()
     ctx.moveTo(rect.width * 0.7, 0)
     ctx.lineTo(rect.width * 0.7, rect.height)
@@ -242,7 +255,7 @@ const ModernAdminDashboard = () => {
       const maxLat = mapCenter.lat + 0.02
       return rect.height - ((lat - minLat) / (maxLat - minLat)) * rect.height
     }
-    
+
     const lngToX = (lng) => {
       const minLng = mapCenter.lng - 0.02
       const maxLng = mapCenter.lng + 0.02
@@ -254,13 +267,13 @@ const ModernAdminDashboard = () => {
       if (report.location) {
         const x = lngToX(report.location.lng)
         const y = latToY(report.location.lat)
-        
+
         const statusColors = {
           'new': '#ef4444',
           'in_progress': '#3b82f6',
           'resolved': '#10b981'
         }
-        
+
         const prioritySizes = {
           'high': 12,
           'medium': 10,
@@ -299,12 +312,12 @@ const ModernAdminDashboard = () => {
       }
     })
 
-  }, [reports, mapCenter, mapZoom, filteredReports, isLoading])
+  }, [mapCenter, mapZoom, filteredReports, isLoading])
 
   // Handle canvas click
   const handleCanvasClick = (event) => {
     if (isLoading) return
-    
+
     const canvas = canvasRef.current
     const rect = canvas.getBoundingClientRect()
     const x = event.clientX - rect.left
@@ -315,7 +328,7 @@ const ModernAdminDashboard = () => {
     const maxLat = mapCenter.lat + 0.02
     const minLng = mapCenter.lng - 0.02
     const maxLng = mapCenter.lng + 0.02
-    
+
     const clickLat = maxLat - ((y / rect.height) * (maxLat - minLat))
     const clickLng = minLng + ((x / rect.width) * (maxLng - minLng))
 
@@ -326,7 +339,7 @@ const ModernAdminDashboard = () => {
     filteredReports.forEach((report) => {
       if (report.location) {
         const distance = Math.sqrt(
-          Math.pow(report.location.lat - clickLat, 2) + 
+          Math.pow(report.location.lat - clickLat, 2) +
           Math.pow(report.location.lng - clickLng, 2)
         )
         if (distance < minDistance && distance < 0.002) { // Within click threshold
@@ -340,17 +353,6 @@ const ModernAdminDashboard = () => {
       setSelectedReport(closestReport)
     }
   }
-
-  // Filter logic
-  const filteredReports = reports.filter(report => {
-    const matchesDepartment = selectedDepartment === 'all' || report.department === selectedDepartment
-    const matchesSearch = searchTerm === '' || 
-      report.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      report.address.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesStatus = statusFilter === 'all' || report.status === statusFilter
-    
-    return matchesDepartment && matchesSearch && matchesStatus
-  })
 
   const getStatusColor = (status) => {
     const colors = {
@@ -371,10 +373,10 @@ const ModernAdminDashboard = () => {
   }
 
   const handleStatusUpdate = (reportId, newStatus) => {
-    setReports(prev => prev.map(report => 
+    setReports(prev => prev.map(report =>
       report.id === reportId ? { ...report, status: newStatus } : report
     ))
-    
+
     if (selectedReport?.id === reportId) {
       setSelectedReport(prev => ({ ...prev, status: newStatus }))
     }
@@ -440,7 +442,7 @@ const ModernAdminDashboard = () => {
                 className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
-            
+
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
@@ -460,10 +462,10 @@ const ModernAdminDashboard = () => {
               {departments.map((dept) => {
                 const IconComponent = dept.icon
                 const isSelected = selectedDepartment === dept.id
-                const count = dept.id === 'all' 
-                  ? filteredReports.length 
+                const count = dept.id === 'all'
+                  ? filteredReports.length
                   : filteredReports.filter(r => r.department === dept.id).length
-                
+
                 return (
                   <button
                     key={dept.id}
@@ -685,24 +687,24 @@ const ModernAdminDashboard = () => {
                 <button
                   onClick={() => {
                     if (!updateMessage.trim()) return
-                    
+
                     const newUpdate = {
                       message: updateMessage,
                       timestamp: new Date().toISOString(),
                       officer: officialProfile.name
                     }
-                    
-                    setReports(prev => prev.map(report => 
-                      report.id === selectedReport.id 
+
+                    setReports(prev => prev.map(report =>
+                      report.id === selectedReport.id
                         ? { ...report, updates: [...(report.updates || []), newUpdate] }
                         : report
                     ))
-                    
+
                     setSelectedReport(prev => ({
                       ...prev,
                       updates: [...(prev.updates || []), newUpdate]
                     }))
-                    
+
                     setUpdateMessage('')
                   }}
                   disabled={!updateMessage.trim()}
