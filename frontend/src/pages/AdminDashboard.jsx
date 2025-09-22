@@ -392,7 +392,7 @@ const FloatingReportPanel = ({ report, isOpen, onClose, onStatusUpdate }) => {
                       </h4>
                       <p className="text-gray-800 mb-2 font-medium">{report.address}</p>
                       <div className="text-sm text-gray-500">
-                        Coordinates: {report.latitude?.toFixed(4) || 'N/A'}, {report.longitude?.toFixed(4) || 'N/A'}
+                        Coordinates: {report.latitude ? parseFloat(report.latitude).toFixed(4) : 'N/A'}, {report.longitude ? parseFloat(report.longitude).toFixed(4) : 'N/A'}
                       </div>
                     </div>
                 )}
