@@ -1,5 +1,3 @@
-// File: modern-admin-dashboard.tsx (Completed and Enhanced Version)
-
 import React, { useState, useEffect, useMemo } from 'react';
 import {
   Shield, MapPin, Calendar, User, Construction, Trash2,
@@ -11,148 +9,7 @@ import {
   PlayCircle, Pause, RotateCcw, AlertCircle, Map, List,
   Home, UserCircle, Maximize2, Edit, Plus, Minus
 } from 'lucide-react';
-
-// Mock data with more comprehensive details
-const mockReports = [
-  {
-    id: 1,
-    title: 'Major pothole causing traffic disruption',
-    description: 'Large pothole on Main Street intersection causing significant traffic delays and vehicle damage. Multiple complaints received from commuters. Urgent repair needed to prevent accidents and further road deterioration.',
-    category: 'pothole',
-    department: 'roads',
-    status: 'new',
-    priority: 'critical',
-    urgency_score: 9,
-    location: { lat: 12.9716, lng: 77.5946 },
-    address: 'Main Street & 5th Avenue Intersection, Downtown District',
-    user_name: 'John Smith',
-    user_phone: '+91 98765 43210',
-    user_email: 'john.smith@email.com',
-    created_at: '2024-01-20T10:30:00Z',
-    image_url: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=600&h=400&fit=crop',
-    estimated_cost: '₹25,000',
-    estimated_duration: '2-3 days',
-    affected_people: 500,
-    votes: 24,
-    updates: []
-  },
-  {
-    id: 2,
-    title: 'Overflowing garbage containers in residential area',
-    description: 'Multiple waste bins overflowing in Oak Avenue residential complex. Creating health hazards and attracting pests. Residents complaining of foul smell and unhygienic conditions.',
-    category: 'garbage',
-    department: 'sanitation',
-    status: 'in_progress',
-    priority: 'medium',
-    urgency_score: 6,
-    location: { lat: 12.9652, lng: 77.6045 },
-    address: 'Oak Avenue Residential Complex, Block A-C',
-    user_name: 'Maria Garcia',
-    user_phone: '+91 87654 32109',
-    user_email: 'maria.garcia@email.com',
-    created_at: '2024-01-19T14:45:00Z',
-    image_url: 'https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?w=600&h=400&fit=crop',
-    estimated_cost: '₹8,000',
-    estimated_duration: '1 day',
-    affected_people: 150,
-    votes: 12,
-    updates: [
-      { message: 'Cleanup crew dispatched to location. Expected completion by evening.', timestamp: '2024-01-20T09:00:00Z', officer: 'Sanitation Team Lead' }
-    ]
-  },
-  {
-    id: 3,
-    title: 'Street light malfunction causing safety concerns',
-    description: 'Non-functional street lighting on Pine Street creating safety concerns for residents, especially during night hours. Multiple lights not working for past week.',
-    category: 'streetlight',
-    department: 'electrical',
-    status: 'resolved',
-    priority: 'medium',
-    urgency_score: 5,
-    location: { lat: 12.9779, lng: 77.5871 },
-    address: 'Pine Street, Sector 15, Suburb Area',
-    user_name: 'David Wilson',
-    user_phone: '+91 76543 21098',
-    user_email: 'david.wilson@email.com',
-    created_at: '2024-01-18T20:15:00Z',
-    image_url: 'https://images.unsplash.com/photo-1518709268805-4e9042af2ac1?w=600&h=400&fit=crop',
-    estimated_cost: '₹15,000',
-    estimated_duration: '1 day',
-    affected_people: 200,
-    votes: 18,
-    updates: [
-      { message: 'Issue resolved - new LED lights installed. Testing completed successfully.', timestamp: '2024-01-19T16:00:00Z', officer: 'Electrical Department' }
-    ]
-  },
-  {
-    id: 4,
-    title: 'Water pipe burst causing flooding',
-    description: 'Major pipeline burst on Elm Street causing severe flooding and traffic disruption. Water supply affected in surrounding areas. Emergency repair required.',
-    category: 'water_leak',
-    department: 'water',
-    status: 'new',
-    priority: 'critical',
-    urgency_score: 10,
-    location: { lat: 12.9598, lng: 77.6097 },
-    address: 'Elm Street Commercial District, Near Metro Station',
-    user_name: 'Lisa Brown',
-    user_phone: '+91 65432 10987',
-    user_email: 'lisa.brown@email.com',
-    created_at: '2024-01-21T08:15:00Z',
-    image_url: 'https://images.unsplash.com/photo-1581833971358-2c8b550f87b3?w=600&h=400&fit=crop',
-    estimated_cost: '₹50,000',
-    estimated_duration: '3-5 days',
-    affected_people: 1200,
-    votes: 45,
-    updates: []
-  },
-  {
-    id: 5,
-    title: 'Park maintenance required urgently',
-    description: 'City park equipment damaged and unsafe. Swings broken, benches vandalized, and walking paths have potholes. Children safety at risk.',
-    category: 'park',
-    department: 'parks',
-    status: 'new',
-    priority: 'high',
-    urgency_score: 7,
-    location: { lat: 12.9800, lng: 77.5950 },
-    address: 'Central Park, Green Valley Colony',
-    user_name: 'Robert Chen',
-    user_phone: '+91 54321 09876',
-    user_email: 'robert.chen@email.com',
-    created_at: '2024-01-20T16:20:00Z',
-    image_url: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=600&h=400&fit=crop',
-    estimated_cost: '₹35,000',
-    estimated_duration: '1 week',
-    affected_people: 300,
-    votes: 8,
-    updates: []
-  },
-  {
-    id: 6,
-    title: 'Traffic signal malfunction at busy intersection',
-    description: 'Traffic lights not functioning properly at the main commercial intersection, causing major traffic jams and safety hazards during peak hours.',
-    category: 'traffic',
-    department: 'traffic',
-    status: 'in_progress',
-    priority: 'high',
-    urgency_score: 8,
-    location: { lat: 12.9750, lng: 77.6000 },
-    address: 'Commercial Street & Brigade Road Junction',
-    user_name: 'Priya Sharma',
-    user_phone: '+91 99887 76655',
-    user_email: 'priya.sharma@email.com',
-    created_at: '2024-01-21T12:00:00Z',
-    image_url: 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=600&h=400&fit=crop',
-    estimated_cost: '₹20,000',
-    estimated_duration: '2 days',
-    affected_people: 800,
-    votes: 32,
-    updates: [
-      { message: 'Traffic control team deployed. Signal repair in progress.', timestamp: '2024-01-21T14:30:00Z', officer: 'Traffic Control Officer' }
-    ]
-  }
-];
+import { apiClient } from '../config/api';
 
 // Government departments - YouTube style navigation
 const departments = [
@@ -177,7 +34,7 @@ const departments = [
     count: 0
   },
   {
-    id: 'water',
+    id: 'water_leak',
     name: 'Water & Drainage',
     icon: Droplets,
     color: 'bg-blue-600',
@@ -399,7 +256,8 @@ const FloatingReportPanel = ({ report, isOpen, onClose, onStatusUpdate }) => {
     const colors = {
       'new': 'text-red-700 bg-red-50 border-red-200',
       'in_progress': 'text-blue-700 bg-blue-50 border-blue-200',
-      'resolved': 'text-green-700 bg-green-50 border-green-200'
+      'resolved': 'text-green-700 bg-green-50 border-green-200',
+      'acknowledged': 'text-blue-700 bg-blue-50 border-blue-200'
     };
     return colors[status] || 'text-gray-700 bg-gray-50 border-gray-200';
   };
@@ -465,14 +323,12 @@ const FloatingReportPanel = ({ report, isOpen, onClose, onStatusUpdate }) => {
                   <Calendar className="w-4 h-4" />
                   <span>{new Date(report.created_at).toLocaleDateString()}</span>
                 </div>
-                <div className="flex items-center space-x-1">
-                  <Users className="w-4 h-4" />
-                  <span>{report.affected_people} affected</span>
-                </div>
-                <div className="flex items-center space-x-1">
-                  <ThumbsUp className="w-4 h-4" />
-                  <span>{report.votes} votes</span>
-                </div>
+                {report.votes && (
+                  <div className="flex items-center space-x-1">
+                    <ThumbsUp className="w-4 h-4" />
+                    <span>{report.votes} votes</span>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -480,23 +336,25 @@ const FloatingReportPanel = ({ report, isOpen, onClose, onStatusUpdate }) => {
           {/* Content */}
           <div className="flex-1 overflow-y-auto">
             {/* Image */}
-            <div className="relative">
-              <img
-                src={report.image_url}
-                alt={report.title}
-                className="w-full h-72 object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
-              <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between">
-                <div className="bg-black/60 text-white px-3 py-2 rounded-full text-sm backdrop-blur-sm flex items-center space-x-2">
-                  <Camera className="w-4 h-4" />
-                  <span>Evidence Photo</span>
+            {report.image_urls && report.image_urls.length > 0 && (
+              <div className="relative">
+                <img
+                  src={report.image_urls[0]}
+                  alt={report.title}
+                  className="w-full h-72 object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between">
+                  <div className="bg-black/60 text-white px-3 py-2 rounded-full text-sm backdrop-blur-sm flex items-center space-x-2">
+                    <Camera className="w-4 h-4" />
+                    <span>Evidence Photo</span>
+                  </div>
+                  <button className="bg-white/90 p-2 rounded-full hover:bg-white transition-colors">
+                    <Download className="w-4 h-4 text-gray-600" />
+                  </button>
                 </div>
-                <button className="bg-white/90 p-2 rounded-full hover:bg-white transition-colors">
-                  <Download className="w-4 h-4 text-gray-600" />
-                </button>
               </div>
-            </div>
+            )}
 
             <div className="p-6 space-y-6">
               {/* Title and Description */}
@@ -506,36 +364,39 @@ const FloatingReportPanel = ({ report, isOpen, onClose, onStatusUpdate }) => {
               </div>
 
               {/* Key Metrics */}
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-5 text-center border border-blue-200 hover:shadow-md transition-shadow">
                   <Users className="w-8 h-8 text-blue-600 mx-auto mb-3" />
-                  <div className="text-3xl font-bold text-blue-700 mb-1">{report.affected_people}</div>
+                  <div className="text-3xl font-bold text-blue-700 mb-1">{report.affected_people || 'N/A'}</div>
                   <div className="text-sm text-blue-600 font-medium">People Affected</div>
                 </div>
                 <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-2xl p-5 text-center border border-green-200 hover:shadow-md transition-shadow">
                   <ThumbsUp className="w-8 h-8 text-green-600 mx-auto mb-3" />
-                  <div className="text-3xl font-bold text-green-700 mb-1">{report.votes}</div>
+                  <div className="text-3xl font-bold text-green-700 mb-1">{report.votes || 0}</div>
                   <div className="text-sm text-green-600 font-medium">Community Votes</div>
                 </div>
                 <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-2xl p-5 text-center border border-orange-200 hover:shadow-md transition-shadow">
                   <AlertTriangle className="w-8 h-8 text-orange-600 mx-auto mb-3" />
-                  <div className="text-3xl font-bold text-orange-700 mb-1">{report.urgency_score}/10</div>
+                  <div className="text-3xl font-bold text-orange-700 mb-1">{report.urgency_score || 'N/A'}/10</div>
                   <div className="text-sm text-orange-600 font-medium">Urgency Score</div>
                 </div>
               </div>
 
               {/* Details Grid */}
               <div className="space-y-5">
-                <div className="bg-gray-50 rounded-2xl p-5 border border-gray-200">
-                  <h4 className="font-bold text-gray-900 mb-4 flex items-center text-lg">
-                    <MapPin className="w-5 h-5 mr-3 text-blue-600" />
-                    Location Details
-                  </h4>
-                  <p className="text-gray-800 mb-2 font-medium">{report.address}</p>
-                  <div className="text-sm text-gray-500">
-                    Coordinates: {report.location.lat.toFixed(4)}, {report.location.lng.toFixed(4)}
-                  </div>
-                </div>
+                {report.address && (
+                    <div className="bg-gray-50 rounded-2xl p-5 border border-gray-200">
+                      <h4 className="font-bold text-gray-900 mb-4 flex items-center text-lg">
+                        <MapPin className="w-5 h-5 mr-3 text-blue-600" />
+                        Location Details
+                      </h4>
+                      <p className="text-gray-800 mb-2 font-medium">{report.address}</p>
+                      <div className="text-sm text-gray-500">
+                        Coordinates: {report.latitude?.toFixed(4) || 'N/A'}, {report.longitude?.toFixed(4) || 'N/A'}
+                      </div>
+                    </div>
+                )}
+                
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <div className="bg-gradient-to-br from-indigo-50 to-blue-50 rounded-2xl p-5 border border-indigo-200">
@@ -544,14 +405,14 @@ const FloatingReportPanel = ({ report, isOpen, onClose, onStatusUpdate }) => {
                       Reporter Information
                     </h4>
                     <div className="space-y-2">
-                      <p className="text-gray-800 font-semibold">{report.user_name}</p>
+                      <p className="text-gray-800 font-semibold">{report.user_name || 'Anonymous'}</p>
                       <div className="flex items-center space-x-2 text-sm text-gray-600">
                         <Phone className="w-4 h-4" />
-                        <span>{report.user_phone}</span>
+                        <span>{report.user_phone || 'N/A'}</span>
                       </div>
                       <div className="flex items-center space-x-2 text-sm text-gray-600">
                         <Mail className="w-4 h-4" />
-                        <span>{report.user_email}</span>
+                        <span>{report.user_email || 'N/A'}</span>
                       </div>
                     </div>
                   </div>
@@ -594,14 +455,14 @@ const FloatingReportPanel = ({ report, isOpen, onClose, onStatusUpdate }) => {
                         <span className="text-2xl">₹</span>
                       </div>
                       <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Estimated Cost</p>
-                      <p className="text-2xl font-bold text-gray-900">{report.estimated_cost}</p>
+                      <p className="text-2xl font-bold text-gray-900">{report.estimated_cost || 'N/A'}</p>
                     </div>
                     <div className="text-center">
                       <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-sm border border-emerald-200">
                         <Clock className="w-6 h-6 text-emerald-600" />
                       </div>
                       <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Duration</p>
-                      <p className="text-2xl font-bold text-gray-900">{report.estimated_duration}</p>
+                      <p className="text-2xl font-bold text-gray-900">{report.estimated_duration || 'N/A'}</p>
                     </div>
                   </div>
                 </div>
@@ -614,7 +475,7 @@ const FloatingReportPanel = ({ report, isOpen, onClose, onStatusUpdate }) => {
                   </h4>
                   <div className="flex items-center space-x-3">
                     {(() => {
-                      const dept = departments.find(d => d.id === report.department);
+                      const dept = departments.find(d => d.id === report.category);
                       const Icon = dept?.icon || Building2;
                       return (
                         <>
@@ -622,7 +483,7 @@ const FloatingReportPanel = ({ report, isOpen, onClose, onStatusUpdate }) => {
                             <Icon className="w-6 h-6" />
                           </div>
                           <div>
-                            <p className="font-semibold text-gray-900">{dept?.name || report.department}</p>
+                            <p className="font-semibold text-gray-900">{dept?.name || report.category}</p>
                             <p className="text-sm text-gray-600">{dept?.description || 'Government department'}</p>
                           </div>
                         </>
@@ -660,34 +521,15 @@ const FloatingReportPanel = ({ report, isOpen, onClose, onStatusUpdate }) => {
                   </div>
                 </div>
               )}
-
-              {/* Contact Actions */}
-              <div className="bg-gray-50 rounded-2xl p-6 border border-gray-200">
-                <h4 className="font-bold text-gray-900 mb-4 flex items-center text-lg">
-                  <Phone className="w-5 h-5 mr-3 text-gray-600" />
-                  Quick Contact
-                </h4>
-                <div className="grid grid-cols-2 gap-3">
-                  <button className="flex items-center space-x-3 p-3 bg-white rounded-xl hover:bg-gray-50 transition-colors border border-gray-200 group">
-                    <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center group-hover:bg-green-200 transition-colors">
-                      <Phone className="w-5 h-5 text-green-600" />
+              {report.audio_url && (
+                <div className="bg-gray-50 rounded-lg p-4">
+                    <h3 className="text-sm font-medium text-gray-700 mb-2">Voice Note</h3>
+                    <div className="flex items-center space-x-2">
+                        <Mic className="w-4 h-4 text-gray-500" />
+                        <span className="text-sm text-gray-900">Voice recording attached</span>
                     </div>
-                    <div className="text-left">
-                      <p className="text-sm font-semibold text-gray-900">Call Reporter</p>
-                      <p className="text-xs text-gray-500">{report.user_phone}</p>
-                    </div>
-                  </button>
-                  <button className="flex items-center space-x-3 p-3 bg-white rounded-xl hover:bg-gray-50 transition-colors border border-gray-200 group">
-                    <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center group-hover:bg-blue-200 transition-colors">
-                      <Mail className="w-5 h-5 text-blue-600" />
-                    </div>
-                    <div className="text-left">
-                      <p className="text-sm font-semibold text-gray-900">Send Email</p>
-                      <p className="text-xs text-gray-500 truncate">{report.user_email}</p>
-                    </div>
-                  </button>
                 </div>
-              </div>
+              )}
             </div>
           </div>
 
@@ -786,41 +628,42 @@ const ModernAdminDashboard = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [viewMode, setViewMode] = useState('list'); // 'list' or 'map'
   const [isLoading, setIsLoading] = useState(true);
-  const [stats, setStats] = useState({ total: 0, new: 0, inProgress: 0, resolved: 0, critical: 0 });
+  const [stats, setStats] = useState({ total: 0, new: 0, in_progress: 0, resolved: 0, critical: 0 });
   const [showFloatingPanel, setShowFloatingPanel] = useState(false);
+  const [error, setError] = useState(null);
+
+  const fetchReports = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const response = await apiClient.get('/admin/dashboard');
+      if (response.success) {
+        setReports(response.data.reports);
+        setStats(response.data.stats);
+      } else {
+        setError('Failed to fetch reports. Please check the backend connection.');
+      }
+    } catch (err) {
+      console.error('API call failed:', err);
+      setError('An error occurred while fetching data. Please ensure the backend is running.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // Load data
   useEffect(() => {
-    const loadData = async () => {
-      setIsLoading(true);
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      setReports(mockReports);
-
-      const newCount = mockReports.filter(r => r.status === 'new').length;
-      const inProgressCount = mockReports.filter(r => r.status === 'in_progress').length;
-      const resolvedCount = mockReports.filter(r => r.status === 'resolved').length;
-      const criticalCount = mockReports.filter(r => r.priority === 'critical').length;
-
-      setStats({
-        total: mockReports.length,
-        new: newCount,
-        inProgress: inProgressCount,
-        resolved: resolvedCount,
-        critical: criticalCount
-      });
-      setIsLoading(false);
-    };
-    loadData();
+    fetchReports();
   }, []);
 
   // Filter reports
   const filteredReports = useMemo(() => {
     return reports.filter(report => {
-      const matchesDepartment = selectedDepartment === 'all' || report.department === selectedDepartment;
+      const matchesDepartment = selectedDepartment === 'all' || report.category === selectedDepartment;
       const matchesSearch = searchTerm === '' ||
         report.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         report.address.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        report.user_name.toLowerCase().includes(searchTerm.toLowerCase());
+        (report.user_name && report.user_name.toLowerCase().includes(searchTerm.toLowerCase()));
       return matchesDepartment && matchesSearch;
     });
   }, [reports, selectedDepartment, searchTerm]);
@@ -829,7 +672,7 @@ const ModernAdminDashboard = () => {
   const departmentsWithCounts = useMemo(() => {
     return departments.map(dept => ({
       ...dept,
-      count: dept.id === 'all' ? reports.length : reports.filter(r => r.department === dept.id).length
+      count: dept.id === 'all' ? reports.length : reports.filter(r => r.category === dept.id).length
     }));
   }, [reports]);
 
@@ -840,30 +683,17 @@ const ModernAdminDashboard = () => {
   };
 
   // Update report status
-  const handleStatusUpdate = (reportId, newStatus) => {
-    setReports(prev => prev.map(report =>
-      report.id === reportId ? { ...report, status: newStatus } : report
-    ));
-    if (selectedReport?.id === reportId) {
-      setSelectedReport(prev => ({ ...prev, status: newStatus }));
+  const handleStatusUpdate = async (reportId, newStatus) => {
+    try {
+      await apiClient.patch(`/reports/${reportId}`, { status: newStatus });
+      fetchReports(); // Re-fetch all reports to get the updated list
+      if (selectedReport?.id === reportId) {
+        setSelectedReport(prev => ({ ...prev, status: newStatus }));
+      }
+    } catch (err) {
+      console.error('Failed to update report status:', err);
+      alert('Failed to update report status.');
     }
-
-    // Update stats
-    const updatedReports = reports.map(report =>
-      report.id === reportId ? { ...report, status: newStatus } : report
-    );
-    const newCount = updatedReports.filter(r => r.status === 'new').length;
-    const inProgressCount = updatedReports.filter(r => r.status === 'in_progress').length;
-    const resolvedCount = updatedReports.filter(r => r.status === 'resolved').length;
-    const criticalCount = updatedReports.filter(r => r.priority === 'critical').length;
-
-    setStats({
-      total: updatedReports.length,
-      new: newCount,
-      inProgress: inProgressCount,
-      resolved: resolvedCount,
-      critical: criticalCount
-    });
   };
 
   const formatDate = (dateString) => {
@@ -872,6 +702,7 @@ const ModernAdminDashboard = () => {
     const diffTime = Math.abs(now - date);
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
+    if (diffDays === 0) return 'Today';
     if (diffDays === 1) return 'Yesterday';
     if (diffDays < 7) return `${diffDays} days ago`;
     return date.toLocaleDateString();
@@ -881,6 +712,7 @@ const ModernAdminDashboard = () => {
     const colors = {
       'new': 'text-red-700 bg-red-100 border-red-200',
       'in_progress': 'text-blue-700 bg-blue-100 border-blue-200',
+      'acknowledged': 'text-blue-700 bg-blue-100 border-blue-200',
       'resolved': 'text-green-700 bg-green-100 border-green-200'
     };
     return colors[status] || 'text-gray-700 bg-gray-100 border-gray-200';
@@ -913,6 +745,26 @@ const ModernAdminDashboard = () => {
               <div className="bg-blue-600 h-full rounded-full animate-pulse" style={{ width: '70%' }}></div>
             </div>
           </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="text-center p-8 bg-white rounded-xl shadow-lg border border-red-200">
+          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <AlertCircle className="w-8 h-8 text-red-600" />
+          </div>
+          <h3 className="text-xl font-bold text-red-700 mb-2">Error Loading Data</h3>
+          <p className="text-gray-600">{error}</p>
+          <button
+            onClick={fetchReports}
+            className="mt-6 px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Try Again
+          </button>
         </div>
       </div>
     );
@@ -976,7 +828,10 @@ const ModernAdminDashboard = () => {
                 <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></div>
               </button>
 
-              <button className="p-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-colors shadow-sm">
+              <button
+                onClick={fetchReports}
+                className="p-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-colors shadow-sm"
+              >
                 <RefreshCw className="w-5 h-5" />
               </button>
             </div>
@@ -1010,7 +865,7 @@ const ModernAdminDashboard = () => {
               <Clock className="w-6 h-6 text-blue-600" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-blue-700">{stats.inProgress}</p>
+              <p className="text-2xl font-bold text-blue-700">{stats.in_progress}</p>
               <p className="text-sm text-gray-500">In Progress</p>
             </div>
           </div>
@@ -1028,7 +883,7 @@ const ModernAdminDashboard = () => {
               <Flag className="w-6 h-6 text-orange-600" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-orange-700">{stats.critical}</p>
+              <p className="text-2xl font-bold text-orange-700">{stats.critical || 0}</p>
               <p className="text-sm text-gray-500">Critical</p>
             </div>
           </div>
@@ -1100,7 +955,7 @@ const ModernAdminDashboard = () => {
                       {/* Image */}
                       <div className="relative overflow-hidden rounded-xl">
                         <img
-                          src={report.image_url}
+                          src={report.image_urls[0]}
                           alt={report.title}
                           className="w-full h-48 object-cover transition-transform group-hover:scale-110"
                         />
@@ -1128,11 +983,11 @@ const ModernAdminDashboard = () => {
                       <div className="grid grid-cols-3 gap-4 py-3 border-t border-gray-100">
                         <div className="text-center">
                           <p className="text-xs text-gray-500 mb-1">Votes</p>
-                          <p className="font-bold text-lg text-gray-900">{report.votes}</p>
+                          <p className="font-bold text-lg text-gray-900">{report.votes || 0}</p>
                         </div>
                         <div className="text-center">
                           <p className="text-xs text-gray-500 mb-1">Affected</p>
-                          <p className="font-bold text-lg text-gray-900">{report.affected_people}</p>
+                          <p className="font-bold text-lg text-gray-900">{report.affected_people || 'N/A'}</p>
                         </div>
                         <div className="text-center">
                           <p className="text-xs text-gray-500 mb-1">Date</p>
