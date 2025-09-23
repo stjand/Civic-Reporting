@@ -192,7 +192,7 @@ const ReportDetailPanel = ({ report, onClose, onStatusUpdate, isMobile = false }
   };
 
   // Parse image URLs
-  const imageUrls = React.useMemo(() => {
+  const imageUrls = useMemo(() => {
     if (!report.image_urls) return [];
     try {
       return typeof report.image_urls === 'string' 
