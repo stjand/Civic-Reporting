@@ -25,6 +25,7 @@ import {
 import MapPicker from '../components/MapPicker'
 import { apiClient } from '../config/api'
 import { useNavigate } from 'react-router-dom'
+import imageCompression from 'browser-image-compression'
 
 const ReportForm = () => {
   const navigate = useNavigate()
@@ -119,13 +120,36 @@ const ReportForm = () => {
     }
   }
 
-  const handlePhotoSelect = (e) => {
+  const handlePhotoSelect = async (e) => {
     const file = e.target.files[0]
     if (file) {
+      // Set a temporary preview immediately
       const reader = new FileReader()
       reader.onload = (e) => setPreview(e.target.result)
       reader.readAsDataURL(file)
-      setFormData(prev => ({ ...prev, photo: file }))
+      
+      try {
+        // Log original file size
+        console.log(`Original file size: ${file.size / 1024 / 1024} MB`);
+        
+        const options = {
+          maxSizeMB: 1, // Compress to a maximum of 1MB
+          maxWidthOrHeight: 1920,
+          useWebWorker: true,
+        };
+
+        const compressedFile = await imageCompression(file, options);
+        
+        // Log compressed file size
+        console.log(`Compressed file size: ${compressedFile.size / 1024 / 1024} MB`);
+        
+        setFormData(prev => ({ ...prev, photo: compressedFile }));
+      } catch (error) {
+        console.error('Image compression error:', error);
+        alert('Failed to compress image. Please try another file.');
+        setPreview(null);
+        setFormData(prev => ({ ...prev, photo: null }));
+      }
     }
   }
 
