@@ -24,7 +24,7 @@ const MapPicker = ({ onLocationSelect, initialLocation = null, isFullscreen = fa
 
     try {
       // Initialize map
-      const map = L.map(mapRef.current).setView([17.4116, 78.4795], 20)
+      const map = L.map(mapRef.current).setView([17.4116, 78.4795], 7)
       mapInstanceRef.current = map
 
       // Add tile layer
