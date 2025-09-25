@@ -30,7 +30,7 @@ const departments = [
 ];
 
 // Enhanced Map Component
-const MapView = ({ reports, selectedReport, onReportSelect }) => {
+const MapView = ({ reports, selectedReport, onReportSelect, disableInteraction }) => {
   const mapRef = React.useRef(null);
   const mapInstanceRef = React.useRef(null);
   const markersRef = React.useRef([]);
@@ -69,11 +69,20 @@ const MapView = ({ reports, selectedReport, onReportSelect }) => {
   useEffect(() => {
     if (!mapRef.current || mapInstanceRef.current) return;
 
-    const map = L.map(mapRef.current).setView([17.4239, 78.4738], 11);
+    const map = L.map(mapRef.current, {
+      dragging: !disableInteraction,
+      tap: !disableInteraction,
+      scrollWheelZoom: !disableInteraction,
+      doubleClickZoom: !disableInteraction,
+      boxZoom: !disableInteraction,
+      keyboard: !disableInteraction,
+      zoomControl: !disableInteraction,
+      attributionControl: true,
+    }).setView([17.4239, 78.4738], 11);
     mapInstanceRef.current = map;
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap contributors'
+      attribution: '\u00a9 OpenStreetMap contributors'
     }).addTo(map);
 
     setMapLoaded(true);
@@ -84,11 +93,27 @@ const MapView = ({ reports, selectedReport, onReportSelect }) => {
         mapInstanceRef.current = null;
       }
     };
-  }, []);
+  }, [disableInteraction]);
 
   // Update markers when reports or selectedReport changes
   useEffect(() => {
     if (!mapInstanceRef.current || !mapLoaded) return;
+
+    // Update map interaction state dynamically
+    mapInstanceRef.current.dragging[disableInteraction ? 'disable' : 'enable']();
+    mapInstanceRef.current.tap = !disableInteraction;
+    mapInstanceRef.current.scrollWheelZoom[disableInteraction ? 'disable' : 'enable']();
+    mapInstanceRef.current.doubleClickZoom[disableInteraction ? 'disable' : 'enable']();
+    mapInstanceRef.current.boxZoom[disableInteraction ? 'disable' : 'enable']();
+    mapInstanceRef.current.keyboard[disableInteraction ? 'disable' : 'enable']();
+    if (mapInstanceRef.current.zoomControl) {
+      if (disableInteraction) {
+        mapInstanceRef.current.zoomControl.remove();
+        mapInstanceRef.current.zoomControl = null;
+      } else if (!mapInstanceRef.current.zoomControl) {
+        L.control.zoom().addTo(mapInstanceRef.current);
+      }
+    }
 
     // Clear existing markers
     markersRef.current.forEach(marker => {
@@ -121,13 +146,14 @@ const MapView = ({ reports, selectedReport, onReportSelect }) => {
     if (selectedReport && selectedReport.latitude && selectedReport.longitude) {
       mapInstanceRef.current.setView([parseFloat(selectedReport.latitude), parseFloat(selectedReport.longitude)], 15);
     }
-  }, [reports, selectedReport, mapLoaded, onReportSelect]);
+
+  }, [reports, selectedReport, mapLoaded, onReportSelect, disableInteraction]);
 
   return (
     <div className="relative w-full h-full bg-gray-100 rounded-lg overflow-hidden">
       <div
         ref={mapRef}
-        className="w-full h-full"
+        className={`w-full h-full ${disableInteraction ? 'pointer-events-none select-none opacity-70' : ''}`}
         style={{ minHeight: '400px' }}
       />
       
@@ -238,7 +264,8 @@ const ReportDetailPanel = ({ report, onClose, onStatusUpdate, isMobile = false }
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 left-4 w-8 h-8 bg-white/90 backdrop-blur-sm hover:bg-white rounded-full flex items-center justify-center shadow-lg transition-all"
+          aria-label="Close report details"
+          className="absolute top-4 left-4 w-8 h-8 bg-white/90 backdrop-blur-sm hover:bg-white rounded-full flex items-center justify-center shadow-lg transition-all z-[1001]"
         >
           {isMobile ? <ArrowLeft className="w-4 h-4" /> : <X className="w-4 h-4" />}
         </button>
@@ -267,7 +294,7 @@ const ReportDetailPanel = ({ report, onClose, onStatusUpdate, isMobile = false }
       </div>
 
       {/* Tab Navigation */}
-      <div className="border-b border-gray-200 bg-white sticky top-0 z-10">
+      <div className="border-b border-gray-200 bg-white sticky top-0 z-20">
         <div className="flex">
           {['details', 'media', 'actions'].map((tab) => (
             <button
@@ -278,6 +305,7 @@ const ReportDetailPanel = ({ report, onClose, onStatusUpdate, isMobile = false }
                   ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50/50'
                   : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
               }`}
+              type="button"
             >
               {tab === 'media' && imageUrls.length > 0 && (
                 <span className="ml-1 px-1.5 py-0.5 bg-blue-100 text-blue-600 rounded-full text-xs">
@@ -427,11 +455,11 @@ const ReportDetailPanel = ({ report, onClose, onStatusUpdate, isMobile = false }
             {imageUrls.length > 0 ? (
               <div className="grid grid-cols-1 gap-4">
                 {imageUrls.map((url, index) => (
-                  <div key={index} className="relative group">
+                  <div key={index} className="relative group rounded-xl overflow-hidden shadow-sm">
                     <img
                       src={`${baseURL}${url}`}
                       alt={`Report image ${index + 1}`}
-                      className="w-full rounded-xl object-cover aspect-video"
+                      className="w-full object-cover aspect-video rounded-xl"
                       onError={(e) => {
                         e.target.style.display = 'none';
                       }}
@@ -458,6 +486,7 @@ const ReportDetailPanel = ({ report, onClose, onStatusUpdate, isMobile = false }
                 <button
                   onClick={() => onStatusUpdate(report.id, 'acknowledged')}
                   className="w-full bg-blue-600 text-white py-3 px-4 rounded-xl hover:bg-blue-700 transition-colors font-medium flex items-center justify-center gap-2"
+                  type="button"
                 >
                   <Eye className="w-4 h-4" />
                   Acknowledge Report
@@ -465,6 +494,7 @@ const ReportDetailPanel = ({ report, onClose, onStatusUpdate, isMobile = false }
                 <button
                   onClick={() => onStatusUpdate(report.id, 'in_progress')}
                   className="w-full bg-yellow-600 text-white py-3 px-4 rounded-xl hover:bg-yellow-700 transition-colors font-medium flex items-center justify-center gap-2"
+                  type="button"
                 >
                   <Construction className="w-4 h-4" />
                   Start Working
@@ -476,6 +506,7 @@ const ReportDetailPanel = ({ report, onClose, onStatusUpdate, isMobile = false }
               <button
                 onClick={() => onStatusUpdate(report.id, 'in_progress')}
                 className="w-full bg-yellow-600 text-white py-3 px-4 rounded-xl hover:bg-yellow-700 transition-colors font-medium flex items-center justify-center gap-2"
+                type="button"
               >
                 <Construction className="w-4 h-4" />
                 Start Working
@@ -486,6 +517,7 @@ const ReportDetailPanel = ({ report, onClose, onStatusUpdate, isMobile = false }
               <button
                 onClick={() => onStatusUpdate(report.id, 'resolved')}
                 className="w-full bg-green-600 text-white py-3 px-4 rounded-xl hover:bg-green-700 transition-colors font-medium flex items-center justify-center gap-2"
+                type="button"
               >
                 <CheckCircle className="w-4 h-4" />
                 Mark as Resolved
@@ -555,6 +587,9 @@ const ListView = ({ reports, onReportSelect, selectedReport }) => {
               className={`bg-white rounded-xl border p-4 cursor-pointer transition-all hover:shadow-md ${
                 selectedReport?.id === report.id ? 'border-blue-500 shadow-md ring-2 ring-blue-100' : 'border-gray-200'
               }`}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => { if(e.key === 'Enter' || e.key === ' ') onReportSelect(report); }}
             >
               <div className="flex gap-4">
                 {imageUrl ? (
@@ -565,6 +600,7 @@ const ListView = ({ reports, onReportSelect, selectedReport }) => {
                     onError={(e) => {
                       e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="%23e5e7eb"%3E%3Crect width="64" height="64"/%3E%3C/svg%3E';
                     }}
+                    loading="lazy"
                   />
                 ) : (
                   <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -796,6 +832,7 @@ const CivicAdminDashboard = () => {
   const handleLogout = () => {
     setIsLoggedIn(false);
     setSelectedReport(null);
+    setSidebarOpen(false);
   };
 
   if (!isLoggedIn) {
@@ -835,13 +872,17 @@ const CivicAdminDashboard = () => {
     );
   }
 
+  // Disable map interaction if sidebar or modal is open on mobile
+  const disableMapInteraction = isMobile && (sidebarOpen || selectedReport !== null);
+
   return (
-    <div className="h-screen bg-gray-50 flex overflow-hidden">
-      {/* Mobile Overlay */}
+    <div className="h-screen bg-gray-50 flex overflow-hidden relative">
+      {/* Mobile Overlay for Sidebar */}
       {isMobile && sidebarOpen && (
         <div 
           className="fixed inset-0 bg-black bg-opacity-50 z-40"
           onClick={() => setSidebarOpen(false)}
+          aria-hidden="true"
         />
       )}
 
@@ -851,24 +892,23 @@ const CivicAdminDashboard = () => {
       }`}>
         <div className="h-full flex flex-col">
           {/* Sidebar Header */}
-          <div className="p-4 border-b border-gray-200">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center">
-                  <Shield className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <h1 className="font-bold text-gray-900">Civic Portal</h1>
-                  <p className="text-xs text-gray-500">Admin Dashboard</p>
-                </div>
+          <div className="p-4 border-b border-gray-200 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center">
+                <Shield className="w-6 h-6 text-white" />
               </div>
-              <button
-                onClick={() => setSidebarOpen(false)}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors lg:hidden"
-              >
-                <X className="w-5 h-5" />
-              </button>
+              <div>
+                <h1 className="font-bold text-gray-900">Civic Portal</h1>
+                <p className="text-xs text-gray-500">Admin Dashboard</p>
+              </div>
             </div>
+            <button
+              onClick={() => setSidebarOpen(false)}
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors lg:hidden"
+              aria-label="Close sidebar"
+            >
+              <X className="w-5 h-5" />
+            </button>
           </div>
 
           {/* Departments */}
@@ -884,12 +924,14 @@ const CivicAdminDashboard = () => {
                     onClick={() => {
                       setSelectedDepartment(dept.id);
                       if (isMobile) setSidebarOpen(false);
+                      setSelectedReport(null);
                     }}
                     className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-all ${
                       selectedDepartment === dept.id
                         ? 'bg-blue-50 text-blue-700 border border-blue-200 shadow-sm'
                         : 'hover:bg-gray-50 text-gray-700'
                     }`}
+                    type="button"
                   >
                     <Icon className="w-5 h-5" />
                     <span className="flex-1 font-medium">{dept.name}</span>
@@ -932,17 +974,18 @@ const CivicAdminDashboard = () => {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex-1 flex flex-col overflow-hidden relative">
         {/* Header with Search */}
-        <div className="bg-white border-b border-gray-200 p-4">
-          <div className="flex items-center gap-4 mb-4">
+        <div className="bg-white border-b border-gray-200 p-4 sticky top-0 z-30 flex flex-col gap-3">
+          <div className="flex items-center gap-4">
             <button
               onClick={() => setSidebarOpen(true)}
               className="p-2 hover:bg-gray-100 rounded-lg transition-colors lg:hidden"
+              aria-label="Open sidebar"
             >
               <Menu className="w-5 h-5" />
             </button>
-            <h2 className="text-xl font-semibold text-gray-900 flex-1">
+            <h2 className="text-xl font-semibold text-gray-900 flex-1 truncate" title={selectedDepartment === 'all' ? 'All Reports' : departments.find(d => d.id === selectedDepartment)?.name}>
               {selectedDepartment === 'all' ? 'All Reports' : departments.find(d => d.id === selectedDepartment)?.name}
             </h2>
             <div className="flex items-center gap-2">
@@ -954,6 +997,7 @@ const CivicAdminDashboard = () => {
                     : 'hover:bg-gray-100 text-gray-600'
                 }`}
                 title="Map View"
+                type="button"
               >
                 <Map className="w-5 h-5" />
               </button>
@@ -965,6 +1009,7 @@ const CivicAdminDashboard = () => {
                     : 'hover:bg-gray-100 text-gray-600'
                 }`}
                 title="List View"
+                type="button"
               >
                 <List className="w-5 h-5" />
               </button>
@@ -972,10 +1017,11 @@ const CivicAdminDashboard = () => {
                 onClick={fetchData}
                 className="p-2.5 hover:bg-gray-100 rounded-lg transition-colors text-gray-600"
                 title="Refresh"
+                type="button"
               >
                 <RefreshCw className="w-5 h-5" />
               </button>
-              <button className="p-2.5 hover:bg-gray-100 rounded-lg transition-colors text-gray-600 relative">
+              <button className="p-2.5 hover:bg-gray-100 rounded-lg transition-colors text-gray-600 relative" title="Notifications" type="button">
                 <Bell className="w-5 h-5" />
                 {stats.new > 0 && (
                   <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
@@ -987,6 +1033,7 @@ const CivicAdminDashboard = () => {
                 onClick={handleLogout}
                 className="p-2.5 hover:bg-gray-100 rounded-lg transition-colors text-gray-600"
                 title="Logout"
+                type="button"
               >
                 <LogOut className="w-5 h-5" />
               </button>
@@ -1003,23 +1050,25 @@ const CivicAdminDashboard = () => {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                aria-label="Search reports"
               />
             </div>
-            <span className="text-sm text-gray-500 bg-gray-100 px-3 py-2.5 rounded-xl whitespace-nowrap">
+            <span className="text-sm text-gray-500 bg-gray-100 px-3 py-2.5 rounded-xl whitespace-nowrap select-none" aria-live="polite">
               {filteredReports.length} of {reports.length}
             </span>
           </div>
         </div>
 
         {/* Content Area */}
-        <div className="flex-1 flex overflow-hidden">
+        <div className="flex-1 flex overflow-hidden relative">
           {/* Main View */}
-          <div className={`flex-1 p-4 overflow-hidden ${selectedReport && !isMobile ? 'mr-0' : ''}`}>
+          <div className={`flex-1 p-4 overflow-hidden transition-all duration-300 ${selectedReport && !isMobile ? 'mr-0' : ''}`}>
             {viewMode === 'map' ? (
               <MapView
                 reports={filteredReports}
                 selectedReport={selectedReport}
                 onReportSelect={setSelectedReport}
+                disableInteraction={disableMapInteraction}
               />
             ) : (
               <ListView
@@ -1046,12 +1095,19 @@ const CivicAdminDashboard = () => {
 
       {/* Detail Panel - Mobile (Full Screen Modal) */}
       {selectedReport && isMobile && (
-        <ReportDetailPanel
-          report={selectedReport}
-          onClose={() => setSelectedReport(null)}
-          onStatusUpdate={handleStatusUpdate}
-          isMobile={true}
-        />
+        <>
+          <div
+            className="fixed inset-0 bg-black bg-opacity-50 z-40"
+            onClick={() => setSelectedReport(null)}
+            aria-hidden="true"
+          />
+          <ReportDetailPanel
+            report={selectedReport}
+            onClose={() => setSelectedReport(null)}
+            onStatusUpdate={handleStatusUpdate}
+            isMobile={true}
+          />
+        </>
       )}
     </div>
   );
