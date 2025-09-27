@@ -1,8 +1,31 @@
-// File: frontend/src/pages/Login.jsx
-import React from 'react'
+import React, { useState } from 'react'
 import { Lock, Mail, KeyRound } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 
 const Login = () => {
+  const navigate = useNavigate()
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setLoading(true)
+    setError('')
+
+    // Simple demo authentication - replace with real authentication later
+    if (email === 'admin@civic.gov' && password === 'admin123') {
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      navigate('/admin')
+    } else {
+      setError('Invalid email or password. Use admin@civic.gov / admin123')
+    }
+    
+    setLoading(false)
+  }
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50 p-4 sm:p-6">
       <div className="card w-full max-w-sm p-6 sm:p-8">
@@ -14,7 +37,13 @@ const Login = () => {
           <p className="body-sm text-center">Manage your reports and track progress</p>
         </div>
 
-        <form className="space-y-6">
+        <form className="space-y-6" onSubmit={handleSubmit}>
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm">
+              {error}
+            </div>
+          )}
+
           <div className="input-group">
             <label className="input-label">Email address</label>
             <div className="relative">
@@ -29,6 +58,8 @@ const Login = () => {
                 required
                 className="input pl-10"
                 placeholder="you@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
             </div>
           </div>
@@ -52,6 +83,8 @@ const Login = () => {
                 required
                 className="input pl-10"
                 placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
               />
             </div>
           </div>
@@ -71,10 +104,17 @@ const Login = () => {
           <div>
             <button
               type="submit"
+              disabled={loading}
               className="btn-primary btn-lg w-full"
             >
-              Sign in
+              {loading ? 'Signing in...' : 'Sign in'}
             </button>
+          </div>
+
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-center">
+            <p className="text-sm font-medium text-blue-800 mb-2">Demo Credentials</p>
+            <p className="text-xs text-blue-600">Email: admin@civic.gov</p>
+            <p className="text-xs text-blue-600">Password: admin123</p>
           </div>
         </form>
       </div>
