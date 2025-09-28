@@ -15,10 +15,21 @@ import {
   Activity,
   ClipboardCheck // Added for Check Status feature
 } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext' // <-- NEW: Import useAuth
+
+// CRITICAL FIX: Custom navigation function to trigger App.jsx's router logic
+const navigate = (path) => {
+    if (path) {
+        window.history.pushState({}, '', path)
+        // CRITICAL: Dispatch the custom event that App.jsx is listening for
+        window.dispatchEvent(new Event('navigate'))
+    }
+}
 
 const Home = () => {
-  const navigate = useNavigate()
+  // Use authentication state to check if user is logged in
+  const { isAuthenticated } = useAuth(); // <-- NEW: Use auth context
+  
 
   const features = [
     {
@@ -107,26 +118,30 @@ const Home = () => {
       case 'home':
         navigate('/')
         break
-      // Redirect to user login for submitting a report
+        
       case 'report':
-        navigate('/login') // Assumes regular user login is at /login
+        // FIX: If authenticated, navigate to Report Form, else go to login
+        isAuthenticated ? navigate('/report') : navigate('/login')
         break
-      // Redirect to admin login for the dashboard
+      
       case 'dashboard':
-        navigate('/login?admin=true') // Appends flag for admin login, as per PrivateRoute.jsx logic
+        // FIX: If authenticated, navigate to Admin, else go to login with flag
+        isAuthenticated ? navigate('/admin') : navigate('/login?admin=true')
         break
-      // New case for checking report status
+        
       case 'checkstatus':
-        navigate('/status') // Assumes a route for report status checking
+        navigate('/status') // Report status page is public
         break
+        
       case 'about':
-        // Handle navigation for the 'about' section if a route exists
         console.log('Navigating to about section')
         break
+        
       case 'admin':
-        // For 'View All Reports' button in Recent Activity
-        navigate('/login?admin=true')
+        // FIX: For 'View All Reports' button
+        isAuthenticated ? navigate('/admin') : navigate('/login?admin=true')
         break
+        
       default:
         console.log(`Unknown navigation section: ${section}`)
     }
@@ -367,7 +382,7 @@ const Home = () => {
                   Track Report Status
                 </button>
                 <button
-                  onClick={() => handleNavClick('admin')}
+                  onClick={() => handleNavClick('dashboard')}
                   className="btn btn-lg btn-secondary"
                 >
                   Explore Analytics

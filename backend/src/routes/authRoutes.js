@@ -1,20 +1,15 @@
-import express from 'express';
-import { 
-  register, 
-  login, 
-  logout, 
-  getMe 
-} from '../controllers/authController.js';
-import authMiddleware from '../middleware/authMiddleware.js';
+import express from "express";
+import { signup, login, logout, getMe } from "../controllers/authController.js";
+import authMiddleware from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
 // Public routes
-router.post('/register', register);
-router.post('/login', login);
-router.post('/logout', logout); // Logout can be public to ensure cookie is cleared
+router.post("/signup", signup);
+router.post("/login", login);
+router.post("/logout", logout);
 
-// Protected route to get logged-in user details
-router.get('/me', authMiddleware, getMe);
+// Protected route to get current user
+router.get("/me", authMiddleware, getMe);
 
 export default router;

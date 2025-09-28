@@ -1,127 +1,164 @@
-import knex from '../knex.js';
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
-import logger from '../utils/logger.js';
-import validator from 'validator';
-import 'dotenv/config'; // Load environment variables
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+// NOTE: Assuming db is imported from a file named knex.js
+// If your db import is from './knex.js', you may need to update this line:
+import db from "../knex.js"; 
 
-const JWT_SECRET = process.env.JWT_SECRET;
+const JWT_SECRET = process.env.JWT_SECRET || "supersecretkey";
 
-/**
- * Helper to generate a JWT token
- * @param {number} userId - The user's ID
- * @returns {string} - The JWT token
- */
-const generateToken = (userId) => {
-  return jwt.sign({ userId }, JWT_SECRET, { expiresIn: '7d' });
+// Helper for dynamic cookie settings (CRITICAL FIX FOR LOCAL/DEPLOYED)
+const isProduction = process.env.NODE_ENV === 'production';
+const cookieOptions = {
+  httpOnly: true,
+  // CRITICAL: 'secure' must be true for sameSite: 'none' (for deployment/HTTPS)
+  secure: isProduction, 
+  // 🟢 FIX: 'Lax' allows cross-port (http://localhost:5173 -> http://localhost:3001). 
+  // 'none' is required for cross-domain deployment (HTTPS only).
+  // Your code previously used 'strict' here, causing local failure.
+  sameSite: isProduction ? 'none' : 'Lax', 
+  maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
 };
 
-/**
- * Sets the JWT as an HTTP-only cookie
- * @param {Response} res - Express response object
- * @param {string} token - The JWT token
- */
-const setAuthCookie = (res, token) => {
-  res.cookie('jwt', token, {
-    httpOnly: true, // Prevents client-side JS access
-    secure: process.env.NODE_ENV === 'production', // Only send over HTTPS in production
-    sameSite: 'strict', // CSRF protection
-    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-  });
-};
-
-// --- Controller Functions ---
-
-export const register = async (req, res) => {
+export const signup = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, role, department, designation, location } = req.body;
 
-    // Validation
-    if (!name || !email || !password) {
-      return res.status(400).json({ success: false, error: 'All fields are required' });
+    if (!name || !email || !password || !role) {
+      return res.status(400).json({ error: "Missing required fields" });
     }
-    if (!validator.isEmail(email)) {
-      return res.status(400).json({ success: false, error: 'Invalid email format' });
-    }
-    if (password.length < 8) {
-      return res.status(400).json({ success: false, error: 'Password must be at least 8 characters' });
+
+    if (role === "official" && (!department || !designation || !location)) {
+      return res.status(400).json({ error: "Missing official details" });
     }
 
     // Check if user already exists
-    const existingUser = await knex('users').where({ email }).first();
+    const existingUser = await db("users").where({ email }).first();
     if (existingUser) {
-      return res.status(409).json({ success: false, error: 'User with this email already exists' });
+      return res.status(400).json({ error: "User already exists with this email" });
     }
 
-    // Hash password and insert user
     const hashedPassword = await bcrypt.hash(password, 10);
-    const [user] = await knex('users').insert({ 
-      name, 
-      email, 
-      password: hashedPassword 
-    }).returning(['id', 'name', 'email', 'role']);
 
-    // Generate token and set cookie
-    const token = generateToken(user.id);
-    setAuthCookie(res, token);
+    const [user] = await db("users")
+      .insert({
+        name,
+        email,
+        password: hashedPassword,
+        role,
+        department: role === "official" ? department : null,
+        designation: role === "official" ? designation : null,
+        location: role === "official" ? location : null,
+      })
+      .returning(["id", "name", "email", "role", "department", "designation", "location"]);
+
+    // Generate JWT token
+    const token = jwt.sign({ userId: user.id, role: user.role }, JWT_SECRET, { expiresIn: "7d" });
+
+    // Set HTTP-only cookie using the corrected options
+    res.cookie('jwt', token, cookieOptions);
 
     res.status(201).json({ 
-      success: true, 
-      message: 'Registration successful', 
-      user: { id: user.id, name: user.name, email: user.email, role: user.role }
+      success: true,
+      message: "Account created successfully",
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        department: user.department,
+        designation: user.designation,
+        location: user.location
+      }
     });
-  } catch (error) {
-    logger.error('Registration failed:', error);
-    res.status(500).json({ success: false, error: 'Internal server error during registration' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Signup failed" });
   }
 };
 
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
-
+    
     if (!email || !password) {
-      return res.status(400).json({ success: false, error: 'Email and password are required' });
+      return res.status(400).json({ error: "Email and password are required" });
     }
 
-    // Find user
-    const user = await knex('users').where({ email }).first();
+    const user = await db("users").where({ email }).first();
+
     if (!user) {
-      return res.status(401).json({ success: false, error: 'Invalid credentials' });
+      return res.status(400).json({ error: "Invalid credentials" });
     }
 
-    // Compare password
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(401).json({ success: false, error: 'Invalid credentials' });
+    const match = await bcrypt.compare(password, user.password);
+    if (!match) {
+      return res.status(400).json({ error: "Invalid credentials" });
     }
 
-    // Generate token and set cookie
-    const token = generateToken(user.id);
-    setAuthCookie(res, token);
+    // Generate JWT token
+    const token = jwt.sign({ userId: user.id, role: user.role }, JWT_SECRET, { expiresIn: "7d" });
 
-    res.status(200).json({ 
-      success: true, 
-      message: 'Login successful', 
-      user: { id: user.id, name: user.name, email: user.email, role: user.role }
+    // Set HTTP-only cookie using the corrected options
+    res.cookie('jwt', token, cookieOptions);
+
+    res.json({
+      success: true,
+      message: "Login successful",
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        department: user.department,
+        designation: user.designation,
+        location: user.location
+      }
     });
-  } catch (error) {
-    logger.error('Login failed:', error);
-    res.status(500).json({ success: false, error: 'Internal server error during login' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Login failed" });
   }
 };
 
-export const logout = (req, res) => {
-  // Clear the HTTP-only cookie
-  res.clearCookie('jwt', { 
-    httpOnly: true, 
-    secure: process.env.NODE_ENV === 'production', 
-    sameSite: 'strict' 
-  });
-  res.status(200).json({ success: true, message: 'Logout successful' });
+export const logout = async (req, res) => {
+  try {
+    // Need to remove maxAge for clearing the cookie, but keep other settings
+    const clearCookieOptions = {
+        httpOnly: cookieOptions.httpOnly,
+        secure: cookieOptions.secure,
+        sameSite: cookieOptions.sameSite
+    };
+    
+    res.clearCookie('jwt', clearCookieOptions);
+    
+    res.json({ 
+      success: true, 
+      message: "Logged out successfully" 
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Logout failed" });
+  }
 };
 
-export const getMe = (req, res) => {
-  // authMiddleware ensures req.user is populated
-  res.status(200).json({ success: true, user: req.user });
+export const getMe = async (req, res) => {
+  try {
+    // req.user is set by authMiddleware
+    const user = await db("users")
+      .where({ id: req.user.id })
+      .select('id', 'name', 'email', 'role', 'department', 'designation', 'location')
+      .first();
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.json({
+      success: true,
+      user
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to get user data" });
+  }
 };

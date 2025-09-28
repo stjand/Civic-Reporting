@@ -1,105 +1,163 @@
 import React, { useState } from 'react';
-import { useNavigate, useLocation, Link, useSearchParams } from 'react-router-dom';
+import { LogIn, Shield, User } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { LogIn, Shield } from 'lucide-react'; // Shield icon added
 
-/**
- * Login/Auth page that allows a user to log in.
- */
+// Custom navigation function
+const navigate = (path) => {
+    if (path) {
+        window.history.pushState({}, '', path)
+        window.dispatchEvent(new Event('navigate'))
+    }
+}
+
 function Login() {
+  const { login } = useAuth(); // Use the login function from context
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { login } = useAuth();
-  const navigate = useNavigate();
-  const location = useLocation();
-  const [searchParams] = useSearchParams(); // <-- Reads the ?admin=true flag
-  
-  // Check if we were redirected from the admin route
-  const isAdminLogin = searchParams.get('admin') === 'true'; 
-  
-  const from = location.state?.from?.pathname || '/';
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
     setIsSubmitting(true);
     
+    if (!email || !password) {
+      setError('Please fill in all fields');
+      setIsSubmitting(false);
+      return;
+    }
+
     try {
-      await login(email, password);
-      // Redirect user to the page they tried to access or the default page
-      navigate(from, { replace: true });
+      await login({ email, password }); // This will handle role-based redirect
+      setSuccess(true);
+      // Note: redirect is now handled automatically in the AuthContext
     } catch (err) {
-      // Use specific backend error message if available
-      setError(err.response?.data?.error || err || 'Login failed. Please check your credentials.');
+      setError(err.message || 'Login failed. Please check your credentials.');
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  if (success) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-100 flex items-center justify-center px-4">
+        <div className="max-w-md mx-auto bg-white rounded-2xl shadow-xl p-8 text-center">
+          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <LogIn className="w-8 h-8 text-green-600" />
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Login Successful!</h2>
+          <p className="text-gray-600 mb-4">Welcome back. Redirecting you to your dashboard...</p>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="max-w-md mx-auto mt-10 p-8 border rounded-xl shadow-lg bg-white">
-      <h2 className="text-3xl font-bold text-gray-800 text-center mb-6 flex items-center justify-center">
-        {isAdminLogin ? ( // <-- CONDITIONAL TITLE/ICON
-          <Shield className="w-6 h-6 mr-3 text-blue-600" />
-        ) : (
-          <LogIn className="w-6 h-6 mr-3" />
-        )}
-        {isAdminLogin ? 'Admin Login' : 'User Login'} 
-      </h2>
-      
-      <form onSubmit={handleSubmit}>
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
-            Email Address
-          </label>
-          <input
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500"
-            id="email"
-            type="email"
-            placeholder="your.email@example.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center px-4">
+      <div className="max-w-md w-full">
+        <div className="text-center mb-8">
+          <div className="flex justify-center mb-4">
+            <div className="p-3 bg-blue-600 rounded-full">
+              <LogIn className="w-8 h-8 text-white" />
+            </div>
+          </div>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome Back</h1>
+          <p className="text-gray-600">Sign in to your CivicReport account</p>
         </div>
-        <div className="mb-6">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password">
-            Password
-          </label>
-          <input
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500"
-            id="password"
-            type="password"
-            placeholder="********"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            minLength={8}
-          />
+
+        <div className="bg-white rounded-2xl shadow-xl p-8">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Email Address
+              </label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                placeholder="your.email@example.com"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Password
+              </label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                placeholder="Enter your password"
+                required
+              />
+            </div>
+
+            {error && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                <p className="text-red-600 text-sm">{error}</p>
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isSubmitting ? (
+                <div className="flex items-center justify-center">
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                  Signing In...
+                </div>
+              ) : (
+                'Sign In'
+              )}
+            </button>
+
+            <div className="text-center">
+              <p className="text-gray-600">
+                Don't have an account?{' '}
+                <button
+                  type="button"
+                  onClick={() => navigate('/register')}
+                  className="text-blue-600 hover:text-blue-700 font-medium"
+                >
+                  Create one here
+                </button>
+              </p>
+            </div>
+
+            <div className="mt-6 pt-6 border-t border-gray-200">
+              <div className="text-center text-sm text-gray-500 mb-4">
+                Demo Accounts (for testing)
+              </div>
+              <div className="grid grid-cols-2 gap-3 text-xs">
+                <div className="bg-gray-50 p-3 rounded-lg">
+                  <div className="flex items-center mb-1">
+                    <User className="w-3 h-3 mr-1" />
+                    <span className="font-medium">Citizen</span>
+                  </div>
+                  <div className="text-gray-600">citizen@demo.com</div>
+                  <div className="text-gray-600">password123</div>
+                </div>
+                <div className="bg-gray-50 p-3 rounded-lg">
+                  <div className="flex items-center mb-1">
+                    <Shield className="w-3 h-3 mr-1" />
+                    <span className="font-medium">Official</span>
+                  </div>
+                  <div className="text-gray-600">official@demo.com</div>
+                  <div className="text-gray-600">password123</div>
+                </div>
+              </div>
+            </div>
+          </form>
         </div>
-        
-        {error && (
-          <p className="text-red-500 text-xs italic mb-4 text-center">{error}</p>
-        )}
-        
-        <div className="flex flex-col items-center justify-between">
-          <button
-            className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 w-full transition duration-150 ease-in-out disabled:opacity-50"
-            type="submit"
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? 'Logging In...' : 'Log In'}
-          </button>
-          
-          {!isAdminLogin && ( // <-- CONDITIONAL LINK: Hide Register link for Admin Login
-            <Link to="/register" className="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800 mt-4">
-              Don't have an account? Register
-            </Link>
-          )}
-        </div>
-      </form>
+      </div>
     </div>
   );
 }

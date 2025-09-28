@@ -47,10 +47,12 @@ const upload = multer({
 
 // --- CORRECTED CORS CONFIGURATION ---
 const allowedOrigins = [
-  'http://localhost:5173',          // Local frontend dev
+  'http://localhost:5173',          // Local frontend dev (Vite default)
   'http://127.0.0.1:5173',          // Local frontend dev alternative
+  'http://localhost:3000',          // <-- Add this common port
+  'http://127.0.0.1:3000',          // <-- Add this common port
   'https://civic-reporting-frontend-2hth7nqj6-stjands-projects.vercel.app', // Your Vercel frontend
-  // NOTE: If you have a custom domain, add it here as well.
+  // ... (use flexible Vercel logic if you use dynamic preview URLs)
 ];
 
 // Enable CORS with dynamic origin checking

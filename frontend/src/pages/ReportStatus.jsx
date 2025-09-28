@@ -1,20 +1,44 @@
 // File: frontend/src/pages/ReportStatus.jsx
 import React, { useState, useEffect } from 'react'
-import { useParams, Link, useNavigate } from 'react-router-dom'
-import { CheckCircle, Clock, MapPin, User, FileText, Loader2, ArrowLeft, Shield, Search } from 'lucide-react'
+// import { useParams, Link, useNavigate } from 'react-router-dom' // <-- REMOVED: Incompatible with custom router
+import { CheckCircle, Clock, MapPin, User, FileText, Loader2, ArrowLeft, Shield, Search, AlertTriangle } from 'lucide-react'
+
+// CRITICAL FIX: Custom navigation function to trigger App.jsx's router logic
+const navigate = (path) => {
+    if (path) {
+        window.history.pushState({}, '', path)
+        window.dispatchEvent(new Event('navigate'))
+    }
+}
 
 const ReportStatus = () => {
-  const { id } = useParams()
-  const navigate = useNavigate() // Hook to handle internal navigation
+  // FIX: Get ID directly from window.location.pathname, replacing useParams()
+  const path = window.location.pathname;
+  // Extracts ID like 'RPT-001' from '/status/RPT-001' or returns null for '/status'
+  const idMatch = path.match(/\/status\/(RPT-\d+)/i);
+  const id = idMatch ? idMatch[1].toUpperCase() : null;
+  
+  // const { id } = useParams() // <-- REMOVED
+  // const navigate = useNavigate() // <-- REMOVED
   const [report, setReport] = useState(null)
-  const [loading, setLoading] = useState(false) // Set to false initially, only load when ID is present
-  const [reportIdInput, setReportIdInput] = useState('')
+  const [loading, setLoading] = useState(false) 
+  // Initialize input with ID from URL if present
+  const [reportIdInput, setReportIdInput] = useState(id || '') 
+
+  // Function to handle the search button click/Enter key press
+  const handleSearch = () => {
+    if (reportIdInput) {
+      // Use custom navigate to change the URL and trigger re-render in App.jsx
+      navigate(`/status/${reportIdInput.toUpperCase()}`);
+    }
+  };
 
   // Mock API call to fetch report details
   useEffect(() => {
     // Only attempt to fetch if an ID is present in the URL
     if (id) {
         setLoading(true)
+        setReport(null) // Clear previous report
         const fetchReport = async () => {
             try {
                 // Simulate fetching data for a report
@@ -27,23 +51,35 @@ const ReportStatus = () => {
                     mockReport = {
                         id: id.toUpperCase(),
                         title: 'Large pothole on Main Street',
-                        description: 'Deep pothole causing vehicle damage near traffic signal intersection',
-                        status: 'In Progress',
-                        category: 'Road Maintenance',
-                        location: 'Main Street, near City Center',
-                        reporter: 'Jane Doe',
-                        createdAt: '2025-09-01T10:00:00Z',
+                        description: 'A major and deep pothole located near the crosswalk. It poses a significant hazard to motorcyclists and cyclists.',
+                        category: 'Pothole/Road Damage',
+                        location: 'Main Street, near City Park',
+                        user: 'Citizen Reporter',
+                        status: id.toUpperCase() === 'RPT-001' ? 'Resolved' : id.toUpperCase() === 'RPT-002' ? 'In Progress' : 'New',
+                        priority: id.toUpperCase() === 'RPT-001' ? 'Medium' : 'High',
+                        department: 'Roads & Infrastructure',
+                        submitted: '2024-05-15T10:00:00Z',
+                        image_url: 'https://via.placeholder.com/300x200?text=Report+Image',
                         timeline: [
-                            { step: 'Report Submitted', date: '2025-09-01T10:00:00Z', status: 'completed' },
-                            { step: 'Under Review', date: '2025-09-01T10:05:00Z', status: 'completed' },
-                            { step: 'In Progress', date: '2025-09-02T09:30:00Z', status: 'current' },
-                            { step: 'Resolved', date: null, status: 'pending' }
-                        ]
+                            { status: 'Report Submitted', date: new Date('2024-05-15T10:00:00Z'), icon: FileText },
+                            { status: 'New', date: new Date('2024-05-15T10:05:00Z'), icon: Clock },
+                            ...(id.toUpperCase() !== 'RPT-003' ? [{ status: 'Acknowledged', date: new Date('2024-05-15T14:30:00Z'), icon: Shield }] : []),
+                            ...(id.toUpperCase() === 'RPT-001' ? [
+                                { status: 'In Progress', date: new Date('2024-05-16T09:00:00Z'), icon: Loader2 },
+                                { status: 'Resolved', date: new Date('2024-05-17T15:00:00Z'), icon: CheckCircle }
+                            ] : []),
+                            ...(id.toUpperCase() === 'RPT-002' ? [
+                                { status: 'In Progress', date: new Date('2024-05-16T11:00:00Z'), icon: Loader2 },
+                                { status: 'Inspection Scheduled', date: new Date('2024-05-17T13:00:00Z'), icon: Search },
+                                { status: 'Work in Progress', date: null, icon: Loader2, className: 'animate-pulse' }
+                            ] : []),
+                        ],
                     }
                 }
-                // --- End Mock Logic ---
 
                 setReport(mockReport)
+                // --- End Mock Logic ---
+
             } catch (error) {
                 console.error('Failed to fetch report:', error)
                 setReport(null)
@@ -53,269 +89,167 @@ const ReportStatus = () => {
         }
         fetchReport()
     } else {
-        // If no ID, ensure loading is false and report is null
-        setLoading(false)
-        setReport(null)
+        // If no ID in URL, ensure we are not loading and have no report displayed
+        setLoading(false);
+        setReport(null);
     }
-  }, [id])
-
-  const handleSearch = (e) => {
-    e.preventDefault()
-    if (reportIdInput.trim()) {
-      // Navigate to the new URL with the entered ID
-      navigate(`/status/${reportIdInput.trim().toUpperCase()}`)
-    }
-  }
+  }, [id]) // Rerun effect whenever ID changes (i.e., when user navigates to a new status link)
 
   const getStatusColor = (status) => {
-    switch (status) {
-      case 'In Progress': return 'bg-yellow-100 text-yellow-800 border border-yellow-200'
-      case 'Resolved': return 'bg-green-100 text-green-800 border border-green-200'
-      case 'Submitted': return 'bg-blue-100 text-blue-800 border border-blue-200'
-      case 'Under Review': return 'bg-purple-100 text-purple-800 border border-purple-200'
-      default: return 'bg-gray-100 text-gray-800 border border-gray-200'
+    switch (status.toLowerCase()) {
+      case 'resolved':
+        return 'bg-green-500'
+      case 'in progress':
+      case 'acknowledged':
+      case 'work in progress':
+        return 'bg-yellow-500'
+      case 'new':
+        return 'bg-blue-500'
+      case 'inspection scheduled':
+        return 'bg-indigo-500'
+      default:
+        return 'bg-gray-500'
     }
   }
 
-  const getTimelineIcon = (stepStatus) => {
-    switch (stepStatus) {
-      case 'completed': 
-        return (
-          <div className="flex items-center justify-center w-8 h-8 bg-green-100 rounded-full">
-            <CheckCircle className="w-5 h-5 text-green-600" />
-          </div>
-        )
-      case 'current': 
-        return (
-          <div className="flex items-center justify-center w-8 h-8 bg-blue-100 rounded-full">
-            <Clock className="w-5 h-5 text-blue-600 animate-pulse" />
-          </div>
-        )
-      case 'pending': 
-        return (
-          <div className="flex items-center justify-center w-8 h-8 bg-gray-100 rounded-full border-2 border-gray-300">
-            <div className="w-3 h-3 bg-gray-300 rounded-full"></div>
-          </div>
-        )
-      default: return null
+  const getPriorityColor = (priority) => {
+    switch (priority.toLowerCase()) {
+      case 'high':
+        return 'text-red-600 border-red-200 bg-red-50'
+      case 'medium':
+        return 'text-yellow-600 border-yellow-200 bg-yellow-50'
+      case 'low':
+        return 'text-green-600 border-green-200 bg-green-50'
+      default:
+        return 'text-gray-600 border-gray-200 bg-gray-50'
     }
   }
 
-  // --- Common Header for all states ---
-  const Header = () => (
-    <div className="bg-white border-b border-gray-200">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-3">
-              <Link
-                to="/"
-                className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition-colors duration-200"
-              >
-                <ArrowLeft className="w-5 h-5" />
-              </Link>
-              <div className="flex items-center space-x-2">
-                <Shield className="w-6 h-6 text-blue-600" />
-                <span className="font-semibold text-lg text-gray-900">Report Status Tracker</span>
-              </div>
-            </div>
-            {report && (
-                <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(report.status)}`}>
-                  {report.status}
-                </span>
-            )}
-          </div>
-        </div>
-      </div>
-  )
-  
-  // --- Loading State ---
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <Header />
-        <div className="flex items-center justify-center min-h-[400px]">
-          <div className="flex flex-col items-center space-y-4">
-            <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
-            <p className="text-gray-600">Loading report status for ID: {id}...</p>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  // --- Report Not Found State (only when an ID was searched for) ---
-  if (!report && id) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <Header />
-        <div className="flex items-center justify-center min-h-[400px]">
-          <div className="text-center max-w-md mx-auto p-8">
-            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <FileText className="w-8 h-8 text-red-600" />
-            </div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">Report Not Found</h1>
-            <p className="text-gray-600 mb-6">The report ID "{id}" could not be found. Please check the ID and try again.</p>
-            <button
-              onClick={() => navigate('/status')} // Go back to the input form
-              className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Try a Different ID
-            </button>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  // --- Report ID Input Form (when /status is accessed) ---
-  if (!id) {
-    return (
-        <div className="min-h-screen bg-gray-50">
-            <Header />
-            <div className="max-w-xl mx-auto p-4 sm:p-6 lg:p-8 pt-16">
-                <div className="card p-8 text-center shadow-lg">
-                    <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                        <Search className="w-8 h-8 text-blue-600" />
-                    </div>
-                    <h1 className="text-2xl font-bold text-gray-900 mb-4">Track Your Report</h1>
-                    <p className="text-gray-600 mb-8">
-                        Enter your unique Report ID below to view the latest status and progress timeline.
-                    </p>
-                    
-                    <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-4">
-                        <input
-                            type="text"
-                            value={reportIdInput}
-                            onChange={(e) => setReportIdInput(e.target.value)}
-                            placeholder="e.g., RPT-001"
-                            className="flex-grow p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-gray-900"
-                            required
-                        />
-                        <button
-                            type="submit"
-                            className="btn btn-primary px-6 py-3 flex items-center justify-center"
-                        >
-                            <Search className="w-5 h-5 mr-2" />
-                            Check Status
-                        </button>
-                    </form>
-
-                    <Link to="/" className="text-sm text-gray-500 mt-6 block hover:text-blue-600 transition">
-                        Back to Home Page
-                    </Link>
-                </div>
-            </div>
-        </div>
-    )
-  }
-
-  // --- Main Report Detail View (when ID is found) ---
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Header />
+    <div className="min-h-screen bg-gray-50 py-10 px-4">
+      <div className="max-w-3xl mx-auto">
+        {/* Header and Search Bar */}
+        <div className="flex items-center space-x-3 mb-8">
+            <ArrowLeft onClick={() => navigate('/')} className="w-6 h-6 cursor-pointer text-gray-600 hover:text-blue-600" />
+            <h1 className="text-3xl font-bold text-gray-900">Report Status Tracker</h1>
+        </div>
 
-      {/* Content */}
-      <div className="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-          
-          {/* Report Header */}
-          <div className="px-6 py-6 border-b border-gray-200">
-            <div className="flex items-start justify-between">
-              <div className="flex-1">
-                <h1 className="text-2xl font-bold text-gray-900 mb-2">
-                  {report.title}
-                </h1>
-                <div className="flex items-center space-x-4 text-sm text-gray-600">
-                  <div className="flex items-center space-x-1">
-                    <FileText className="w-4 h-4" />
-                    <span>ID: {report.id}</span>
-                  </div>
-                  <div className="flex items-center space-x-1">
-                    <User className="w-4 h-4" />
-                    <span>By: {report.reporter}</span>
-                  </div>
-                  <div>
-                    {new Date(report.createdAt).toLocaleDateString()}
-                  </div>
-                </div>
-              </div>
+        <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+          {/* Search Bar */}
+          <div className="p-6 border-b border-gray-200 bg-blue-50">
+            <h2 className="text-xl font-semibold text-gray-800 mb-3">Find Your Report</h2>
+            <div className="flex space-x-3">
+              <input
+                type="text"
+                placeholder="Enter Report ID (e.g., RPT-001)"
+                value={reportIdInput}
+                onChange={(e) => setReportIdInput(e.target.value.toUpperCase())}
+                onKeyPress={(e) => {
+                    if (e.key === 'Enter') handleSearch();
+                }}
+                className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              />
+              <button
+                onClick={handleSearch}
+                disabled={!reportIdInput}
+                className="px-5 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+              >
+                <Search className="w-5 h-5" />
+              </button>
             </div>
           </div>
 
-          {/* Report Details */}
-          <div className="px-6 py-6 border-b border-gray-200">
-            <div className="grid md:grid-cols-2 gap-6">
+          {/* Loading and Error States */}
+          {loading && (
+            <div className="p-10 text-center">
+              <Loader2 className="w-8 h-8 text-blue-600 animate-spin mx-auto mb-3" />
+              <p className="text-gray-600">Loading report details...</p>
+            </div>
+          )}
+
+          {!loading && id && !report && (
+            <div className="p-10 text-center bg-red-50">
+              <AlertTriangle className="w-8 h-8 text-red-600 mx-auto mb-3" />
+              <h3 className="text-xl font-semibold text-red-800">Report Not Found</h3>
+              <p className="text-red-700 mt-2">Could not find report with ID: **{id}**. Please check the ID and try again.</p>
+            </div>
+          )}
+          
+          {/* Default State (No ID in URL) */}
+          {!loading && !id && !report && (
+            <div className="p-10 text-center">
+                <Search className="w-8 h-8 text-blue-600 mx-auto mb-3" />
+                <h3 className="text-xl font-semibold text-gray-800">Track Your Report</h3>
+                <p className="text-gray-600 mt-2">Enter a valid Report ID in the search bar above to view its current status and timeline.</p>
+            </div>
+          )}
+
+
+          {/* Report Display */}
+          {report && (
+            <div className="p-6 space-y-6">
+              <div className="flex justify-between items-start">
+                <div>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-1">{report.title}</h3>
+                  <div className={`inline-block px-3 py-1 text-xs font-medium rounded-full border ${getPriorityColor(report.priority)}`}>
+                    Priority: {report.priority}
+                  </div>
+                </div>
+                <div className={`px-4 py-2 text-white font-semibold rounded-full text-sm ${getStatusColor(report.status)}`}>
+                  {report.status}
+                </div>
+              </div>
+
+              {/* Details Grid */}
+              <div className="grid grid-cols-2 gap-4 text-sm text-gray-700 border-t border-b border-gray-200 py-4">
+                <p className="flex items-center"><User className="w-4 h-4 mr-2" /> Submitted by: {report.user}</p>
+                <p className="flex items-center"><Clock className="w-4 h-4 mr-2" /> Submitted on: {new Date(report.submitted).toLocaleDateString()}</p>
+                <p className="flex items-center"><FileText className="w-4 h-4 mr-2" /> Category: {report.category}</p>
+                <p className="flex items-center"><Shield className="w-4 h-4 mr-2" /> Department: {report.department}</p>
+              </div>
+
+              {/* Description & Location */}
               <div className="space-y-4">
                 <div>
-                  <h3 className="text-sm font-medium text-gray-700 mb-2">Category</h3>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-3 h-3 bg-blue-600 rounded-full"></div>
-                    <span className="text-gray-900">{report.category}</span>
-                  </div>
+                    <h4 className="font-semibold text-gray-800 mb-1">Description</h4>
+                    <p className="text-gray-600 whitespace-pre-wrap">{report.description}</p>
                 </div>
-
+                
                 <div>
-                  <h3 className="text-sm font-medium text-gray-700 mb-2">Location</h3>
-                  <div className="flex items-start space-x-2">
-                    <MapPin className="w-4 h-4 text-gray-500 mt-0.5" />
-                    <span className="text-gray-900">{report.location}</span>
-                  </div>
+                    <h4 className="font-semibold text-gray-800 mb-1 flex items-center"><MapPin className="w-4 h-4 mr-2" /> Location</h4>
+                    <p className="text-gray-600">{report.location}</p>
                 </div>
               </div>
 
-              <div>
-                <h3 className="text-sm font-medium text-gray-700 mb-2">Description</h3>
-                <p className="text-gray-900 text-sm leading-relaxed">
-                  {report.description}
-                </p>
+              {/* Timeline */}
+              <div className="pt-4">
+                <h4 className="font-semibold text-gray-800 mb-3">Resolution Timeline</h4>
+                <div className="relative border-l border-gray-200 space-y-8 pl-4">
+                  {report.timeline.map((item, index) => {
+                    const IconComponent = item.icon
+                    return (
+                      <div key={index} className="relative">
+                        <div className={`absolute -left-7 top-0 w-6 h-6 rounded-full flex items-center justify-center ${getStatusColor(item.status)} ${item.className || ''}`}>
+                          <IconComponent className="w-4 h-4 text-white" />
+                        </div>
+                        <h5 className="font-medium text-gray-900">{item.status}</h5>
+                        {item.date && (
+                          <p className="text-sm text-gray-500 mt-1">
+                            {item.date.toLocaleDateString()} at {item.date.toLocaleTimeString()}
+                          </p>
+                        )}
+                        {!item.date && item.status === 'pending' && (
+                          <p className="text-sm text-gray-400 mt-1">
+                            Pending completion
+                          </p>
+                        )}
+                      </div>
+                    )
+                  })}
+                </div>
               </div>
             </div>
-          </div>
-
-          {/* Timeline */}
-          <div className="px-6 py-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-6">Progress Timeline</h2>
-            <div className="space-y-6">
-              {report.timeline.map((item, index) => (
-                <div key={index} className="flex items-start space-x-4">
-                  <div className="flex flex-col items-center">
-                    {getTimelineIcon(item.status)}
-                    {index < report.timeline.length - 1 && (
-                      <div className={`w-px h-12 mt-2 ${
-                        item.status === 'completed' ? 'bg-green-300' : 'bg-gray-200'
-                      }`} />
-                    )}
-                  </div>
-                  <div className="flex-1 pb-2">
-                    <div className="flex items-center justify-between">
-                      <h3 className={`font-medium ${
-                        item.status === 'completed' ? 'text-gray-900' : 
-                        item.status === 'current' ? 'text-blue-600' : 'text-gray-500'
-                      }`}>
-                        {item.step}
-                      </h3>
-                      {item.status === 'current' && (
-                        <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">
-                          Current
-                        </span>
-                      )}
-                    </div>
-                    {item.date && (
-                      <p className="text-sm text-gray-500 mt-1">
-                        {new Date(item.date).toLocaleString()}
-                      </p>
-                    )}
-                    {!item.date && item.status === 'pending' && (
-                      <p className="text-sm text-gray-400 mt-1">
-                        Pending completion
-                      </p>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+          )}
 
           {/* Footer Actions */}
           <div className="px-6 py-4 bg-gray-50 border-t border-gray-200">
@@ -330,12 +264,12 @@ const ReportStatus = () => {
                 >
                     Track Another ID
                 </button>
-                <Link
-                  to="/"
+                <button
+                  onClick={() => navigate('/')}
                   className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors duration-200"
                 >
                   Back to Home
-                </Link>
+                </button>
               </div>
             </div>
           </div>
@@ -345,4 +279,4 @@ const ReportStatus = () => {
   )
 }
 
-export default ReportStatus
+export default ReportStatus;

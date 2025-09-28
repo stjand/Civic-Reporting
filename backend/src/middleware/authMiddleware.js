@@ -1,9 +1,9 @@
 import jwt from 'jsonwebtoken';
 import knex from '../knex.js';
 import logger from '../utils/logger.js';
-import 'dotenv/config'; // Load environment variables
 
-const JWT_SECRET = process.env.JWT_SECRET;
+const JWT_SECRET = process.env.JWT_SECRET || "supersecretkey";
+const isProduction = process.env.NODE_ENV === 'production'; // Added for clarity
 
 const authMiddleware = async (req, res, next) => {
   try {
@@ -13,22 +13,30 @@ const authMiddleware = async (req, res, next) => {
     if (!token) {
       return res.status(401).json({ 
         success: false, 
-        error: 'Authentication failed: No token provided' 
+        error: 'Authentication required' 
       });
     }
 
     // 2. Verify token
     const decoded = jwt.verify(token, JWT_SECRET);
     
-    // 3. Find user and attach to request
-    const user = await knex('users').where({ id: decoded.userId }).select('id', 'name', 'email', 'role').first();
+    // 3. Find user and attach to request (using userId from the updated signup/login)
+    const user = await knex('users')
+      .where({ id: decoded.userId }) 
+      .select('id', 'name', 'email', 'role', 'department', 'designation', 'location')
+      .first();
 
     if (!user) {
-      // Clear cookie if token is invalid but present
-      res.clearCookie('jwt', { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'strict' });
+      // Clear cookie if user doesn't exist
+      res.clearCookie('jwt', { 
+        httpOnly: true, 
+        secure: isProduction, 
+        // 🟢 FIX: Use 'Lax' for local testing
+        sameSite: isProduction ? 'none' : 'Lax' // <--- THIS IS THE FIX
+      });
       return res.status(401).json({ 
         success: false, 
-        error: 'Authentication failed: User not found' 
+        error: 'User not found' 
       });
     }
 
@@ -36,22 +44,28 @@ const authMiddleware = async (req, res, next) => {
     next();
   } catch (error) {
     logger.error(`Authentication error: ${error.message}`);
-    // Clear cookie on verification failure (e.g., expired token)
-    res.clearCookie('jwt', { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'strict' });
+    
+    // Clear cookie on any verification failure
+    res.clearCookie('jwt', { 
+      httpOnly: true, 
+      secure: isProduction, 
+      // 🟢 FIX: Use 'Lax' for local testing
+      sameSite: isProduction ? 'none' : 'Lax' // <--- THIS IS THE FIX
+  });
+    
     return res.status(401).json({ 
       success: false, 
-      error: 'Authentication failed: Invalid token',
-      details: error.message
+      error: 'Invalid or expired token'
     });
   }
 };
 
-export const roleMiddleware = (roles) => {
+export const roleMiddleware = (allowedRoles) => {
   return (req, res, next) => {
-    if (!req.user || !roles.includes(req.user.role)) {
+    if (!req.user || !allowedRoles.includes(req.user.role)) {
       return res.status(403).json({ 
         success: false, 
-        error: 'Authorization failed: Access denied' 
+        error: 'Access denied. Insufficient permissions.' 
       });
     }
     next();
