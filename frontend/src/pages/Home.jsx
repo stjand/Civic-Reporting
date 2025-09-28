@@ -1,3 +1,5 @@
+// Exact path of file: frontend/src/pages/Home.jsx
+
 import React from 'react'
 import {
   Camera,
@@ -12,12 +14,15 @@ import {
   ArrowRight,
   Shield,
   Users,
-  Activity
+  Activity,
+  ClipboardCheck 
 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'; // <-- NEW: Import useAuth
 
 const Home = () => {
   const navigate = useNavigate()
+  const { isAuthenticated, user } = useAuth(); // <-- NEW: Access auth state
 
   const features = [
     {
@@ -102,27 +107,59 @@ const Home = () => {
   }
 
   const handleNavClick = (section) => {
+    // Determine the user's logged-in dashboard path
+    const userDashboardPath = isAuthenticated 
+        ? (user.role === 'admin' ? '/analytics' : '/citizen-dashboard') 
+        : '/login';
+
     switch(section) {
       case 'home':
         navigate('/')
         break
+      // CITIZEN FLOW: Directs to the ReportForm if authenticated, otherwise to Login
       case 'report':
-        navigate('/report')
+        navigate(isAuthenticated ? '/report' : '/login')
         break
+      // GOVERNMENT OFFICIAL FLOW: Directs to analytics if logged in as admin, otherwise to admin login
       case 'dashboard':
-        navigate('/admin')
+      case 'admin': // Used by 'Explore Analytics' button
+        navigate(isAuthenticated 
+          ? (user.role === 'admin' ? '/analytics' : userDashboardPath) // Redirects citizen to their dashboard
+          : '/login?admin=true') // Redirects to login with admin role pre-selected
+        break
+      // CHECK STATUS flow remains public
+      case 'checkstatus':
+        navigate('/status')
         break
       case 'about':
-        // Handle navigation for the 'about' section if a route exists
-        // For now, it will just log
         console.log('Navigating to about section')
         break
-      case 'admin':
-        navigate('/admin')
+      case 'login':
+        navigate('/login')
+        break
+      case 'register':
+        navigate('/register')
         break
       default:
         console.log(`Unknown navigation section: ${section}`)
     }
+  }
+  
+  // Dynamic navigation button for Admin/Citizen
+  const DashboardButton = () => {
+    if (!isAuthenticated) return null;
+    
+    const path = user.role === 'admin' ? '/analytics' : '/citizen-dashboard';
+    const text = user.role === 'admin' ? 'Go to Analytics' : 'Go to Dashboard';
+    
+    return (
+      <button
+        onClick={() => navigate(path)}
+        className="btn btn-md btn-secondary"
+      >
+        {text}
+      </button>
+    )
   }
 
   return (
@@ -152,7 +189,13 @@ const Home = () => {
               onClick={() => handleNavClick('dashboard')}
               className="nav-link"
             >
-              Dashboard
+              {isAuthenticated ? 'My Dashboard' : 'Official Login'}
+            </button>
+            <button
+              onClick={() => handleNavClick('checkstatus')} 
+              className="nav-link"
+            >
+              Check Status
             </button>
             <button
               onClick={() => handleNavClick('about')}
@@ -163,12 +206,24 @@ const Home = () => {
           </div>
 
           <div className="flex items-center space-x-3">
-            <button
-              onClick={() => handleNavClick('report')}
-              className="btn btn-md btn-primary"
-            >
-              Report Issue
-            </button>
+            {isAuthenticated ? (
+                <DashboardButton />
+            ) : (
+                <>
+                    <button
+                        onClick={() => handleNavClick('login')}
+                        className="btn btn-md btn-secondary"
+                    >
+                        Sign In
+                    </button>
+                    <button
+                        onClick={() => handleNavClick('register')}
+                        className="btn btn-md btn-primary"
+                    >
+                        Sign Up
+                    </button>
+                </>
+            )}
           </div>
         </div>
       </nav>
@@ -188,18 +243,31 @@ const Home = () => {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            {isAuthenticated ? (
+                // If logged in, go directly to report or analytics
+                <button
+                    onClick={() => handleNavClick('report')}
+                    className="btn btn-lg btn-primary"
+                >
+                    Submit Report
+                    <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                </button>
+            ) : (
+                // If logged out, prompt to sign up
+                <button
+                    onClick={() => handleNavClick('register')}
+                    className="btn btn-lg btn-primary"
+                >
+                    Get Started - Sign Up
+                    <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                </button>
+            )}
+            
             <button
-              onClick={() => handleNavClick('report')}
-              className="btn btn-lg btn-primary"
-            >
-              Submit Report
-              <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
-            </button>
-            <button
-              onClick={() => handleNavClick('dashboard')}
+              onClick={() => handleNavClick('checkstatus')}
               className="btn btn-lg btn-secondary"
             >
-              View Dashboard
+              Check Report Status
             </button>
           </div>
         </div>
@@ -271,7 +339,7 @@ const Home = () => {
                   <p className="text-gray-600">Real-time updates from your community</p>
                 </div>
                 <button
-                  onClick={() => handleNavClick('admin')}
+                  onClick={() => handleNavClick('admin')} // Now directs to admin login or analytics page
                   className="btn btn-md btn-primary"
                 >
                   View All Reports
