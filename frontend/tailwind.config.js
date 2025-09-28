@@ -1,4 +1,4 @@
-// File: frontend/tailwind.config.js
+// File: frontend/tailwind.config.js - Final Fixed Version
 /** @type {import('tailwindcss').Config} */
 export default {
   content: [
@@ -21,5 +21,8 @@ export default {
       }
     },
   },
-  plugins: [],
+  plugins: [
+    // ADD THIS LINE
+    require('@tailwindcss/line-clamp'),
+  ],
 }
