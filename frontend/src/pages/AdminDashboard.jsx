@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useAuth } from '../context/AuthContext'; // <-- NEW: Import useAuth
 import {
   MapPin, Search, Menu, List, Map, Filter, Bell, User, Settings,
   X, ChevronLeft, ChevronRight, Phone, Mail, Calendar, Clock,
@@ -7,7 +8,7 @@ import {
   Navigation, Layers, Plus, Minus, Home, BarChart3, Mic, Camera,
   LogOut, ArrowLeft, ChevronDown, MapPinIcon, UserIcon
 } from 'lucide-react';
-import { apiClient } from '../config/api';
+import apiClient from '../config/api';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -648,103 +649,13 @@ const ListView = ({ reports, onReportSelect, selectedReport }) => {
   );
 };
 
-// Login Page Component
-const LoginPage = ({ onLogin }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-
-  const handleLogin = (e) => {
-    e.preventDefault();
-    setError('');
-
-    if (email === 'admin@example.com' && password === 'password123') {
-      onLogin();
-    } else {
-      setError('Invalid email or password.');
-    }
-  };
-
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
-      <div className="max-w-md w-full space-y-8 bg-white rounded-2xl shadow-xl border border-gray-100 p-8">
-        <div className="text-center">
-          <div className="w-16 h-16 mx-auto bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg">
-            <Shield className="w-8 h-8 text-white" />
-          </div>
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">
-            Admin Portal
-          </h2>
-          <p className="text-gray-600">
-            Sign in to manage civic reports
-          </p>
-        </div>
-        <form className="space-y-6" onSubmit={handleLogin}>
-          <div className="space-y-4">
-            <div>
-              <label htmlFor="email-address" className="block text-sm font-medium text-gray-700 mb-2">
-                Email address
-              </label>
-              <input
-                id="email-address"
-                name="email"
-                type="email"
-                autoComplete="email"
-                required
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                placeholder="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-                Password
-              </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="current-password"
-                required
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                placeholder="Enter your password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
-          </div>
-          {error && (
-            <div className="bg-red-50 text-red-600 text-sm p-4 rounded-xl border border-red-200">
-              {error}
-            </div>
-          )}
-          <button
-            type="submit"
-            className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 px-4 rounded-xl font-medium hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all shadow-lg"
-          >
-            Sign in
-          </button>
-        </form>
-        
-        {/* Demo credentials */}
-        <div className="bg-gray-50 p-4 rounded-xl border border-dashed border-gray-300">
-          <p className="text-sm font-medium text-gray-700 mb-2 text-center">
-            Demo Credentials
-          </p>
-          <div className="text-sm text-gray-600 space-y-1">
-            <p><strong>Email:</strong> admin@example.com</p>
-            <p><strong>Password:</strong> password123</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
 
 // Main Dashboard Component
 const CivicAdminDashboard = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  // HOOK INTO GLOBAL AUTHENTICATION
+  const { logout } = useAuth(); // <--- FIX: Use global logout
+  
+  // const [isLoggedIn, setIsLoggedIn] = useState(false); // REMOVED MOCK STATE
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [viewMode, setViewMode] = useState('map');
   const [selectedDepartment, setSelectedDepartment] = useState('all');
@@ -776,25 +687,34 @@ const CivicAdminDashboard = () => {
     setError(null);
     try {
       const response = await apiClient.get('/admin/dashboard');
-      if (response.success) {
-        setReports(response.data.reports);
-        setStats(response.data.stats);
+      
+      const serverBody = response.data; // Server body is inside Axios response.data
+      
+      if (serverBody.success) { // Check server body success
+        setReports(serverBody.data.reports); // Access nested data.reports
+        setStats(serverBody.data.stats);     // Access nested data.stats
       } else {
-        throw new Error(response.error || 'Failed to fetch data');
+        throw new Error(serverBody.error || 'Failed to fetch data: Server reported failure');
       }
     } catch (error) {
       console.error('Failed to fetch data:', error);
-      setError('Failed to load dashboard data. Please check your backend connection.');
+      
+      if (error.response?.status === 401 || error.response?.status === 403) {
+          // If authorization fails (e.g., cookie expired), log out the user
+          logout(); 
+          setError('Session expired. Please log in again.');
+      } else {
+          setError('Failed to load dashboard data. Please check your backend connection.');
+      }
     } finally {
       setIsLoading(false);
     }
   };
 
+  // FIX: Run fetchData immediately on mount (PrivateRoute ensures user is logged in)
   useEffect(() => {
-    if (isLoggedIn) {
-      fetchData();
-    }
-  }, [isLoggedIn]);
+    fetchData();
+  }, []); 
 
   // Filter reports
   const filteredReports = useMemo(() => {
@@ -812,7 +732,10 @@ const CivicAdminDashboard = () => {
   const handleStatusUpdate = async (reportId, newStatus) => {
     try {
       const response = await apiClient.put(`/reports/${reportId}`, { status: newStatus });
-      if (response.success) {
+      
+      const serverBody = response.data;
+      
+      if (serverBody.success) {
         setReports(prev => prev.map(report =>
           report.id === reportId ? { ...report, status: newStatus } : report
         ));
@@ -821,7 +744,7 @@ const CivicAdminDashboard = () => {
         }
         fetchData();
       } else {
-        throw new Error(response.error || 'Failed to update status');
+        throw new Error(serverBody.error || 'Failed to update status');
       }
     } catch (error) {
       console.error('Failed to update status:', error);
@@ -829,15 +752,11 @@ const CivicAdminDashboard = () => {
     }
   };
 
-  const handleLogout = () => {
-    setIsLoggedIn(false);
-    setSelectedReport(null);
-    setSidebarOpen(false);
-  };
+  // FIX: Use global logout function
+  const handleLogout = logout;
 
-  if (!isLoggedIn) {
-    return <LoginPage onLogin={() => setIsLoggedIn(true)} />;
-  }
+  // REMOVED: Mock isLoggedIn check is no longer needed. 
+  // If the component renders, the user is authenticated and is an admin.
 
   if (isLoading) {
     return (

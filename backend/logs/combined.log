@@ -631,3 +631,96 @@
 {"level":"\u001b[32minfo\u001b[39m","message":"✅ Database connection successful","timestamp":"2025-09-28 11:40:37"}
 {"level":"\u001b[32minfo\u001b[39m","message":"📊 Found 8 tables in database","timestamp":"2025-09-28 11:40:37"}
 {"level":"\u001b[32minfo\u001b[39m","message":"🚀 Civic Reporter Backend running at http://localhost:3001","timestamp":"2025-09-28 11:40:37"}
+{"level":"\u001b[32minfo\u001b[39m","message":"✅ Database connection successful","timestamp":"2025-09-28 14:46:27"}
+{"level":"\u001b[32minfo\u001b[39m","message":"📊 Found 8 tables in database","timestamp":"2025-09-28 14:46:27"}
+{"level":"\u001b[32minfo\u001b[39m","message":"🚀 Civic Reporter Backend running at http://localhost:3001","timestamp":"2025-09-28 14:46:27"}
+{"level":"\u001b[32minfo\u001b[39m","message":"✅ Database connection successful","timestamp":"2025-09-28 14:46:47"}
+{"level":"\u001b[32minfo\u001b[39m","message":"📊 Found 8 tables in database","timestamp":"2025-09-28 14:46:47"}
+{"level":"\u001b[32minfo\u001b[39m","message":"🚀 Civic Reporter Backend running at http://localhost:3001","timestamp":"2025-09-28 14:46:47"}
+{"level":"\u001b[32minfo\u001b[39m","message":"✅ Database connection successful","timestamp":"2025-09-28 15:07:58"}
+{"level":"\u001b[32minfo\u001b[39m","message":"📊 Found 8 tables in database","timestamp":"2025-09-28 15:07:58"}
+{"level":"\u001b[32minfo\u001b[39m","message":"🚀 Civic Reporter Backend running at http://localhost:3001","timestamp":"2025-09-28 15:07:58"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/auth/me","timestamp":"2025-09-28 15:15:42"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/auth/me","timestamp":"2025-09-28 15:15:42"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/auth/me","timestamp":"2025-09-28 15:15:57"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/auth/me","timestamp":"2025-09-28 15:15:57"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/login","timestamp":"2025-09-28 15:17:45"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/auth/me","timestamp":"2025-09-28 15:17:47"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/auth/me","timestamp":"2025-09-28 15:17:47"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/reports","timestamp":"2025-09-28 15:18:31"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/reports","timestamp":"2025-09-28 15:18:51"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/reports","timestamp":"2025-09-28 15:21:34"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/logout","timestamp":"2025-09-28 15:21:50"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/login","timestamp":"2025-09-28 15:21:54"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/login","timestamp":"2025-09-28 15:22:32"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/login","timestamp":"2025-09-28 15:23:23"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/register","timestamp":"2025-09-28 15:23:49"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/logout","timestamp":"2025-09-28 15:24:20"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/auth/me","timestamp":"2025-09-28 15:35:55"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/auth/me","timestamp":"2025-09-28 15:35:55"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/login","timestamp":"2025-09-28 15:36:23"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/login","timestamp":"2025-09-28 15:41:19"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/login","timestamp":"2025-09-28 15:41:20"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/auth/me","timestamp":"2025-09-28 15:41:22"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/auth/me","timestamp":"2025-09-28 15:41:22"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/login","timestamp":"2025-09-28 15:41:37"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/login","timestamp":"2025-09-28 15:42:53"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/admin/dashboard","timestamp":"2025-09-28 15:43:20"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/admin/dashboard","timestamp":"2025-09-28 15:43:23"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/admin/dashboard","timestamp":"2025-09-28 15:43:24"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/auth/me","timestamp":"2025-09-28 15:44:45"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/admin/dashboard","timestamp":"2025-09-28 15:48:26"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/admin/dashboard","timestamp":"2025-09-28 15:48:46"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/logout","timestamp":"2025-09-28 15:48:58"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/auth/me","timestamp":"2025-09-28 15:56:36"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/auth/me","timestamp":"2025-09-28 15:56:36"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/auth/me","timestamp":"2025-09-28 15:59:24"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/auth/me","timestamp":"2025-09-28 15:59:24"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/login","timestamp":"2025-09-28 16:02:58"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/login","timestamp":"2025-09-28 16:03:07"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/admin/dashboard","timestamp":"2025-09-28 16:03:08"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/admin/dashboard","timestamp":"2025-09-28 16:03:08"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/logout","timestamp":"2025-09-28 16:04:06"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/auth/me","timestamp":"2025-09-28 16:08:28"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/auth/me","timestamp":"2025-09-28 16:08:28"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/auth/me","timestamp":"2025-09-28 16:08:29"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/auth/me","timestamp":"2025-09-28 16:08:29"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/login","timestamp":"2025-09-28 16:08:32"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/admin/dashboard","timestamp":"2025-09-28 16:08:33"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/admin/dashboard","timestamp":"2025-09-28 16:08:33"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/auth/me","timestamp":"2025-09-28 16:09:47"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/auth/me","timestamp":"2025-09-28 16:09:47"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/admin/dashboard","timestamp":"2025-09-28 16:09:48"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/admin/dashboard","timestamp":"2025-09-28 16:09:48"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/auth/me","timestamp":"2025-09-28 16:18:03"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/auth/me","timestamp":"2025-09-28 16:18:03"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/auth/me","timestamp":"2025-09-28 16:18:19"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/auth/me","timestamp":"2025-09-28 16:18:19"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/admin/dashboard","timestamp":"2025-09-28 16:18:28"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/admin/dashboard","timestamp":"2025-09-28 16:18:28"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/auth/me","timestamp":"2025-09-28 16:18:58"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/auth/me","timestamp":"2025-09-28 16:18:58"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/admin/dashboard","timestamp":"2025-09-28 16:19:05"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/admin/dashboard","timestamp":"2025-09-28 16:19:05"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/auth/me","timestamp":"2025-09-28 16:22:29"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/auth/me","timestamp":"2025-09-28 16:22:29"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/auth/me","timestamp":"2025-09-28 16:26:33"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/auth/me","timestamp":"2025-09-28 16:26:33"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/auth/me","timestamp":"2025-09-28 17:25:18"}
+{"level":"\u001b[31merror\u001b[39m","message":"Authentication error: getaddrinfo ENOTFOUND aws-1-ap-south-1.pooler.supabase.com","timestamp":"2025-09-28 17:25:18"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/auth/me","timestamp":"2025-09-28 17:25:18"}
+{"level":"\u001b[31merror\u001b[39m","message":"Authentication error: getaddrinfo ENOTFOUND aws-1-ap-south-1.pooler.supabase.com","timestamp":"2025-09-28 17:25:18"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/register","timestamp":"2025-09-28 17:38:42"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/login","timestamp":"2025-09-28 17:39:10"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/login","timestamp":"2025-09-28 17:39:21"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/login","timestamp":"2025-09-28 17:39:24"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/register","timestamp":"2025-09-28 17:39:34"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/register","timestamp":"2025-09-28 17:39:41"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/login","timestamp":"2025-09-28 17:39:51"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/login","timestamp":"2025-09-28 17:39:58"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/login","timestamp":"2025-09-28 17:40:06"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/login","timestamp":"2025-09-28 17:40:12"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/login","timestamp":"2025-09-28 17:40:16"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/login","timestamp":"2025-09-28 17:40:27"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/login","timestamp":"2025-09-28 17:40:43"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/login","timestamp":"2025-09-28 17:40:46"}

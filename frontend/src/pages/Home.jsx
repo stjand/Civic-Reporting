@@ -12,7 +12,8 @@ import {
   ArrowRight,
   Shield,
   Users,
-  Activity
+  Activity,
+  ClipboardCheck // Added for Check Status feature
 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 
@@ -106,19 +107,25 @@ const Home = () => {
       case 'home':
         navigate('/')
         break
+      // Redirect to user login for submitting a report
       case 'report':
-        navigate('/report')
+        navigate('/login') // Assumes regular user login is at /login
         break
+      // Redirect to admin login for the dashboard
       case 'dashboard':
-        navigate('/admin')
+        navigate('/login?admin=true') // Appends flag for admin login, as per PrivateRoute.jsx logic
+        break
+      // New case for checking report status
+      case 'checkstatus':
+        navigate('/status') // Assumes a route for report status checking
         break
       case 'about':
         // Handle navigation for the 'about' section if a route exists
-        // For now, it will just log
         console.log('Navigating to about section')
         break
       case 'admin':
-        navigate('/admin')
+        // For 'View All Reports' button in Recent Activity
+        navigate('/login?admin=true')
         break
       default:
         console.log(`Unknown navigation section: ${section}`)
@@ -152,7 +159,13 @@ const Home = () => {
               onClick={() => handleNavClick('dashboard')}
               className="nav-link"
             >
-              Dashboard
+              Admin Dashboard
+            </button>
+            <button
+              onClick={() => handleNavClick('checkstatus')} // New button in nav links
+              className="nav-link"
+            >
+              Check Status
             </button>
             <button
               onClick={() => handleNavClick('about')}
@@ -194,6 +207,13 @@ const Home = () => {
             >
               Submit Report
               <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+            </button>
+            <button
+              onClick={() => handleNavClick('checkstatus')} // New button in Hero section
+              className="btn btn-lg btn-tertiary" // Assuming a tertiary style or use secondary
+            >
+              Check Report Status
+              <ClipboardCheck className="w-5 h-5 ml-2" />
             </button>
             <button
               onClick={() => handleNavClick('dashboard')}
@@ -271,7 +291,7 @@ const Home = () => {
                   <p className="text-gray-600">Real-time updates from your community</p>
                 </div>
                 <button
-                  onClick={() => handleNavClick('admin')}
+                  onClick={() => handleNavClick('admin')} // 'admin' case redirects to admin login
                   className="btn btn-md btn-primary"
                 >
                   View All Reports
@@ -339,6 +359,12 @@ const Home = () => {
                   className="btn btn-lg btn-primary"
                 >
                   Submit Your First Report
+                </button>
+                <button
+                  onClick={() => handleNavClick('checkstatus')} // New button in CTA
+                  className="btn btn-lg btn-tertiary"
+                >
+                  Track Report Status
                 </button>
                 <button
                   onClick={() => handleNavClick('admin')}

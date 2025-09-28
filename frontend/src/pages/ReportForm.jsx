@@ -23,7 +23,7 @@ import {
   Minimize2
 } from 'lucide-react'
 import MapPicker from '../components/MapPicker'
-import { apiClient } from '../config/api'
+import apiClient from '../config/api'
 import { useNavigate } from 'react-router-dom'
 import imageCompression from 'browser-image-compression'
 
@@ -250,7 +250,8 @@ const handleSubmit = async () => {
       }
       
       reportFormData.append('address', locationAddress)
-      reportFormData.append('user_name', 'Anonymous')
+      // The user_name is now typically pulled from req.user on the backend
+      reportFormData.append('user_name', 'Anonymous') 
       
       if (formData.photo) {
         reportFormData.append('photo', formData.photo)
@@ -260,14 +261,22 @@ const handleSubmit = async () => {
         reportFormData.append('audio', formData.audioRecording, 'recording.wav')
       }
 
-      const response = await apiClient.post('/reports', reportFormData)
+      // Use apiClient.postFormData helper for file uploads
+      // NOTE: Assuming your apiClient was fixed to use the postFormData helper for multipart/form-data
+      // If using the default apiClient.post (Axios), it will still work but the helper is cleaner.
       
-      // Corrected line: Access the id directly from the data object
-      if (response.data && response.data.id) {
-          setReportId(response.data.id);
+      // We assume apiClient.post is the Axios post method, which returns the server's body in response.data
+      const response = await apiClient.post('/reports', reportFormData) 
+      
+      // FIX: Extract the nested report object from response.data.data
+      const insertedReport = response.data?.data; 
+      
+      if (insertedReport && insertedReport.id) {
+          setReportId(insertedReport.id); // <-- CORRECTED: Use insertedReport.id
           setSubmitted(true)
       } else {
-          throw new Error('Invalid response from server. Report ID not found.')
+          // This error is now thrown if the backend response structure is wrong
+          throw new Error('Invalid response structure from server. Report data not found.')
       }
       
       // Reset form data after successful submission
@@ -291,7 +300,11 @@ const handleSubmit = async () => {
       })
       
       // More specific error message
-      if (error.message.includes('Failed to fetch')) {
+      // A 401 Unauthorized error will occur here if the user's JWT cookie is missing/expired.
+      if (error.response?.status === 401) {
+        alert('Report submission failed: You must be logged in to submit a report.')
+      }
+      else if (error.message.includes('Failed to fetch')) {
         alert('Cannot connect to server. Please check if the backend is running on port 3001.')
       } else if (error.message.includes('API Error: 404')) {
         alert('API endpoint not found. Please check your backend routes.')

@@ -5,13 +5,16 @@ import logger from './utils/logger.js';
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
+import cookieParser from 'cookie-parser'; // <-- NEW
+import authMiddleware, { roleMiddleware } from './middleware/authMiddleware.js'; // <-- NEW
+import authRoutes from './routes/authRoutes.js'; // <-- NEW
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
 // Create uploads directory
 const uploadsDir = path.join(process.cwd(), 'uploads');
-if (!fs.existsSync(uploadsDir)) {
+if (!!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
 
@@ -42,16 +45,38 @@ const upload = multer({
   }
 });
 
-// Enable CORS
+// --- CORRECTED CORS CONFIGURATION ---
+const allowedOrigins = [
+  'http://localhost:5173',          // Local frontend dev
+  'http://127.0.0.1:5173',          // Local frontend dev alternative
+  'https://civic-reporting-frontend-2hth7nqj6-stjands-projects.vercel.app', // Your Vercel frontend
+  // NOTE: If you have a custom domain, add it here as well.
+];
+
+// Enable CORS with dynamic origin checking
 app.use(cors({
-  origin: '*',
+  origin: (origin, callback) => {
+    // Allow requests with no origin (e.g., Postman, mobile apps)
+    if (!origin) return callback(null, true); 
+    
+    // Check if the requesting origin is in the allowed list
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      logger.error(`CORS blocked request from origin: ${origin}`);
+      callback(new Error(`Not allowed by CORS: ${origin}`));
+    }
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true // CRITICAL: Allows sending/receiving HTTP-only cookies
 }));
+// --- END CORRECTED CORS CONFIGURATION ---
 
 // Middleware
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+app.use(cookieParser()); // <-- NEW: Use cookie parser
 app.use('/uploads', express.static('uploads'));
 
 // Logger middleware
@@ -59,6 +84,9 @@ app.use((req, res, next) => {
   logger.info(`Received a ${req.method} request for ${req.url}`);
   next();
 });
+
+// --- NEW AUTH ROUTES ---
+app.use('/api/auth', authRoutes);
 
 // DB check
 const testDatabaseConnection = async () => {
@@ -123,9 +151,15 @@ app.get('/api/reports', async (req, res) => {
   }
 });
 
-// Report submission
-app.post('/api/reports', upload.fields([{ name: 'photo', maxCount: 5 }, { name: 'audio', maxCount: 1 }]), async (req, res) => {
+// Report submission (NOW PROTECTED)
+app.post('/api/reports', 
+  authMiddleware, // <-- NEW: Only logged-in users can submit
+  upload.fields([{ name: 'photo', maxCount: 5 }, { name: 'audio', maxCount: 1 }]), 
+  async (req, res) => {
   try {
+    // req.user is available here from authMiddleware
+    const user_id = req.user.id; // <-- NEW: Get user ID
+
     const { title, description, category, location, address, user_name, urgency_score, priority } = req.body;
 
     let parsedLocation = null;
@@ -157,12 +191,13 @@ app.post('/api/reports', upload.fields([{ name: 'photo', maxCount: 5 }, { name: 
       latitude: parsedLocation ? parseFloat(parsedLocation.lat) : null,
       longitude: parsedLocation ? parseFloat(parsedLocation.lng) : null,
       address: address || 'Location not specified',
-      user_name: user_name || 'Anonymous',
+      // user_name is optional/overridable, use logged in user's name if not provided
+      user_name: user_name || req.user.name, 
       urgency_score: parseInt(urgency_score) || 5,
       priority: priority || 'medium',
       image_urls: JSON.stringify(imageUrls),
       audio_url: audioUrl,
-      user_id: null,
+      user_id: user_id, // <-- NEW: Associate report with user
       department_id: departmentId,
       created_at: new Date(),
       updated_at: new Date()
@@ -172,7 +207,10 @@ app.post('/api/reports', upload.fields([{ name: 'photo', maxCount: 5 }, { name: 
     res.status(201).json({ success: true, message: 'Report submitted successfully', data: insertedReport });
   } catch (error) {
     logger.error(`❌ Failed to add report: ${error.message}`);
-    res.status(500).json({ success: false, error: 'Failed to add report', details: error.message });
+    // If the error is from multer, the error handler below will catch it
+    if (!res.headersSent) {
+      res.status(500).json({ success: false, error: 'Failed to add report', details: error.message });
+    }
   }
 });
 
@@ -212,8 +250,11 @@ app.put('/api/reports/:id', async (req, res) => {
   }
 });
 
-// Admin dashboard
-app.get('/api/admin/dashboard', async (req, res) => {
+// Admin dashboard (NOW PROTECTED)
+app.get('/api/admin/dashboard', 
+  authMiddleware, // <-- NEW: Requires login
+  roleMiddleware(['admin']), // <-- NEW: Requires 'admin' role
+  async (req, res) => {
   try {
     const allReports = await knex('reports').select('*').orderBy('created_at', 'desc');
     const stats = {

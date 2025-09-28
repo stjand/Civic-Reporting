@@ -1,25 +1,16 @@
 import React, { useState } from 'react';
-import { useNavigate, useLocation, Link, useSearchParams } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { LogIn, Shield } from 'lucide-react'; // Shield icon added
+import { UserPlus } from 'lucide-react';
 
-/**
- * Login/Auth page that allows a user to log in.
- */
-function Login() {
+function Register() {
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { login } = useAuth();
+  const { register } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
-  const [searchParams] = useSearchParams(); // <-- Reads the ?admin=true flag
-  
-  // Check if we were redirected from the admin route
-  const isAdminLogin = searchParams.get('admin') === 'true'; 
-  
-  const from = location.state?.from?.pathname || '/';
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -27,12 +18,11 @@ function Login() {
     setIsSubmitting(true);
     
     try {
-      await login(email, password);
-      // Redirect user to the page they tried to access or the default page
-      navigate(from, { replace: true });
+      await register(name, email, password);
+      // Navigate to home after successful registration/login
+      navigate('/', { replace: true });
     } catch (err) {
-      // Use specific backend error message if available
-      setError(err.response?.data?.error || err || 'Login failed. Please check your credentials.');
+      setError(err || 'Registration failed.');
     } finally {
       setIsSubmitting(false);
     }
@@ -41,15 +31,25 @@ function Login() {
   return (
     <div className="max-w-md mx-auto mt-10 p-8 border rounded-xl shadow-lg bg-white">
       <h2 className="text-3xl font-bold text-gray-800 text-center mb-6 flex items-center justify-center">
-        {isAdminLogin ? ( // <-- CONDITIONAL TITLE/ICON
-          <Shield className="w-6 h-6 mr-3 text-blue-600" />
-        ) : (
-          <LogIn className="w-6 h-6 mr-3" />
-        )}
-        {isAdminLogin ? 'Admin Login' : 'User Login'} 
+        <UserPlus className="w-6 h-6 mr-3" />
+        Register Account
       </h2>
       
       <form onSubmit={handleSubmit}>
+        <div className="mb-4">
+          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
+            Full Name
+          </label>
+          <input
+            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500"
+            id="name"
+            type="text"
+            placeholder="John Doe"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+          />
+        </div>
         <div className="mb-4">
           <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
             Email Address
@@ -66,7 +66,7 @@ function Login() {
         </div>
         <div className="mb-6">
           <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password">
-            Password
+            Password (min 8 chars)
           </label>
           <input
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -86,22 +86,20 @@ function Login() {
         
         <div className="flex flex-col items-center justify-between">
           <button
-            className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 w-full transition duration-150 ease-in-out disabled:opacity-50"
+            className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 w-full transition duration-150 ease-in-out disabled:opacity-50"
             type="submit"
             disabled={isSubmitting}
           >
-            {isSubmitting ? 'Logging In...' : 'Log In'}
+            {isSubmitting ? 'Registering...' : 'Register'}
           </button>
           
-          {!isAdminLogin && ( // <-- CONDITIONAL LINK: Hide Register link for Admin Login
-            <Link to="/register" className="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800 mt-4">
-              Don't have an account? Register
-            </Link>
-          )}
+          <Link to="/login" className="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800 mt-4">
+            Already have an account? Log In
+          </Link>
         </div>
       </form>
     </div>
   );
 }
 
-export default Login;
+export default Register;
