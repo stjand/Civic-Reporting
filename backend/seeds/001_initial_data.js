@@ -1,3 +1,11 @@
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+const bcrypt = require('bcrypt');
+
+// Use 'password123' for seeded users for easy testing.
+const defaultPassword = 'password123';
+const hashedPassword = bcrypt.hashSync(defaultPassword, 10);
+
 /**
  * @param { import("knex").Knex } knex
  */
@@ -17,6 +25,7 @@ export async function seed(knex) {
   if (await knex.schema.hasTable('departments')) {
     await knex('departments').del();
   }
+  // Clear users table last (before insertion)
   if (await knex.schema.hasTable('users')) {
     await knex('users').del();
   }
@@ -34,18 +43,23 @@ export async function seed(knex) {
     ])
     .returning('id');
 
-  const deptIds = deptRows.map(d => d.id ?? d); // For PostgreSQL, d.id may exist or just d
+  const deptIds = deptRows.map(d => d.id ?? d);
 
   // -------------------------------
-  // 2️⃣ Insert Users
+  // 2️⃣ Insert Users (ALIGNED WITH NEW AUTH SCHEMA: email, password, name, role)
   // -------------------------------
   const userRows = await knex('users')
     .insert([
-      { phone: '+919876543210', name: 'Admin User', role: 'admin', is_verified: true, reputation_score: 100 },
-      { phone: '+919876543211', name: 'Ward Officer - Zone 1', role: 'ward_officer', is_verified: true, reputation_score: 90 },
-      { phone: '+919876543212', name: 'Ward Officer - Zone 2', role: 'ward_officer', is_verified: true, reputation_score: 85 },
-      { phone: '+919876543213', name: 'John Citizen', role: 'citizen', is_verified: true, reputation_score: 75 },
-      { phone: '+919876543214', name: 'Jane Reporter', role: 'citizen', is_verified: true, reputation_score: 80 }
+      // Admin user 
+      { name: 'Seed Administrator', email: 'admin@seed.com', password: hashedPassword, role: 'admin' }, 
+      // User 1 
+      { name: 'Ward Officer - Zone 1', email: 'ward1@seed.com', password: hashedPassword, role: 'user' }, 
+      // User 2 
+      { name: 'Ward Officer - Zone 2', email: 'ward2@seed.com', password: hashedPassword, role: 'user' }, 
+      // User 3 (Citizen)
+      { name: 'John Citizen', email: 'john.citizen@seed.com', password: hashedPassword, role: 'user' }, 
+      // User 4 (Citizen)
+      { name: 'Jane Reporter', email: 'jane.reporter@seed.com', password: hashedPassword, role: 'user' } 
     ])
     .returning('id');
 

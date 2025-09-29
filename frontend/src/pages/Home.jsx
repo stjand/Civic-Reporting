@@ -12,12 +12,24 @@ import {
   ArrowRight,
   Shield,
   Users,
-  Activity
+  Activity,
+  ClipboardCheck // Added for Check Status feature
 } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext' // <-- NEW: Import useAuth
+
+// CRITICAL FIX: Custom navigation function to trigger App.jsx's router logic
+const navigate = (path) => {
+    if (path) {
+        window.history.pushState({}, '', path)
+        // CRITICAL: Dispatch the custom event that App.jsx is listening for
+        window.dispatchEvent(new Event('navigate'))
+    }
+}
 
 const Home = () => {
-  const navigate = useNavigate()
+  // Use authentication state to check if user is logged in
+  const { isAuthenticated } = useAuth(); // <-- NEW: Use auth context
+  
 
   const features = [
     {
@@ -106,20 +118,30 @@ const Home = () => {
       case 'home':
         navigate('/')
         break
+        
       case 'report':
-        navigate('/report')
+        // FIX: If authenticated, navigate to Report Form, else go to login
+        isAuthenticated ? navigate('/report') : navigate('/login')
         break
+      
       case 'dashboard':
-        navigate('/admin')
+        // FIX: If authenticated, navigate to Admin, else go to login with flag
+        isAuthenticated ? navigate('/admin') : navigate('/login?admin=true')
         break
+        
+      case 'checkstatus':
+        navigate('/status') // Report status page is public
+        break
+        
       case 'about':
-        // Handle navigation for the 'about' section if a route exists
-        // For now, it will just log
         console.log('Navigating to about section')
         break
+        
       case 'admin':
-        navigate('/admin')
+        // FIX: For 'View All Reports' button
+        isAuthenticated ? navigate('/admin') : navigate('/login?admin=true')
         break
+        
       default:
         console.log(`Unknown navigation section: ${section}`)
     }
@@ -152,7 +174,13 @@ const Home = () => {
               onClick={() => handleNavClick('dashboard')}
               className="nav-link"
             >
-              Dashboard
+              Admin Dashboard
+            </button>
+            <button
+              onClick={() => handleNavClick('checkstatus')} // New button in nav links
+              className="nav-link"
+            >
+              Check Status
             </button>
             <button
               onClick={() => handleNavClick('about')}
@@ -194,6 +222,13 @@ const Home = () => {
             >
               Submit Report
               <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+            </button>
+            <button
+              onClick={() => handleNavClick('checkstatus')} // New button in Hero section
+              className="btn btn-lg btn-tertiary" // Assuming a tertiary style or use secondary
+            >
+              Check Report Status
+              <ClipboardCheck className="w-5 h-5 ml-2" />
             </button>
             <button
               onClick={() => handleNavClick('dashboard')}
@@ -271,7 +306,7 @@ const Home = () => {
                   <p className="text-gray-600">Real-time updates from your community</p>
                 </div>
                 <button
-                  onClick={() => handleNavClick('admin')}
+                  onClick={() => handleNavClick('admin')} // 'admin' case redirects to admin login
                   className="btn btn-md btn-primary"
                 >
                   View All Reports
@@ -341,7 +376,13 @@ const Home = () => {
                   Submit Your First Report
                 </button>
                 <button
-                  onClick={() => handleNavClick('admin')}
+                  onClick={() => handleNavClick('checkstatus')} // New button in CTA
+                  className="btn btn-lg btn-tertiary"
+                >
+                  Track Report Status
+                </button>
+                <button
+                  onClick={() => handleNavClick('dashboard')}
                   className="btn btn-lg btn-secondary"
                 >
                   Explore Analytics

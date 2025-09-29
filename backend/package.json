@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "nodemon -r dotenv/config index.js",
-    "start": "node -r dotenv/config index.js",
+    "dev": "nodemon -r dotenv/config src/index.js",
+    "start": "node -r dotenv/config src/index.js",
     "build": "echo 'Build complete'",
     "test": "node -r dotenv/config jest",
     "migrate": "node -r dotenv/config run_migrations.js",
@@ -14,20 +14,24 @@
     "db:reset": "knex migrate:rollback --all --knexfile knexfile.js && knex migrate:latest --knexfile knexfile.js && knex seed:run --knexfile knexfile.js"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.58.0",
     "aws-sdk": "^2.1400.0",
+    "bcrypt": "^6.0.0",
     "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
-    "dotenv": "^16.4.5",
+    "dotenv": "^16.6.1",
     "express": "^4.21.2",
     "express-rate-limit": "^6.8.1",
     "helmet": "^7.2.0",
     "joi": "^17.9.2",
-    "jsonwebtoken": "^9.0.1",
+    "jsonwebtoken": "^9.0.2",
     "knex": "^3.1.0",
     "multer": "^1.4.5-lts.1",
     "nodemailer": "^6.9.3",
     "pg": "^8.16.3",
     "redis": "^4.6.7",
+    "validator": "^13.15.15",
     "winston": "^3.10.0"
   },
   "devDependencies": {
