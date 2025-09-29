@@ -1,26 +1,21 @@
-import React, { useState } from 'react';
-import { 
-  User, 
-  Mail, 
-  Phone, 
-  MapPin, 
-  Shield, 
-  Settings, 
+import React, { useState, useEffect } from 'react';
+import {
+  User,
+  Mail,
+  Phone,
+  MapPin,
   Edit3,
   Save,
   X,
   ArrowLeft,
-  Bell,
   Lock,
   Eye,
   EyeOff,
-  Camera,
   Award,
-  Calendar,
   Activity,
-  BarChart3
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { updateMyProfile, changeMyPassword, getMyStats } from '../services/apiServices';
 
 // Custom navigation function
 const navigate = (path) => {
@@ -31,14 +26,14 @@ const navigate = (path) => {
 };
 
 const Profile = () => {
-  const { user, logout } = useAuth();
+  const { user, logout, refreshUser } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [showPasswordForm, setShowPasswordForm] = useState(false);
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [userStats, setUserStats] = useState(null);
 
-  // Form states
   const [profileForm, setProfileForm] = useState({
     name: user?.name || '',
     email: user?.email || '',
@@ -53,46 +48,75 @@ const Profile = () => {
     confirmPassword: ''
   });
 
-  // Mock user stats
-  const userStats = {
-    joinDate: '2023-06-15',
-    totalReports: 12,
-    resolvedReports: 8,
-    validatedReports: 24,
-    communityPoints: 348,
-    badges: ['Active Reporter', 'Community Validator', 'Early Adopter'],
-    recentActivity: [
-      { date: '2024-01-20', action: 'Submitted report: Broken streetlight', points: 10 },
-      { date: '2024-01-19', action: 'Validated community report', points: 5 },
-      { date: '2024-01-18', action: 'Report resolved: Pothole fixed', points: 15 }
-    ]
+  // Fetch real stats when the component loads
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const statsData = await getMyStats();
+        setUserStats(statsData.stats);
+      } catch (error) {
+        console.error("Failed to fetch user stats:", error);
+      }
+    };
+    if (user) {
+        fetchStats();
+        // Update form with latest user data from context
+        setProfileForm({
+            name: user.name || '',
+            email: user.email || '',
+            phone: user.phone || '',
+            location: user.location || '',
+            bio: user.bio || ''
+        });
+    }
+  }, [user]);
+
+  const handleProfileChange = (e) => {
+    const { name, value } = e.target;
+    setProfileForm(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleProfileSubmit = (e) => {
+  const handlePasswordChange = (e) => {
+    const { name, value } = e.target;
+    setPasswordForm(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleProfileSubmit = async (e) => {
     e.preventDefault();
-    // Here you would typically send the data to your API
-    console.log('Profile update:', profileForm);
-    setIsEditing(false);
-    // Show success message
-    alert('Profile updated successfully!');
+    try {
+      await updateMyProfile(profileForm);
+      alert('Profile updated successfully!');
+      setIsEditing(false);
+      if (refreshUser) refreshUser();
+    } catch (error) {
+      console.error('Profile update failed:', error);
+      alert(`Error updating profile: ${error.error || 'Please try again.'}`);
+    }
   };
 
-  const handlePasswordSubmit = (e) => {
+  const handlePasswordSubmit = async (e) => {
     e.preventDefault();
     if (passwordForm.newPassword !== passwordForm.confirmPassword) {
       alert('New passwords do not match!');
       return;
     }
-    if (passwordForm.newPassword.length < 8) {
-      alert('New password must be at least 8 characters long!');
+    if (passwordForm.newPassword.length < 6) {
+      alert('New password must be at least 6 characters long!');
       return;
     }
-    
-    // Here you would typically send the password change request to your API
-    console.log('Password change request');
-    setShowPasswordForm(false);
-    setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
-    alert('Password changed successfully!');
+
+    try {
+      await changeMyPassword({
+        currentPassword: passwordForm.currentPassword,
+        newPassword: passwordForm.newPassword,
+      });
+      alert('Password changed successfully!');
+      setShowPasswordForm(false);
+      setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
+    } catch (error) {
+      console.error('Password change failed:', error);
+      alert(`Error changing password: ${error.error || 'Please check your current password and try again.'}`);
+    }
   };
 
   const handleCancel = () => {
@@ -129,21 +153,6 @@ const Profile = () => {
             </div>
             
             <div className="flex items-center space-x-4">
-              <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors relative">
-                <Bell className="w-5 h-5 text-gray-600" />
-                <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
-              </button>
-              
-              <div className="flex items-center space-x-3">
-                <div className="text-right">
-                  <p className="text-sm font-medium text-gray-900">{user?.name}</p>
-                  <p className="text-xs text-gray-500 capitalize">{user?.role}</p>
-                </div>
-                <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                  <User className="w-4 h-4 text-blue-600" />
-                </div>
-              </div>
-              
               <button
                 onClick={logout}
                 className="px-3 py-1.5 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors"
@@ -180,132 +189,68 @@ const Profile = () => {
               <div className="p-6">
                 {isEditing ? (
                   <form onSubmit={handleProfileSubmit} className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
-                        <input
-                          type="text"
-                          value={profileForm.name}
-                          onChange={(e) => setProfileForm({...profileForm, name: e.target.value})}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                          required
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
-                        <input
-                          type="email"
-                          value={profileForm.email}
-                          onChange={(e) => setProfileForm({...profileForm, email: e.target.value})}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                          required
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
-                        <input
-                          type="tel"
-                          value={profileForm.phone}
-                          onChange={(e) => setProfileForm({...profileForm, phone: e.target.value})}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                          placeholder="Optional"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Location</label>
-                        <input
-                          type="text"
-                          value={profileForm.location}
-                          onChange={(e) => setProfileForm({...profileForm, location: e.target.value})}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                          placeholder="City, State"
-                        />
-                      </div>
-                    </div>
-
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Bio</label>
-                      <textarea
-                        value={profileForm.bio}
-                        onChange={(e) => setProfileForm({...profileForm, bio: e.target.value})}
-                        rows={3}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
-                        placeholder="Tell us about yourself..."
-                      />
+                      <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                      <input type="text" name="name" id="name" value={profileForm.name} onChange={handleProfileChange} className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"/>
                     </div>
-
-                    <div className="flex items-center justify-end space-x-3">
-                      <button
-                        type="button"
-                        onClick={handleCancel}
-                        className="px-4 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors"
-                      >
-                        <X className="w-4 h-4 mr-2 inline" />
-                        Cancel
-                      </button>
-                      <button
-                        type="submit"
-                        className="px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-lg transition-colors flex items-center"
-                      >
-                        <Save className="w-4 h-4 mr-2" />
-                        Save Changes
-                      </button>
+                    <div>
+                      <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                      <input type="email" name="email" id="email" value={profileForm.email} className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100 cursor-not-allowed" disabled/>
+                    </div>
+                    <div>
+                      <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                      <input type="tel" name="phone" id="phone" value={profileForm.phone} onChange={handleProfileChange} className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" placeholder="e.g., +1 123 456 7890"/>
+                    </div>
+                     <div>
+                      <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                      <input type="text" name="location" id="location" value={profileForm.location} onChange={handleProfileChange} className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" placeholder="e.g., San Francisco, CA"/>
+                    </div>
+                    <div>
+                        <label htmlFor="bio" className="block text-sm font-medium text-gray-700 mb-1">Bio</label>
+                        <textarea name="bio" id="bio" rows="3" value={profileForm.bio} onChange={handleProfileChange} className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" placeholder="Tell us a little about yourself"></textarea>
+                    </div>
+                    <div className="flex justify-end space-x-3 pt-2">
+                      <button type="button" onClick={handleCancel} className="px-4 py-2 text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 border border-gray-300 rounded-md shadow-sm flex items-center"><X className="w-4 h-4 mr-2"/>Cancel</button>
+                      <button type="submit" className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 border border-transparent rounded-md shadow-sm flex items-center"><Save className="w-4 h-4 mr-2"/>Save Changes</button>
                     </div>
                   </form>
                 ) : (
                   <div className="space-y-6">
-                    <div className="flex items-center space-x-4">
-                      <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-                        <span className="text-xl font-bold text-white">
-                          {user?.name?.charAt(0).toUpperCase()}
-                        </span>
-                      </div>
+                    <div className="flex items-center">
+                      <User className="w-5 h-5 text-gray-400 mr-4 flex-shrink-0" />
                       <div>
-                        <h3 className="text-xl font-bold text-gray-900">{user?.name}</h3>
-                        <p className="text-sm text-gray-500 capitalize">{user?.role}</p>
-                        <p className="text-sm text-blue-600">Member since {new Date(userStats.joinDate).toLocaleDateString()}</p>
+                        <p className="text-xs text-gray-500">Full Name</p>
+                        <p className="font-medium text-gray-900">{profileForm.name || 'Not provided'}</p>
                       </div>
                     </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="flex items-center space-x-3">
-                        <Mail className="w-5 h-5 text-gray-400" />
+                    <div className="flex items-center">
+                      <Mail className="w-5 h-5 text-gray-400 mr-4 flex-shrink-0" />
+                       <div>
+                        <p className="text-xs text-gray-500">Email Address</p>
+                        <p className="font-medium text-gray-900">{profileForm.email || 'Not provided'}</p>
+                      </div>
+                    </div>
+                     <div className="flex items-center">
+                      <Phone className="w-5 h-5 text-gray-400 mr-4 flex-shrink-0" />
+                       <div>
+                        <p className="text-xs text-gray-500">Phone</p>
+                        <p className="font-medium text-gray-900">{profileForm.phone || 'Not provided'}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center">
+                      <MapPin className="w-5 h-5 text-gray-400 mr-4 flex-shrink-0" />
+                      <div>
+                        <p className="text-xs text-gray-500">Location</p>
+                        <p className="font-medium text-gray-900">{profileForm.location || 'Not provided'}</p>
+                      </div>
+                    </div>
+                     <div className="flex items-start">
+                        <User className="w-5 h-5 text-gray-400 mr-4 mt-1 flex-shrink-0" />
                         <div>
-                          <p className="text-sm font-medium text-gray-900">Email</p>
-                          <p className="text-sm text-gray-600">{profileForm.email}</p>
+                            <p className="text-xs text-gray-500">Bio</p>
+                            <p className="font-medium text-gray-900 whitespace-pre-wrap">{profileForm.bio || 'Not provided'}</p>
                         </div>
-                      </div>
-
-                      {profileForm.phone && (
-                        <div className="flex items-center space-x-3">
-                          <Phone className="w-5 h-5 text-gray-400" />
-                          <div>
-                            <p className="text-sm font-medium text-gray-900">Phone</p>
-                            <p className="text-sm text-gray-600">{profileForm.phone}</p>
-                          </div>
-                        </div>
-                      )}
-
-                      {profileForm.location && (
-                        <div className="flex items-center space-x-3">
-                          <MapPin className="w-5 h-5 text-gray-400" />
-                          <div>
-                            <p className="text-sm font-medium text-gray-900">Location</p>
-                            <p className="text-sm text-gray-600">{profileForm.location}</p>
-                          </div>
-                        </div>
-                      )}
                     </div>
-
-                    {profileForm.bio && (
-                      <div>
-                        <p className="text-sm font-medium text-gray-900 mb-2">About</p>
-                        <p className="text-sm text-gray-600">{profileForm.bio}</p>
-                      </div>
-                    )}
                   </div>
                 )}
               </div>
@@ -314,101 +259,43 @@ const Profile = () => {
             {/* Security Settings */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200">
               <div className="px-6 py-4 border-b border-gray-200">
-                <h2 className="text-lg font-semibold text-gray-900 flex items-center">
-                  <Lock className="w-5 h-5 mr-2" />
-                  Security Settings
-                </h2>
+                <h2 className="text-lg font-semibold text-gray-900">Security</h2>
               </div>
-
-              <div className="p-6 space-y-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="font-medium text-gray-900">Password</h3>
-                    <p className="text-sm text-gray-600">Last updated 3 months ago</p>
+              <div className="p-6">
+                {!showPasswordForm ? (
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <h3 className="font-medium text-gray-900">Change Password</h3>
+                      <p className="text-sm text-gray-500 mt-1">It's a good idea to use a strong password that you're not using elsewhere.</p>
+                    </div>
+                    <button onClick={() => setShowPasswordForm(true)} className="px-4 py-2 text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 border border-gray-300 rounded-md shadow-sm">Change</button>
                   </div>
-                  <button
-                    onClick={() => setShowPasswordForm(!showPasswordForm)}
-                    className="px-4 py-2 text-sm text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors"
-                  >
-                    Change Password
-                  </button>
-                </div>
-
-                {showPasswordForm && (
-                  <form onSubmit={handlePasswordSubmit} className="mt-4 p-4 bg-gray-50 rounded-lg space-y-4">
+                ) : (
+                  <form onSubmit={handlePasswordSubmit} className="space-y-4">
                     <div className="relative">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Current Password</label>
-                      <input
-                        type={showCurrentPassword ? "text" : "password"}
-                        value={passwordForm.currentPassword}
-                        onChange={(e) => setPasswordForm({...passwordForm, currentPassword: e.target.value})}
-                        className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        required
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                        className="absolute right-3 top-9 text-gray-400 hover:text-gray-600"
-                      >
-                        {showCurrentPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Current Password</label>
+                      <input type={showCurrentPassword ? 'text' : 'password'} name="currentPassword" value={passwordForm.currentPassword} onChange={handlePasswordChange} className="w-full px-3 py-2 border border-gray-300 rounded-md" required/>
+                      <button type="button" onClick={() => setShowCurrentPassword(!showCurrentPassword)} className="absolute inset-y-0 right-0 top-6 pr-3 flex items-center text-gray-500">
+                        {showCurrentPassword ? <EyeOff className="h-5 w-5"/> : <Eye className="h-5 w-5"/>}
                       </button>
                     </div>
-
-                    <div className="relative">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">New Password</label>
-                      <input
-                        type={showNewPassword ? "text" : "password"}
-                        value={passwordForm.newPassword}
-                        onChange={(e) => setPasswordForm({...passwordForm, newPassword: e.target.value})}
-                        className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        minLength={8}
-                        required
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowNewPassword(!showNewPassword)}
-                        className="absolute right-3 top-9 text-gray-400 hover:text-gray-600"
-                      >
-                        {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                     <div className="relative">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">New Password</label>
+                      <input type={showNewPassword ? 'text' : 'password'} name="newPassword" value={passwordForm.newPassword} onChange={handlePasswordChange} className="w-full px-3 py-2 border border-gray-300 rounded-md" required/>
+                       <button type="button" onClick={() => setShowNewPassword(!showNewPassword)} className="absolute inset-y-0 right-0 top-6 pr-3 flex items-center text-gray-500">
+                        {showNewPassword ? <EyeOff className="h-5 w-5"/> : <Eye className="h-5 w-5"/>}
                       </button>
                     </div>
-
-                    <div className="relative">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Confirm New Password</label>
-                      <input
-                        type={showConfirmPassword ? "text" : "password"}
-                        value={passwordForm.confirmPassword}
-                        onChange={(e) => setPasswordForm({...passwordForm, confirmPassword: e.target.value})}
-                        className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        minLength={8}
-                        required
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        className="absolute right-3 top-9 text-gray-400 hover:text-gray-600"
-                      >
-                        {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                     <div className="relative">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Confirm New Password</label>
+                      <input type={showConfirmPassword ? 'text' : 'password'} name="confirmPassword" value={passwordForm.confirmPassword} onChange={handlePasswordChange} className="w-full px-3 py-2 border border-gray-300 rounded-md" required/>
+                       <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute inset-y-0 right-0 top-6 pr-3 flex items-center text-gray-500">
+                        {showConfirmPassword ? <EyeOff className="h-5 w-5"/> : <Eye className="h-5 w-5"/>}
                       </button>
                     </div>
-
-                    <div className="flex items-center justify-end space-x-3">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setShowPasswordForm(false);
-                          setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
-                        }}
-                        className="px-4 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors"
-                      >
-                        Cancel
-                      </button>
-                      <button
-                        type="submit"
-                        className="px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-lg transition-colors"
-                      >
-                        Update Password
-                      </button>
+                    <div className="flex justify-end space-x-3 pt-2">
+                       <button type="button" onClick={() => setShowPasswordForm(false)} className="px-4 py-2 text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 border border-gray-300 rounded-md shadow-sm">Cancel</button>
+                      <button type="submit" className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 border border-transparent rounded-md shadow-sm">Update Password</button>
                     </div>
                   </form>
                 )}
@@ -418,64 +305,45 @@ const Profile = () => {
 
           {/* Sidebar */}
           <div className="space-y-6">
-            {/* Stats Card */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <h3 className="font-semibold text-gray-900 mb-4">Community Stats</h3>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">Reports Submitted</span>
-                  <span className="font-medium text-gray-900">{userStats.totalReports}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">Issues Resolved</span>
-                  <span className="font-medium text-green-600">{userStats.resolvedReports}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">Reports Validated</span>
-                  <span className="font-medium text-purple-600">{userStats.validatedReports}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">Community Points</span>
-                  <span className="font-medium text-blue-600">{userStats.communityPoints}</span>
+            {userStats ? (
+              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <h3 className="font-semibold text-gray-900 mb-4">Community Stats</h3>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-600">Reports Submitted</span>
+                    <span className="font-medium text-gray-900">{userStats.reportsSubmitted}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-600">Issues Resolved</span>
+                    <span className="font-medium text-green-600">{userStats.reportsResolved}</span>
+                  </div>
+                   <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-600">In Progress</span>
+                    <span className="font-medium text-purple-600">{userStats.reportsInProgress}</span>
+                  </div>
+                   <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-600">Pending</span>
+                    <span className="font-medium text-blue-600">{userStats.reportsNew}</span>
+                  </div>
                 </div>
               </div>
-            </div>
-
-            {/* Badges Card */}
+            ) : (
+              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 text-center text-gray-500">
+                Loading stats...
+              </div>
+            )}
+            
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
               <h3 className="font-semibold text-gray-900 mb-4 flex items-center">
-                <Award className="w-4 h-4 mr-2" />
-                Badges Earned
+                <Award className="w-4 h-4 mr-2 text-gray-400" />
+                <span className="text-gray-600">Badges (Coming Soon)</span>
               </h3>
-              <div className="space-y-3">
-                {userStats.badges.map((badge, index) => (
-                  <div key={index} className="flex items-center space-x-2">
-                    <div className="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
-                      <Award className="w-4 h-4 text-yellow-600" />
-                    </div>
-                    <span className="text-sm font-medium text-gray-900">{badge}</span>
-                  </div>
-                ))}
-              </div>
             </div>
-
-            {/* Recent Activity */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
               <h3 className="font-semibold text-gray-900 mb-4 flex items-center">
-                <Activity className="w-4 h-4 mr-2" />
-                Recent Activity
+                <Activity className="w-4 h-4 mr-2 text-gray-400" />
+                <span className="text-gray-600">Recent Activity (Coming Soon)</span>
               </h3>
-              <div className="space-y-3">
-                {userStats.recentActivity.map((activity, index) => (
-                  <div key={index} className="text-sm">
-                    <p className="text-gray-900 font-medium">{activity.action}</p>
-                    <div className="flex items-center justify-between mt-1">
-                      <span className="text-gray-500">{new Date(activity.date).toLocaleDateString()}</span>
-                      <span className="text-green-600 font-medium">+{activity.points} pts</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
             </div>
           </div>
         </div>

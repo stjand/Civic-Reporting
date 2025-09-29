@@ -3,6 +3,8 @@ import React, { useRef, useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
+// In any component
+import { getMyReports, getMyStats, getAdminDashboard } from '../services/apiServices';
 
 // Fix for default markers in Leaflet
 delete L.Icon.Default.prototype._getIconUrl;

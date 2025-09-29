@@ -14,6 +14,7 @@
     "db:reset": "knex migrate:rollback --all --knexfile knexfile.js && knex migrate:latest --knexfile knexfile.js && knex seed:run --knexfile knexfile.js"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.58.0",
     "aws-sdk": "^2.1400.0",
     "bcrypt": "^6.0.0",
     "bcryptjs": "^2.4.3",

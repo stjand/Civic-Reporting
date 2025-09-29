@@ -1,4 +1,6 @@
 import React from 'react';
+// In any component
+import { getMyReports, getMyStats, getAdminDashboard } from '../services/apiServices';
 
 /**
  * Main application layout component.

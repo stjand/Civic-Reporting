@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   FileText, 
   Eye, 
@@ -12,11 +12,12 @@ import {
   Shield,
   ArrowRight,
   Bell,
-  Activity
+  Activity,
+  Loader2
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { getMyStats, getMyReports } from '../services/apiServices';
 
-// Custom navigation function
 const navigate = (path) => {
   if (path) {
     window.history.pushState({}, '', path);
@@ -26,38 +27,32 @@ const navigate = (path) => {
 
 const CitizenHomepage = () => {
   const { user, logout } = useAuth();
+  const [stats, setStats] = useState(null);
+  const [recentReports, setRecentReports] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Mock data for demonstration
-  const userStats = {
-    reportsSubmitted: 12,
-    reportsValidated: 8,
-    reportsResolved: 7,
-    communityRank: 'Active Contributor'
-  };
+  useEffect(() => {
+    fetchData();
+  }, []);
 
-  const recentReports = [
-    {
-      id: 'RPT-001',
-      title: 'Broken streetlight on Oak Avenue',
-      status: 'In Progress',
-      submitted: '2024-01-15',
-      category: 'Street Lighting'
-    },
-    {
-      id: 'RPT-002',
-      title: 'Pothole near school crossing',
-      status: 'Resolved',
-      submitted: '2024-01-10',
-      category: 'Road Maintenance'
-    },
-    {
-      id: 'RPT-003',
-      title: 'Overflowing garbage bin at park',
-      status: 'New',
-      submitted: '2024-01-08',
-      category: 'Waste Management'
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const [statsData, reportsData] = await Promise.all([
+        getMyStats(),
+        getMyReports()
+      ]);
+      
+      setStats(statsData.stats);
+      setRecentReports(reportsData.reports.slice(0, 3));
+    } catch (err) {
+      setError(err.error || 'Failed to load data');
+      console.error('Error fetching data:', err);
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
 
   const quickActions = [
     {
@@ -91,13 +86,25 @@ const CitizenHomepage = () => {
   ];
 
   const getStatusColor = (status) => {
-    switch(status.toLowerCase()) {
+    switch(status?.toLowerCase()) {
       case 'resolved': return 'bg-green-100 text-green-800 border-green-200';
-      case 'in progress': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      case 'new': return 'bg-blue-100 text-blue-800 border-blue-200';
+      case 'in_progress': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      case 'acknowledged': return 'bg-blue-100 text-blue-800 border-blue-200';
+      case 'new': return 'bg-gray-100 text-gray-800 border-gray-200';
       default: return 'bg-gray-100 text-gray-800 border-gray-200';
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-12 h-12 text-blue-600 animate-spin mx-auto mb-4" />
+          <p className="text-gray-600">Loading your dashboard...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -118,7 +125,6 @@ const CitizenHomepage = () => {
             <div className="flex items-center space-x-4">
               <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors relative">
                 <Bell className="w-5 h-5 text-gray-600" />
-                <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
               </button>
               <div className="flex items-center space-x-3">
                 <div className="text-right">
@@ -152,52 +158,60 @@ const CitizenHomepage = () => {
           </p>
         </div>
 
+        {error && (
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
+            {error}
+          </div>
+        )}
+
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-blue-100 rounded-lg">
-                <FileText className="w-6 h-6 text-blue-600" />
+        {stats && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="p-3 bg-blue-100 rounded-lg">
+                  <FileText className="w-6 h-6 text-blue-600" />
+                </div>
+                <span className="text-2xl font-bold text-gray-900">{stats.reportsSubmitted}</span>
               </div>
-              <span className="text-2xl font-bold text-gray-900">{userStats.reportsSubmitted}</span>
+              <h3 className="font-semibold text-gray-900 mb-1">Reports Submitted</h3>
+              <p className="text-sm text-gray-600">Total issues reported</p>
             </div>
-            <h3 className="font-semibold text-gray-900 mb-1">Reports Submitted</h3>
-            <p className="text-sm text-gray-600">Total issues reported</p>
-          </div>
 
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-green-100 rounded-lg">
-                <CheckSquare className="w-6 h-6 text-green-600" />
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="p-3 bg-yellow-100 rounded-lg">
+                  <Clock className="w-6 h-6 text-yellow-600" />
+                </div>
+                <span className="text-2xl font-bold text-gray-900">{stats.reportsInProgress}</span>
               </div>
-              <span className="text-2xl font-bold text-gray-900">{userStats.reportsValidated}</span>
+              <h3 className="font-semibold text-gray-900 mb-1">In Progress</h3>
+              <p className="text-sm text-gray-600">Being worked on</p>
             </div>
-            <h3 className="font-semibold text-gray-900 mb-1">Reports Validated</h3>
-            <p className="text-sm text-gray-600">Community contributions</p>
-          </div>
 
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-purple-100 rounded-lg">
-                <TrendingUp className="w-6 h-6 text-purple-600" />
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="p-3 bg-green-100 rounded-lg">
+                  <TrendingUp className="w-6 h-6 text-green-600" />
+                </div>
+                <span className="text-2xl font-bold text-gray-900">{stats.reportsResolved}</span>
               </div>
-              <span className="text-2xl font-bold text-gray-900">{userStats.reportsResolved}</span>
+              <h3 className="font-semibold text-gray-900 mb-1">Issues Resolved</h3>
+              <p className="text-sm text-gray-600">Successfully completed</p>
             </div>
-            <h3 className="font-semibold text-gray-900 mb-1">Issues Resolved</h3>
-            <p className="text-sm text-gray-600">Through your reports</p>
-          </div>
 
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-indigo-100 rounded-lg">
-                <BarChart3 className="w-6 h-6 text-indigo-600" />
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="p-3 bg-gray-100 rounded-lg">
+                  <Activity className="w-6 h-6 text-gray-600" />
+                </div>
+                <span className="text-2xl font-bold text-gray-900">{stats.reportsNew}</span>
               </div>
-              <span className="text-sm font-bold text-gray-900">{userStats.communityRank}</span>
+              <h3 className="font-semibold text-gray-900 mb-1">Pending</h3>
+              <p className="text-sm text-gray-600">Awaiting review</p>
             </div>
-            <h3 className="font-semibold text-gray-900 mb-1">Community Rank</h3>
-            <p className="text-sm text-gray-600">Based on activity</p>
           </div>
-        </div>
+        )}
 
         {/* Quick Actions */}
         <div className="mb-8">
@@ -243,37 +257,49 @@ const CitizenHomepage = () => {
           </div>
           
           <div className="divide-y divide-gray-200">
-            {recentReports.map((report, index) => (
-              <div key={report.id} className="px-6 py-4 hover:bg-gray-50 transition-colors">
-                <div className="flex items-center justify-between">
-                  <div className="flex-1">
-                    <h4 className="font-medium text-gray-900 mb-1">{report.title}</h4>
-                    <div className="flex items-center space-x-4 text-sm text-gray-600">
-                      <span className="flex items-center">
-                        <MapPin className="w-4 h-4 mr-1" />
-                        {report.id}
+            {recentReports.length === 0 ? (
+              <div className="px-6 py-12 text-center">
+                <FileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-600 mb-4">No reports yet</p>
+                <button
+                  onClick={() => navigate('/report')}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Submit Your First Report
+                </button>
+              </div>
+            ) : (
+              recentReports.map((report) => (
+                <div key={report.report_id} className="px-6 py-4 hover:bg-gray-50 transition-colors">
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1">
+                      <h4 className="font-medium text-gray-900 mb-1">{report.report_type}</h4>
+                      <div className="flex items-center space-x-4 text-sm text-gray-600">
+                        <span className="flex items-center">
+                          <MapPin className="w-4 h-4 mr-1" />
+                          {report.report_id}
+                        </span>
+                        <span className="flex items-center">
+                          <Clock className="w-4 h-4 mr-1" />
+                          {new Date(report.created_at).toLocaleDateString()}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <span className={`px-3 py-1 text-xs font-medium rounded-full border ${getStatusColor(report.status)}`}>
+                        {report.status}
                       </span>
-                      <span className="flex items-center">
-                        <Clock className="w-4 h-4 mr-1" />
-                        {new Date(report.submitted).toLocaleDateString()}
-                      </span>
-                      <span>{report.category}</span>
+                      <button
+                        onClick={() => navigate(`/status/${report.report_id}`)}
+                        className="text-blue-600 hover:text-blue-700"
+                      >
+                        <Eye className="w-4 h-4" />
+                      </button>
                     </div>
                   </div>
-                  <div className="flex items-center space-x-3">
-                    <span className={`px-3 py-1 text-xs font-medium rounded-full border ${getStatusColor(report.status)}`}>
-                      {report.status}
-                    </span>
-                    <button
-                      onClick={() => navigate(`/status/${report.id}`)}
-                      className="text-blue-600 hover:text-blue-700"
-                    >
-                      <Eye className="w-4 h-4" />
-                    </button>
-                  </div>
                 </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </div>
       </main>

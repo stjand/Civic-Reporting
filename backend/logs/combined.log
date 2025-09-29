@@ -1122,3 +1122,435 @@
 {"level":"\u001b[32minfo\u001b[39m","message":"✅ Database connection successful","timestamp":"2025-09-28 22:50:01"}
 {"level":"\u001b[32minfo\u001b[39m","message":"📊 Found 8 tables in database","timestamp":"2025-09-28 22:50:01"}
 {"level":"\u001b[32minfo\u001b[39m","message":"🚀 Civic Reporter Backend running at http://localhost:3001","timestamp":"2025-09-28 22:50:01"}
+{"level":"\u001b[32minfo\u001b[39m","message":"✅ Database connection successful","timestamp":"2025-09-28 22:50:15"}
+{"level":"\u001b[32minfo\u001b[39m","message":"📊 Found 8 tables in database","timestamp":"2025-09-28 22:50:15"}
+{"level":"\u001b[32minfo\u001b[39m","message":"🚀 Civic Reporter Backend running at http://localhost:3001","timestamp":"2025-09-28 22:50:15"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/auth/me","timestamp":"2025-09-28 22:50:28"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/auth/me","timestamp":"2025-09-28 22:50:28"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/login","timestamp":"2025-09-28 22:50:31"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/admin/dashboard","timestamp":"2025-09-28 22:50:32"}
+{"level":"\u001b[31merror\u001b[39m","message":"Authentication error: select \"id\", \"name\", \"email\", \"role\", \"department\", \"designation\", \"location\" from \"users\" where \"id\" = $1 limit $2 - column \"department\" does not exist","timestamp":"2025-09-28 22:50:32"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/admin/dashboard","timestamp":"2025-09-28 22:50:32"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/logout","timestamp":"2025-09-28 22:50:32"}
+{"level":"\u001b[31merror\u001b[39m","message":"Authentication error: select \"id\", \"name\", \"email\", \"role\", \"department\", \"designation\", \"location\" from \"users\" where \"id\" = $1 limit $2 - column \"department\" does not exist","timestamp":"2025-09-28 22:50:32"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/logout","timestamp":"2025-09-28 22:50:32"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/login","timestamp":"2025-09-28 22:50:37"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/admin/dashboard","timestamp":"2025-09-28 22:50:37"}
+{"level":"\u001b[31merror\u001b[39m","message":"Authentication error: select \"id\", \"name\", \"email\", \"role\", \"department\", \"designation\", \"location\" from \"users\" where \"id\" = $1 limit $2 - column \"department\" does not exist","timestamp":"2025-09-28 22:50:37"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/admin/dashboard","timestamp":"2025-09-28 22:50:37"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/logout","timestamp":"2025-09-28 22:50:37"}
+{"level":"\u001b[31merror\u001b[39m","message":"Authentication error: select \"id\", \"name\", \"email\", \"role\", \"department\", \"designation\", \"location\" from \"users\" where \"id\" = $1 limit $2 - column \"department\" does not exist","timestamp":"2025-09-28 22:50:37"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/logout","timestamp":"2025-09-28 22:50:37"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/auth/me","timestamp":"2025-09-28 22:56:27"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/auth/me","timestamp":"2025-09-28 22:56:27"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/login","timestamp":"2025-09-28 22:56:29"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/admin/dashboard","timestamp":"2025-09-28 22:56:30"}
+{"level":"\u001b[31merror\u001b[39m","message":"Authentication error: select \"id\", \"name\", \"email\", \"role\", \"department\", \"designation\", \"location\" from \"users\" where \"id\" = $1 limit $2 - column \"department\" does not exist","timestamp":"2025-09-28 22:56:30"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/admin/dashboard","timestamp":"2025-09-28 22:56:30"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/logout","timestamp":"2025-09-28 22:56:30"}
+{"level":"\u001b[31merror\u001b[39m","message":"Authentication error: select \"id\", \"name\", \"email\", \"role\", \"department\", \"designation\", \"location\" from \"users\" where \"id\" = $1 limit $2 - column \"department\" does not exist","timestamp":"2025-09-28 22:56:30"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/logout","timestamp":"2025-09-28 22:56:30"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/login","timestamp":"2025-09-28 22:56:38"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/admin/dashboard","timestamp":"2025-09-28 22:56:38"}
+{"level":"\u001b[31merror\u001b[39m","message":"Authentication error: select \"id\", \"name\", \"email\", \"role\", \"department\", \"designation\", \"location\" from \"users\" where \"id\" = $1 limit $2 - column \"department\" does not exist","timestamp":"2025-09-28 22:56:38"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/admin/dashboard","timestamp":"2025-09-28 22:56:38"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/logout","timestamp":"2025-09-28 22:56:38"}
+{"level":"\u001b[31merror\u001b[39m","message":"Authentication error: select \"id\", \"name\", \"email\", \"role\", \"department\", \"designation\", \"location\" from \"users\" where \"id\" = $1 limit $2 - column \"department\" does not exist","timestamp":"2025-09-28 22:56:38"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/logout","timestamp":"2025-09-28 22:56:38"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/login","timestamp":"2025-09-28 22:56:42"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/admin/dashboard","timestamp":"2025-09-28 22:56:42"}
+{"level":"\u001b[31merror\u001b[39m","message":"Authentication error: select \"id\", \"name\", \"email\", \"role\", \"department\", \"designation\", \"location\" from \"users\" where \"id\" = $1 limit $2 - column \"department\" does not exist","timestamp":"2025-09-28 22:56:42"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/admin/dashboard","timestamp":"2025-09-28 22:56:42"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/logout","timestamp":"2025-09-28 22:56:42"}
+{"level":"\u001b[31merror\u001b[39m","message":"Authentication error: select \"id\", \"name\", \"email\", \"role\", \"department\", \"designation\", \"location\" from \"users\" where \"id\" = $1 limit $2 - column \"department\" does not exist","timestamp":"2025-09-28 22:56:42"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/logout","timestamp":"2025-09-28 22:56:42"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/auth/me","timestamp":"2025-09-28 22:59:51"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/auth/me","timestamp":"2025-09-28 22:59:51"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/login","timestamp":"2025-09-28 22:59:55"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/admin/dashboard","timestamp":"2025-09-28 22:59:55"}
+{"level":"\u001b[31merror\u001b[39m","message":"Authentication error: select \"id\", \"name\", \"email\", \"role\", \"department\", \"designation\", \"location\" from \"users\" where \"id\" = $1 limit $2 - column \"department\" does not exist","timestamp":"2025-09-28 22:59:55"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/admin/dashboard","timestamp":"2025-09-28 22:59:55"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/logout","timestamp":"2025-09-28 22:59:55"}
+{"level":"\u001b[31merror\u001b[39m","message":"Authentication error: select \"id\", \"name\", \"email\", \"role\", \"department\", \"designation\", \"location\" from \"users\" where \"id\" = $1 limit $2 - column \"department\" does not exist","timestamp":"2025-09-28 22:59:55"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/logout","timestamp":"2025-09-28 22:59:55"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/login","timestamp":"2025-09-28 23:00:15"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/admin/dashboard","timestamp":"2025-09-28 23:00:15"}
+{"level":"\u001b[31merror\u001b[39m","message":"Authentication error: select \"id\", \"name\", \"email\", \"role\", \"department\", \"designation\", \"location\" from \"users\" where \"id\" = $1 limit $2 - column \"department\" does not exist","timestamp":"2025-09-28 23:00:16"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/admin/dashboard","timestamp":"2025-09-28 23:00:16"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/logout","timestamp":"2025-09-28 23:00:16"}
+{"level":"\u001b[31merror\u001b[39m","message":"Authentication error: select \"id\", \"name\", \"email\", \"role\", \"department\", \"designation\", \"location\" from \"users\" where \"id\" = $1 limit $2 - column \"department\" does not exist","timestamp":"2025-09-28 23:00:16"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/logout","timestamp":"2025-09-28 23:00:16"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/login","timestamp":"2025-09-28 23:00:26"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/admin/dashboard","timestamp":"2025-09-28 23:00:26"}
+{"level":"\u001b[31merror\u001b[39m","message":"Authentication error: select \"id\", \"name\", \"email\", \"role\", \"department\", \"designation\", \"location\" from \"users\" where \"id\" = $1 limit $2 - column \"department\" does not exist","timestamp":"2025-09-28 23:00:26"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/admin/dashboard","timestamp":"2025-09-28 23:00:26"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/logout","timestamp":"2025-09-28 23:00:26"}
+{"level":"\u001b[31merror\u001b[39m","message":"Authentication error: select \"id\", \"name\", \"email\", \"role\", \"department\", \"designation\", \"location\" from \"users\" where \"id\" = $1 limit $2 - column \"department\" does not exist","timestamp":"2025-09-28 23:00:27"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/logout","timestamp":"2025-09-28 23:00:27"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/auth/me","timestamp":"2025-09-28 23:03:34"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/auth/me","timestamp":"2025-09-28 23:03:56"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/auth/me","timestamp":"2025-09-28 23:03:56"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/login","timestamp":"2025-09-28 23:03:58"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/admin/dashboard","timestamp":"2025-09-28 23:03:58"}
+{"level":"\u001b[31merror\u001b[39m","message":"Authentication error: select \"id\", \"name\", \"email\", \"role\", \"department\", \"designation\", \"location\" from \"users\" where \"id\" = $1 limit $2 - column \"department\" does not exist","timestamp":"2025-09-28 23:03:58"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/admin/dashboard","timestamp":"2025-09-28 23:03:58"}
+{"level":"\u001b[31merror\u001b[39m","message":"Authentication error: select \"id\", \"name\", \"email\", \"role\", \"department\", \"designation\", \"location\" from \"users\" where \"id\" = $1 limit $2 - column \"department\" does not exist","timestamp":"2025-09-28 23:03:58"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/logout","timestamp":"2025-09-28 23:03:58"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/logout","timestamp":"2025-09-28 23:03:58"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/login","timestamp":"2025-09-28 23:04:02"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/admin/dashboard","timestamp":"2025-09-28 23:04:02"}
+{"level":"\u001b[31merror\u001b[39m","message":"Authentication error: select \"id\", \"name\", \"email\", \"role\", \"department\", \"designation\", \"location\" from \"users\" where \"id\" = $1 limit $2 - column \"department\" does not exist","timestamp":"2025-09-28 23:04:02"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/admin/dashboard","timestamp":"2025-09-28 23:04:02"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/logout","timestamp":"2025-09-28 23:04:02"}
+{"level":"\u001b[31merror\u001b[39m","message":"Authentication error: select \"id\", \"name\", \"email\", \"role\", \"department\", \"designation\", \"location\" from \"users\" where \"id\" = $1 limit $2 - column \"department\" does not exist","timestamp":"2025-09-28 23:04:02"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/logout","timestamp":"2025-09-28 23:04:02"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/login","timestamp":"2025-09-28 23:04:05"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/admin/dashboard","timestamp":"2025-09-28 23:04:05"}
+{"level":"\u001b[31merror\u001b[39m","message":"Authentication error: select \"id\", \"name\", \"email\", \"role\", \"department\", \"designation\", \"location\" from \"users\" where \"id\" = $1 limit $2 - column \"department\" does not exist","timestamp":"2025-09-28 23:04:05"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/admin/dashboard","timestamp":"2025-09-28 23:04:05"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/logout","timestamp":"2025-09-28 23:04:05"}
+{"level":"\u001b[31merror\u001b[39m","message":"Authentication error: select \"id\", \"name\", \"email\", \"role\", \"department\", \"designation\", \"location\" from \"users\" where \"id\" = $1 limit $2 - column \"department\" does not exist","timestamp":"2025-09-28 23:04:05"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/logout","timestamp":"2025-09-28 23:04:05"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/login","timestamp":"2025-09-28 23:04:08"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/admin/dashboard","timestamp":"2025-09-28 23:04:09"}
+{"level":"\u001b[31merror\u001b[39m","message":"Authentication error: select \"id\", \"name\", \"email\", \"role\", \"department\", \"designation\", \"location\" from \"users\" where \"id\" = $1 limit $2 - column \"department\" does not exist","timestamp":"2025-09-28 23:04:09"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/admin/dashboard","timestamp":"2025-09-28 23:04:09"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/logout","timestamp":"2025-09-28 23:04:09"}
+{"level":"\u001b[31merror\u001b[39m","message":"Authentication error: select \"id\", \"name\", \"email\", \"role\", \"department\", \"designation\", \"location\" from \"users\" where \"id\" = $1 limit $2 - column \"department\" does not exist","timestamp":"2025-09-28 23:04:09"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/logout","timestamp":"2025-09-28 23:04:09"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/login","timestamp":"2025-09-28 23:04:12"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/admin/dashboard","timestamp":"2025-09-28 23:04:12"}
+{"level":"\u001b[31merror\u001b[39m","message":"Authentication error: select \"id\", \"name\", \"email\", \"role\", \"department\", \"designation\", \"location\" from \"users\" where \"id\" = $1 limit $2 - column \"department\" does not exist","timestamp":"2025-09-28 23:04:12"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/admin/dashboard","timestamp":"2025-09-28 23:04:12"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/logout","timestamp":"2025-09-28 23:04:12"}
+{"level":"\u001b[31merror\u001b[39m","message":"Authentication error: select \"id\", \"name\", \"email\", \"role\", \"department\", \"designation\", \"location\" from \"users\" where \"id\" = $1 limit $2 - column \"department\" does not exist","timestamp":"2025-09-28 23:04:12"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/logout","timestamp":"2025-09-28 23:04:12"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/login","timestamp":"2025-09-28 23:04:15"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/admin/dashboard","timestamp":"2025-09-28 23:04:15"}
+{"level":"\u001b[31merror\u001b[39m","message":"Authentication error: select \"id\", \"name\", \"email\", \"role\", \"department\", \"designation\", \"location\" from \"users\" where \"id\" = $1 limit $2 - column \"department\" does not exist","timestamp":"2025-09-28 23:04:15"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/admin/dashboard","timestamp":"2025-09-28 23:04:15"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/logout","timestamp":"2025-09-28 23:04:15"}
+{"level":"\u001b[31merror\u001b[39m","message":"Authentication error: select \"id\", \"name\", \"email\", \"role\", \"department\", \"designation\", \"location\" from \"users\" where \"id\" = $1 limit $2 - column \"department\" does not exist","timestamp":"2025-09-28 23:04:15"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/logout","timestamp":"2025-09-28 23:04:15"}
+{"level":"\u001b[32minfo\u001b[39m","message":"✅ Database connection successful.","timestamp":"2025-09-28 23:08:57"}
+{"level":"\u001b[32minfo\u001b[39m","message":"🚀 Server is running on http://localhost:3001","timestamp":"2025-09-28 23:08:57"}
+{"level":"\u001b[32minfo\u001b[39m","message":"✅ Database connection successful.","timestamp":"2025-09-28 23:12:21"}
+{"level":"\u001b[32minfo\u001b[39m","message":"🚀 Server is running on http://localhost:3001","timestamp":"2025-09-28 23:12:21"}
+{"level":"\u001b[32minfo\u001b[39m","message":"✅ Database connection successful","timestamp":"2025-09-28 23:17:38"}
+{"level":"\u001b[32minfo\u001b[39m","message":"📊 Found 8 tables in database","timestamp":"2025-09-28 23:17:38"}
+{"level":"\u001b[32minfo\u001b[39m","message":"🚀 Civic Reporter Backend running at http://localhost:3001","timestamp":"2025-09-28 23:17:38"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/auth/me","timestamp":"2025-09-28 23:19:46"}
+{"level":"\u001b[31merror\u001b[39m","message":"Authentication error: select \"id\", \"name\", \"email\", \"role\", \"department\", \"designation\", \"location\" from \"users\" where \"id\" = $1 limit $2 - column \"department\" does not exist","timestamp":"2025-09-28 23:19:46"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/auth/me","timestamp":"2025-09-28 23:19:46"}
+{"level":"\u001b[31merror\u001b[39m","message":"Authentication error: select \"id\", \"name\", \"email\", \"role\", \"department\", \"designation\", \"location\" from \"users\" where \"id\" = $1 limit $2 - column \"department\" does not exist","timestamp":"2025-09-28 23:19:46"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/login","timestamp":"2025-09-28 23:19:50"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/admin/dashboard","timestamp":"2025-09-28 23:19:50"}
+{"level":"\u001b[31merror\u001b[39m","message":"Authentication error: select \"id\", \"name\", \"email\", \"role\", \"department\", \"designation\", \"location\" from \"users\" where \"id\" = $1 limit $2 - column \"department\" does not exist","timestamp":"2025-09-28 23:19:50"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/admin/dashboard","timestamp":"2025-09-28 23:19:50"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/logout","timestamp":"2025-09-28 23:19:50"}
+{"level":"\u001b[31merror\u001b[39m","message":"Authentication error: select \"id\", \"name\", \"email\", \"role\", \"department\", \"designation\", \"location\" from \"users\" where \"id\" = $1 limit $2 - column \"department\" does not exist","timestamp":"2025-09-28 23:19:50"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/logout","timestamp":"2025-09-28 23:19:50"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/login","timestamp":"2025-09-28 23:19:53"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/admin/dashboard","timestamp":"2025-09-28 23:19:54"}
+{"level":"\u001b[31merror\u001b[39m","message":"Authentication error: select \"id\", \"name\", \"email\", \"role\", \"department\", \"designation\", \"location\" from \"users\" where \"id\" = $1 limit $2 - column \"department\" does not exist","timestamp":"2025-09-28 23:19:54"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/admin/dashboard","timestamp":"2025-09-28 23:19:54"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/logout","timestamp":"2025-09-28 23:19:54"}
+{"level":"\u001b[31merror\u001b[39m","message":"Authentication error: select \"id\", \"name\", \"email\", \"role\", \"department\", \"designation\", \"location\" from \"users\" where \"id\" = $1 limit $2 - column \"department\" does not exist","timestamp":"2025-09-28 23:19:54"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/logout","timestamp":"2025-09-28 23:19:54"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/login","timestamp":"2025-09-28 23:19:56"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/admin/dashboard","timestamp":"2025-09-28 23:19:57"}
+{"level":"\u001b[31merror\u001b[39m","message":"Authentication error: select \"id\", \"name\", \"email\", \"role\", \"department\", \"designation\", \"location\" from \"users\" where \"id\" = $1 limit $2 - column \"department\" does not exist","timestamp":"2025-09-28 23:19:57"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a GET request for /api/admin/dashboard","timestamp":"2025-09-28 23:19:57"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/logout","timestamp":"2025-09-28 23:19:57"}
+{"level":"\u001b[31merror\u001b[39m","message":"Authentication error: select \"id\", \"name\", \"email\", \"role\", \"department\", \"designation\", \"location\" from \"users\" where \"id\" = $1 limit $2 - column \"department\" does not exist","timestamp":"2025-09-28 23:19:57"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Received a POST request for /api/auth/logout","timestamp":"2025-09-28 23:19:57"}
+{"level":"\u001b[32minfo\u001b[39m","message":"✅ Database connection successful.","timestamp":"2025-09-28 23:27:28"}
+{"level":"\u001b[32minfo\u001b[39m","message":"🚀 Server is running on http://localhost:3001","timestamp":"2025-09-28 23:27:28"}
+{"level":"\u001b[32minfo\u001b[39m","message":"✅ Database connection successful.","timestamp":"2025-09-28 23:27:44"}
+{"level":"\u001b[32minfo\u001b[39m","message":"🚀 Server is running on http://localhost:3001","timestamp":"2025-09-28 23:27:44"}
+{"level":"\u001b[31merror\u001b[39m","message":"Authentication error: select \"id\", \"name\", \"email\", \"role\", \"department\", \"designation\", \"location\" from \"users\" where \"id\" = $1 limit $2 - column \"department\" does not exist","timestamp":"2025-09-28 23:28:26"}
+{"level":"\u001b[31merror\u001b[39m","message":"Authentication error: select \"id\", \"name\", \"email\", \"role\", \"department\", \"designation\", \"location\" from \"users\" where \"id\" = $1 limit $2 - column \"department\" does not exist","timestamp":"2025-09-28 23:28:26"}
+{"level":"\u001b[31merror\u001b[39m","message":"Authentication error: select \"id\", \"name\", \"email\", \"role\", \"department\", \"designation\", \"location\" from \"users\" where \"id\" = $1 limit $2 - column \"department\" does not exist","timestamp":"2025-09-28 23:28:31"}
+{"level":"\u001b[31merror\u001b[39m","message":"Authentication error: select \"id\", \"name\", \"email\", \"role\", \"department\", \"designation\", \"location\" from \"users\" where \"id\" = $1 limit $2 - column \"department\" does not exist","timestamp":"2025-09-28 23:28:31"}
+{"level":"\u001b[31merror\u001b[39m","message":"Authentication error: select \"id\", \"name\", \"email\", \"role\", \"department\", \"designation\", \"location\" from \"users\" where \"id\" = $1 limit $2 - column \"department\" does not exist","timestamp":"2025-09-28 23:28:33"}
+{"level":"\u001b[31merror\u001b[39m","message":"Authentication error: select \"id\", \"name\", \"email\", \"role\", \"department\", \"designation\", \"location\" from \"users\" where \"id\" = $1 limit $2 - column \"department\" does not exist","timestamp":"2025-09-28 23:28:33"}
+{"level":"\u001b[31merror\u001b[39m","message":"Authentication error: select \"id\", \"name\", \"email\", \"role\", \"department\", \"designation\", \"location\" from \"users\" where \"id\" = $1 limit $2 - column \"department\" does not exist","timestamp":"2025-09-28 23:28:36"}
+{"level":"\u001b[31merror\u001b[39m","message":"Authentication error: select \"id\", \"name\", \"email\", \"role\", \"department\", \"designation\", \"location\" from \"users\" where \"id\" = $1 limit $2 - column \"department\" does not exist","timestamp":"2025-09-28 23:28:36"}
+{"level":"\u001b[32minfo\u001b[39m","message":"✅ Database connection successful.","timestamp":"2025-09-28 23:31:16"}
+{"level":"\u001b[32minfo\u001b[39m","message":"🚀 Server is running on http://localhost:3001","timestamp":"2025-09-28 23:31:16"}
+{"level":"\u001b[32minfo\u001b[39m","message":"--- Auth Middleware Triggered ---","timestamp":"2025-09-28 23:31:37"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Incoming Request Path: /api/auth/me","timestamp":"2025-09-28 23:31:37"}
+{"level":"\u001b[31merror\u001b[39m","message":"Auth Middleware FAIL: No cookies were received by the server.","timestamp":"2025-09-28 23:31:37"}
+{"level":"\u001b[31merror\u001b[39m","message":"Auth Middleware FAIL: \"jwt\" cookie was NOT found in the received cookies.","timestamp":"2025-09-28 23:31:37"}
+{"level":"\u001b[32minfo\u001b[39m","message":"--- Auth Middleware Triggered ---","timestamp":"2025-09-28 23:32:46"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Incoming Request Path: /api/auth/me","timestamp":"2025-09-28 23:32:46"}
+{"level":"\u001b[31merror\u001b[39m","message":"Auth Middleware FAIL: No cookies were received by the server.","timestamp":"2025-09-28 23:32:46"}
+{"level":"\u001b[31merror\u001b[39m","message":"Auth Middleware FAIL: \"jwt\" cookie was NOT found in the received cookies.","timestamp":"2025-09-28 23:32:46"}
+{"level":"\u001b[32minfo\u001b[39m","message":"--- Auth Middleware Triggered ---","timestamp":"2025-09-28 23:32:46"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Incoming Request Path: /api/auth/me","timestamp":"2025-09-28 23:32:46"}
+{"level":"\u001b[31merror\u001b[39m","message":"Auth Middleware FAIL: No cookies were received by the server.","timestamp":"2025-09-28 23:32:46"}
+{"level":"\u001b[31merror\u001b[39m","message":"Auth Middleware FAIL: \"jwt\" cookie was NOT found in the received cookies.","timestamp":"2025-09-28 23:32:46"}
+{"level":"\u001b[32minfo\u001b[39m","message":"--- Auth Middleware Triggered ---","timestamp":"2025-09-28 23:33:13"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Incoming Request Path: /api/auth/me","timestamp":"2025-09-28 23:33:13"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Cookies Received by Server: {\"jwt\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc1OTA4MjU5MywiZXhwIjoxNzU5Njg3MzkzfQ.x2nHB0i6hCxrizUf2DpPsSrSih4Ff98O9EXBaB__C3o\"}","timestamp":"2025-09-28 23:33:13"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Auth Middleware PASS: \"jwt\" cookie was found.","timestamp":"2025-09-28 23:33:13"}
+{"level":"\u001b[31merror\u001b[39m","message":"Auth Middleware FAIL: An error occurred during token verification: select \"id\", \"name\", \"email\", \"role\", \"department\", \"designation\", \"location\" from \"users\" where \"id\" = $1 limit $2 - column \"department\" does not exist","timestamp":"2025-09-28 23:33:14"}
+{"level":"\u001b[32minfo\u001b[39m","message":"--- Auth Middleware Triggered ---","timestamp":"2025-09-28 23:33:14"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Incoming Request Path: /api/auth/me","timestamp":"2025-09-28 23:33:14"}
+{"level":"\u001b[31merror\u001b[39m","message":"Auth Middleware FAIL: No cookies were received by the server.","timestamp":"2025-09-28 23:33:14"}
+{"level":"\u001b[31merror\u001b[39m","message":"Auth Middleware FAIL: \"jwt\" cookie was NOT found in the received cookies.","timestamp":"2025-09-28 23:33:14"}
+{"level":"\u001b[32minfo\u001b[39m","message":"--- Auth Middleware Triggered ---","timestamp":"2025-09-28 23:33:14"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Incoming Request Path: /api/auth/me","timestamp":"2025-09-28 23:33:14"}
+{"level":"\u001b[31merror\u001b[39m","message":"Auth Middleware FAIL: No cookies were received by the server.","timestamp":"2025-09-28 23:33:14"}
+{"level":"\u001b[31merror\u001b[39m","message":"Auth Middleware FAIL: \"jwt\" cookie was NOT found in the received cookies.","timestamp":"2025-09-28 23:33:14"}
+{"level":"\u001b[32minfo\u001b[39m","message":"✅ Database connection successful.","timestamp":"2025-09-28 23:36:12"}
+{"level":"\u001b[32minfo\u001b[39m","message":"🚀 Server is running on http://localhost:3001","timestamp":"2025-09-28 23:36:12"}
+{"level":"\u001b[32minfo\u001b[39m","message":"✅ Database connection successful.","timestamp":"2025-09-28 23:36:22"}
+{"level":"\u001b[32minfo\u001b[39m","message":"🚀 Server is running on http://localhost:3001","timestamp":"2025-09-28 23:36:22"}
+{"level":"\u001b[32minfo\u001b[39m","message":"--- Auth Middleware Triggered ---","timestamp":"2025-09-28 23:36:42"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Incoming Request Path: /api/auth/me","timestamp":"2025-09-28 23:36:42"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Cookies Received by Server: {\"jwt\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc1OTA4MjgwMiwiZXhwIjoxNzU5Njg3NjAyfQ.7NKUGqQOVcViYExfzmD40afBGA-veHdW8RXXL6k5YzQ\"}","timestamp":"2025-09-28 23:36:42"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Auth Middleware PASS: \"jwt\" cookie was found.","timestamp":"2025-09-28 23:36:42"}
+{"level":"\u001b[31merror\u001b[39m","message":"Auth Middleware FAIL: An error occurred during token verification: select \"id\", \"name\", \"email\", \"role\", \"department\", \"designation\", \"location\" from \"users\" where \"id\" = $1 limit $2 - column \"department\" does not exist","timestamp":"2025-09-28 23:36:42"}
+{"level":"\u001b[32minfo\u001b[39m","message":"--- Auth Middleware Triggered ---","timestamp":"2025-09-28 23:36:43"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Incoming Request Path: /api/auth/me","timestamp":"2025-09-28 23:36:43"}
+{"level":"\u001b[31merror\u001b[39m","message":"Auth Middleware FAIL: No cookies were received by the server.","timestamp":"2025-09-28 23:36:43"}
+{"level":"\u001b[31merror\u001b[39m","message":"Auth Middleware FAIL: \"jwt\" cookie was NOT found in the received cookies.","timestamp":"2025-09-28 23:36:43"}
+{"level":"\u001b[32minfo\u001b[39m","message":"--- Auth Middleware Triggered ---","timestamp":"2025-09-28 23:36:43"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Incoming Request Path: /api/auth/me","timestamp":"2025-09-28 23:36:43"}
+{"level":"\u001b[31merror\u001b[39m","message":"Auth Middleware FAIL: No cookies were received by the server.","timestamp":"2025-09-28 23:36:43"}
+{"level":"\u001b[31merror\u001b[39m","message":"Auth Middleware FAIL: \"jwt\" cookie was NOT found in the received cookies.","timestamp":"2025-09-28 23:36:43"}
+{"level":"\u001b[32minfo\u001b[39m","message":"--- Auth Middleware Triggered ---","timestamp":"2025-09-28 23:36:45"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Incoming Request Path: /api/auth/me","timestamp":"2025-09-28 23:36:45"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Cookies Received by Server: {\"jwt\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc1OTA4MjgwNSwiZXhwIjoxNzU5Njg3NjA1fQ.fBurGNASr0LQZoHe6ZjqZm46f5YiMWzvYeEuEn0FJj8\"}","timestamp":"2025-09-28 23:36:45"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Auth Middleware PASS: \"jwt\" cookie was found.","timestamp":"2025-09-28 23:36:45"}
+{"level":"\u001b[31merror\u001b[39m","message":"Auth Middleware FAIL: An error occurred during token verification: select \"id\", \"name\", \"email\", \"role\", \"department\", \"designation\", \"location\" from \"users\" where \"id\" = $1 limit $2 - column \"department\" does not exist","timestamp":"2025-09-28 23:36:45"}
+{"level":"\u001b[32minfo\u001b[39m","message":"--- Auth Middleware Triggered ---","timestamp":"2025-09-28 23:36:45"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Incoming Request Path: /api/auth/me","timestamp":"2025-09-28 23:36:45"}
+{"level":"\u001b[31merror\u001b[39m","message":"Auth Middleware FAIL: No cookies were received by the server.","timestamp":"2025-09-28 23:36:45"}
+{"level":"\u001b[31merror\u001b[39m","message":"Auth Middleware FAIL: \"jwt\" cookie was NOT found in the received cookies.","timestamp":"2025-09-28 23:36:45"}
+{"level":"\u001b[32minfo\u001b[39m","message":"--- Auth Middleware Triggered ---","timestamp":"2025-09-28 23:36:45"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Incoming Request Path: /api/auth/me","timestamp":"2025-09-28 23:36:45"}
+{"level":"\u001b[31merror\u001b[39m","message":"Auth Middleware FAIL: No cookies were received by the server.","timestamp":"2025-09-28 23:36:45"}
+{"level":"\u001b[31merror\u001b[39m","message":"Auth Middleware FAIL: \"jwt\" cookie was NOT found in the received cookies.","timestamp":"2025-09-28 23:36:45"}
+{"level":"\u001b[32minfo\u001b[39m","message":"--- Auth Middleware Triggered ---","timestamp":"2025-09-28 23:36:56"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Incoming Request Path: /api/auth/me","timestamp":"2025-09-28 23:36:56"}
+{"level":"\u001b[31merror\u001b[39m","message":"Auth Middleware FAIL: No cookies were received by the server.","timestamp":"2025-09-28 23:36:56"}
+{"level":"\u001b[31merror\u001b[39m","message":"Auth Middleware FAIL: \"jwt\" cookie was NOT found in the received cookies.","timestamp":"2025-09-28 23:36:56"}
+{"level":"\u001b[32minfo\u001b[39m","message":"--- Auth Middleware Triggered ---","timestamp":"2025-09-28 23:36:56"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Incoming Request Path: /api/auth/me","timestamp":"2025-09-28 23:36:56"}
+{"level":"\u001b[31merror\u001b[39m","message":"Auth Middleware FAIL: No cookies were received by the server.","timestamp":"2025-09-28 23:36:56"}
+{"level":"\u001b[31merror\u001b[39m","message":"Auth Middleware FAIL: \"jwt\" cookie was NOT found in the received cookies.","timestamp":"2025-09-28 23:36:56"}
+{"level":"\u001b[32minfo\u001b[39m","message":"--- Auth Middleware Triggered ---","timestamp":"2025-09-28 23:36:59"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Incoming Request Path: /api/auth/me","timestamp":"2025-09-28 23:36:59"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Cookies Received by Server: {\"jwt\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc1OTA4MjgxOSwiZXhwIjoxNzU5Njg3NjE5fQ.IPJ-PoZHokLKnB2pLuDfIVr6rCYJHQUvdJOseu4Oukg\"}","timestamp":"2025-09-28 23:36:59"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Auth Middleware PASS: \"jwt\" cookie was found.","timestamp":"2025-09-28 23:36:59"}
+{"level":"\u001b[31merror\u001b[39m","message":"Auth Middleware FAIL: An error occurred during token verification: select \"id\", \"name\", \"email\", \"role\", \"department\", \"designation\", \"location\" from \"users\" where \"id\" = $1 limit $2 - column \"department\" does not exist","timestamp":"2025-09-28 23:36:59"}
+{"level":"\u001b[32minfo\u001b[39m","message":"--- Auth Middleware Triggered ---","timestamp":"2025-09-28 23:37:00"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Incoming Request Path: /api/auth/me","timestamp":"2025-09-28 23:37:00"}
+{"level":"\u001b[31merror\u001b[39m","message":"Auth Middleware FAIL: No cookies were received by the server.","timestamp":"2025-09-28 23:37:00"}
+{"level":"\u001b[31merror\u001b[39m","message":"Auth Middleware FAIL: \"jwt\" cookie was NOT found in the received cookies.","timestamp":"2025-09-28 23:37:00"}
+{"level":"\u001b[32minfo\u001b[39m","message":"--- Auth Middleware Triggered ---","timestamp":"2025-09-28 23:37:00"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Incoming Request Path: /api/auth/me","timestamp":"2025-09-28 23:37:00"}
+{"level":"\u001b[31merror\u001b[39m","message":"Auth Middleware FAIL: No cookies were received by the server.","timestamp":"2025-09-28 23:37:00"}
+{"level":"\u001b[31merror\u001b[39m","message":"Auth Middleware FAIL: \"jwt\" cookie was NOT found in the received cookies.","timestamp":"2025-09-28 23:37:00"}
+{"level":"\u001b[32minfo\u001b[39m","message":"✅ Database connection successful.","timestamp":"2025-09-28 23:40:06"}
+{"level":"\u001b[32minfo\u001b[39m","message":"🚀 Server is running on http://localhost:3001","timestamp":"2025-09-28 23:40:06"}
+{"level":"\u001b[32minfo\u001b[39m","message":"--- Auth Middleware Triggered ---","timestamp":"2025-09-28 23:40:36"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Incoming Request Path: /api/auth/me","timestamp":"2025-09-28 23:40:36"}
+{"level":"\u001b[31merror\u001b[39m","message":"Auth Middleware FAIL: No cookies were received by the server.","timestamp":"2025-09-28 23:40:36"}
+{"level":"\u001b[31merror\u001b[39m","message":"Auth Middleware FAIL: \"jwt\" cookie was NOT found in the received cookies.","timestamp":"2025-09-28 23:40:36"}
+{"level":"\u001b[32minfo\u001b[39m","message":"--- Auth Middleware Triggered ---","timestamp":"2025-09-28 23:40:36"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Incoming Request Path: /api/auth/me","timestamp":"2025-09-28 23:40:36"}
+{"level":"\u001b[31merror\u001b[39m","message":"Auth Middleware FAIL: No cookies were received by the server.","timestamp":"2025-09-28 23:40:36"}
+{"level":"\u001b[31merror\u001b[39m","message":"Auth Middleware FAIL: \"jwt\" cookie was NOT found in the received cookies.","timestamp":"2025-09-28 23:40:36"}
+{"level":"\u001b[32minfo\u001b[39m","message":"--- Auth Middleware Triggered ---","timestamp":"2025-09-28 23:40:39"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Incoming Request Path: /api/auth/me","timestamp":"2025-09-28 23:40:39"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Cookies Received by Server: {\"jwt\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc1OTA4MzAzOSwiZXhwIjoxNzU5Njg3ODM5fQ.dDLXxOV4jHRAS7qL1wg3YixWQZhammnjsdT-IbMT8eA\"}","timestamp":"2025-09-28 23:40:39"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Auth Middleware PASS: \"jwt\" cookie was found.","timestamp":"2025-09-28 23:40:39"}
+{"level":"\u001b[31merror\u001b[39m","message":"Auth Middleware FAIL: An error occurred during token verification: select \"id\", \"name\", \"email\", \"role\", \"department\", \"designation\", \"location\" from \"users\" where \"id\" = $1 limit $2 - column \"department\" does not exist","timestamp":"2025-09-28 23:40:39"}
+{"level":"\u001b[32minfo\u001b[39m","message":"--- Auth Middleware Triggered ---","timestamp":"2025-09-28 23:40:40"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Incoming Request Path: /api/auth/me","timestamp":"2025-09-28 23:40:40"}
+{"level":"\u001b[31merror\u001b[39m","message":"Auth Middleware FAIL: No cookies were received by the server.","timestamp":"2025-09-28 23:40:40"}
+{"level":"\u001b[31merror\u001b[39m","message":"Auth Middleware FAIL: \"jwt\" cookie was NOT found in the received cookies.","timestamp":"2025-09-28 23:40:40"}
+{"level":"\u001b[32minfo\u001b[39m","message":"--- Auth Middleware Triggered ---","timestamp":"2025-09-28 23:40:40"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Incoming Request Path: /api/auth/me","timestamp":"2025-09-28 23:40:40"}
+{"level":"\u001b[31merror\u001b[39m","message":"Auth Middleware FAIL: No cookies were received by the server.","timestamp":"2025-09-28 23:40:40"}
+{"level":"\u001b[31merror\u001b[39m","message":"Auth Middleware FAIL: \"jwt\" cookie was NOT found in the received cookies.","timestamp":"2025-09-28 23:40:40"}
+{"level":"\u001b[32minfo\u001b[39m","message":"--- Auth Middleware Triggered ---","timestamp":"2025-09-28 23:40:43"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Incoming Request Path: /api/auth/me","timestamp":"2025-09-28 23:40:43"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Cookies Received by Server: {\"jwt\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc1OTA4MzA0MywiZXhwIjoxNzU5Njg3ODQzfQ._MrTJfH0_Biq-ygiYT2uY9kl1CA8e5GtzIj0psVnux8\"}","timestamp":"2025-09-28 23:40:43"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Auth Middleware PASS: \"jwt\" cookie was found.","timestamp":"2025-09-28 23:40:43"}
+{"level":"\u001b[31merror\u001b[39m","message":"Auth Middleware FAIL: An error occurred during token verification: select \"id\", \"name\", \"email\", \"role\", \"department\", \"designation\", \"location\" from \"users\" where \"id\" = $1 limit $2 - column \"department\" does not exist","timestamp":"2025-09-28 23:40:43"}
+{"level":"\u001b[32minfo\u001b[39m","message":"--- Auth Middleware Triggered ---","timestamp":"2025-09-28 23:40:43"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Incoming Request Path: /api/auth/me","timestamp":"2025-09-28 23:40:43"}
+{"level":"\u001b[31merror\u001b[39m","message":"Auth Middleware FAIL: No cookies were received by the server.","timestamp":"2025-09-28 23:40:43"}
+{"level":"\u001b[31merror\u001b[39m","message":"Auth Middleware FAIL: \"jwt\" cookie was NOT found in the received cookies.","timestamp":"2025-09-28 23:40:43"}
+{"level":"\u001b[32minfo\u001b[39m","message":"--- Auth Middleware Triggered ---","timestamp":"2025-09-28 23:40:43"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Incoming Request Path: /api/auth/me","timestamp":"2025-09-28 23:40:43"}
+{"level":"\u001b[31merror\u001b[39m","message":"Auth Middleware FAIL: No cookies were received by the server.","timestamp":"2025-09-28 23:40:43"}
+{"level":"\u001b[31merror\u001b[39m","message":"Auth Middleware FAIL: \"jwt\" cookie was NOT found in the received cookies.","timestamp":"2025-09-28 23:40:43"}
+{"level":"\u001b[32minfo\u001b[39m","message":"--- Auth Middleware Triggered ---","timestamp":"2025-09-28 23:40:45"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Incoming Request Path: /api/admin/dashboard","timestamp":"2025-09-28 23:40:45"}
+{"level":"\u001b[31merror\u001b[39m","message":"Auth Middleware FAIL: No cookies were received by the server.","timestamp":"2025-09-28 23:40:45"}
+{"level":"\u001b[31merror\u001b[39m","message":"Auth Middleware FAIL: \"jwt\" cookie was NOT found in the received cookies.","timestamp":"2025-09-28 23:40:45"}
+{"level":"\u001b[32minfo\u001b[39m","message":"--- Auth Middleware Triggered ---","timestamp":"2025-09-28 23:40:45"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Incoming Request Path: /api/admin/dashboard","timestamp":"2025-09-28 23:40:45"}
+{"level":"\u001b[31merror\u001b[39m","message":"Auth Middleware FAIL: No cookies were received by the server.","timestamp":"2025-09-28 23:40:45"}
+{"level":"\u001b[31merror\u001b[39m","message":"Auth Middleware FAIL: \"jwt\" cookie was NOT found in the received cookies.","timestamp":"2025-09-28 23:40:45"}
+{"level":"\u001b[32minfo\u001b[39m","message":"--- Auth Middleware Triggered ---","timestamp":"2025-09-28 23:40:46"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Incoming Request Path: /api/admin/dashboard","timestamp":"2025-09-28 23:40:46"}
+{"level":"\u001b[31merror\u001b[39m","message":"Auth Middleware FAIL: No cookies were received by the server.","timestamp":"2025-09-28 23:40:46"}
+{"level":"\u001b[31merror\u001b[39m","message":"Auth Middleware FAIL: \"jwt\" cookie was NOT found in the received cookies.","timestamp":"2025-09-28 23:40:46"}
+{"level":"\u001b[32minfo\u001b[39m","message":"--- Auth Middleware Triggered ---","timestamp":"2025-09-28 23:40:46"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Incoming Request Path: /api/admin/dashboard","timestamp":"2025-09-28 23:40:46"}
+{"level":"\u001b[31merror\u001b[39m","message":"Auth Middleware FAIL: No cookies were received by the server.","timestamp":"2025-09-28 23:40:46"}
+{"level":"\u001b[31merror\u001b[39m","message":"Auth Middleware FAIL: \"jwt\" cookie was NOT found in the received cookies.","timestamp":"2025-09-28 23:40:46"}
+{"level":"\u001b[32minfo\u001b[39m","message":"--- Auth Middleware Triggered ---","timestamp":"2025-09-28 23:40:50"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Incoming Request Path: /api/auth/me","timestamp":"2025-09-28 23:40:50"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Cookies Received by Server: {\"jwt\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc1OTA4MzA1MCwiZXhwIjoxNzU5Njg3ODUwfQ.nMBXhuN7IXdJ9hNsyjDZgPVhEbbuHHcqDQrrDzyfoEw\"}","timestamp":"2025-09-28 23:40:50"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Auth Middleware PASS: \"jwt\" cookie was found.","timestamp":"2025-09-28 23:40:50"}
+{"level":"\u001b[31merror\u001b[39m","message":"Auth Middleware FAIL: An error occurred during token verification: select \"id\", \"name\", \"email\", \"role\", \"department\", \"designation\", \"location\" from \"users\" where \"id\" = $1 limit $2 - column \"department\" does not exist","timestamp":"2025-09-28 23:40:50"}
+{"level":"\u001b[32minfo\u001b[39m","message":"--- Auth Middleware Triggered ---","timestamp":"2025-09-28 23:40:50"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Incoming Request Path: /api/auth/me","timestamp":"2025-09-28 23:40:50"}
+{"level":"\u001b[31merror\u001b[39m","message":"Auth Middleware FAIL: No cookies were received by the server.","timestamp":"2025-09-28 23:40:50"}
+{"level":"\u001b[31merror\u001b[39m","message":"Auth Middleware FAIL: \"jwt\" cookie was NOT found in the received cookies.","timestamp":"2025-09-28 23:40:50"}
+{"level":"\u001b[32minfo\u001b[39m","message":"--- Auth Middleware Triggered ---","timestamp":"2025-09-28 23:40:50"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Incoming Request Path: /api/auth/me","timestamp":"2025-09-28 23:40:50"}
+{"level":"\u001b[31merror\u001b[39m","message":"Auth Middleware FAIL: No cookies were received by the server.","timestamp":"2025-09-28 23:40:50"}
+{"level":"\u001b[31merror\u001b[39m","message":"Auth Middleware FAIL: \"jwt\" cookie was NOT found in the received cookies.","timestamp":"2025-09-28 23:40:50"}
+{"level":"\u001b[32minfo\u001b[39m","message":"--- Auth Middleware Triggered ---","timestamp":"2025-09-28 23:40:51"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Incoming Request Path: /api/auth/me","timestamp":"2025-09-28 23:40:51"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Cookies Received by Server: {\"jwt\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc1OTA4MzA1MSwiZXhwIjoxNzU5Njg3ODUxfQ.fgJ9WGSe3rtdSN9Quo5036e8idY58WpI8f03hkJpDrM\"}","timestamp":"2025-09-28 23:40:51"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Auth Middleware PASS: \"jwt\" cookie was found.","timestamp":"2025-09-28 23:40:51"}
+{"level":"\u001b[31merror\u001b[39m","message":"Auth Middleware FAIL: An error occurred during token verification: select \"id\", \"name\", \"email\", \"role\", \"department\", \"designation\", \"location\" from \"users\" where \"id\" = $1 limit $2 - column \"department\" does not exist","timestamp":"2025-09-28 23:40:51"}
+{"level":"\u001b[32minfo\u001b[39m","message":"--- Auth Middleware Triggered ---","timestamp":"2025-09-28 23:40:51"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Incoming Request Path: /api/auth/me","timestamp":"2025-09-28 23:40:51"}
+{"level":"\u001b[31merror\u001b[39m","message":"Auth Middleware FAIL: No cookies were received by the server.","timestamp":"2025-09-28 23:40:51"}
+{"level":"\u001b[31merror\u001b[39m","message":"Auth Middleware FAIL: \"jwt\" cookie was NOT found in the received cookies.","timestamp":"2025-09-28 23:40:51"}
+{"level":"\u001b[32minfo\u001b[39m","message":"--- Auth Middleware Triggered ---","timestamp":"2025-09-28 23:40:51"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Incoming Request Path: /api/auth/me","timestamp":"2025-09-28 23:40:51"}
+{"level":"\u001b[31merror\u001b[39m","message":"Auth Middleware FAIL: No cookies were received by the server.","timestamp":"2025-09-28 23:40:51"}
+{"level":"\u001b[31merror\u001b[39m","message":"Auth Middleware FAIL: \"jwt\" cookie was NOT found in the received cookies.","timestamp":"2025-09-28 23:40:51"}
+{"level":"\u001b[32minfo\u001b[39m","message":"--- Auth Middleware Triggered ---","timestamp":"2025-09-28 23:40:53"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Incoming Request Path: /api/admin/dashboard","timestamp":"2025-09-28 23:40:53"}
+{"level":"\u001b[31merror\u001b[39m","message":"Auth Middleware FAIL: No cookies were received by the server.","timestamp":"2025-09-28 23:40:53"}
+{"level":"\u001b[31merror\u001b[39m","message":"Auth Middleware FAIL: \"jwt\" cookie was NOT found in the received cookies.","timestamp":"2025-09-28 23:40:53"}
+{"level":"\u001b[32minfo\u001b[39m","message":"--- Auth Middleware Triggered ---","timestamp":"2025-09-28 23:40:53"}
+{"level":"\u001b[32minfo\u001b[39m","message":"Incoming Request Path: /api/admin/dashboard","timestamp":"2025-09-28 23:40:53"}
+{"level":"\u001b[31merror\u001b[39m","message":"Auth Middleware FAIL: No cookies were received by the server.","timestamp":"2025-09-28 23:40:53"}
+{"level":"\u001b[31merror\u001b[39m","message":"Auth Middleware FAIL: \"jwt\" cookie was NOT found in the received cookies.","timestamp":"2025-09-28 23:40:53"}
+{"level":"\u001b[32minfo\u001b[39m","message":"✅ Database connection successful.","timestamp":"2025-09-28 23:42:27"}
+{"level":"\u001b[32minfo\u001b[39m","message":"🚀 Server is running on http://localhost:3001","timestamp":"2025-09-28 23:42:27"}
+{"level":"\u001b[32minfo\u001b[39m","message":"✅ Database connection successful.","timestamp":"2025-09-28 23:42:50"}
+{"level":"\u001b[32minfo\u001b[39m","message":"🚀 Server is running on http://localhost:3001","timestamp":"2025-09-28 23:42:50"}
+{"level":"\u001b[32minfo\u001b[39m","message":"✅ Database connection successful.","timestamp":"2025-09-29 09:20:29"}
+{"level":"\u001b[32minfo\u001b[39m","message":"🚀 Server is running on http://localhost:3001","timestamp":"2025-09-29 09:20:29"}
+{"level":"\u001b[32minfo\u001b[39m","message":"✅ Database connection successful.","timestamp":"2025-09-29 09:24:53"}
+{"level":"\u001b[32minfo\u001b[39m","message":"🚀 Server is running on http://localhost:3001","timestamp":"2025-09-29 09:24:53"}
+{"level":"\u001b[32minfo\u001b[39m","message":"✅ Database connection successful.","timestamp":"2025-09-29 09:25:03"}
+{"level":"\u001b[32minfo\u001b[39m","message":"🚀 Server is running on http://localhost:3001","timestamp":"2025-09-29 09:25:03"}
+{"level":"\u001b[32minfo\u001b[39m","message":"✅ Database connection successful.","timestamp":"2025-09-29 09:25:10"}
+{"level":"\u001b[32minfo\u001b[39m","message":"🚀 Server is running on http://localhost:3001","timestamp":"2025-09-29 09:25:10"}
+{"level":"\u001b[32minfo\u001b[39m","message":"✅ Database connection successful.","timestamp":"2025-09-29 09:25:27"}
+{"level":"\u001b[32minfo\u001b[39m","message":"🚀 Server is running on http://localhost:3001","timestamp":"2025-09-29 09:25:27"}
+{"level":"\u001b[32minfo\u001b[39m","message":"✅ Database connection successful.","timestamp":"2025-09-29 09:35:33"}
+{"level":"\u001b[32minfo\u001b[39m","message":"🚀 Server is running on http://localhost:3001","timestamp":"2025-09-29 09:35:33"}
+{"level":"\u001b[31merror\u001b[39m","message":"Supabase Login Error: Invalid login credentials","timestamp":"2025-09-29 09:35:47"}
+{"level":"\u001b[31merror\u001b[39m","message":"Supabase Login Error: Invalid login credentials","timestamp":"2025-09-29 09:36:04"}
+{"level":"\u001b[31merror\u001b[39m","message":"Supabase Login Error: Invalid login credentials","timestamp":"2025-09-29 09:36:23"}
+{"level":"\u001b[32minfo\u001b[39m","message":"✅ Database connection successful.","timestamp":"2025-09-29 09:40:32"}
+{"level":"\u001b[32minfo\u001b[39m","message":"🚀 Server is running on http://localhost:3001","timestamp":"2025-09-29 09:40:32"}
+{"level":"\u001b[32minfo\u001b[39m","message":"✅ Database connection successful.","timestamp":"2025-09-29 09:42:51"}
+{"level":"\u001b[32minfo\u001b[39m","message":"🚀 Server is running on http://localhost:3001","timestamp":"2025-09-29 09:42:51"}
+{"level":"\u001b[31merror\u001b[39m","message":"Report submission failed: insert into \"reports\" (\"description\", \"latitude\", \"longitude\", \"photo_url\", \"report_id\", \"report_type\", \"status\", \"user_id\") values ($1, DEFAULT, DEFAULT, $2, $3, DEFAULT, $4, $5) returning * - column \"photo_url\" of relation \"reports\" does not exist","timestamp":"2025-09-29 09:46:16"}
+{"level":"\u001b[31merror\u001b[39m","message":"Supabase Login Error: Email not confirmed","timestamp":"2025-09-29 09:47:45"}
+{"level":"\u001b[31merror\u001b[39m","message":"Supabase Login Error: Email not confirmed","timestamp":"2025-09-29 09:47:56"}
+{"level":"\u001b[31merror\u001b[39m","message":"Supabase Login Error: Email not confirmed","timestamp":"2025-09-29 09:51:38"}
+{"level":"\u001b[31merror\u001b[39m","message":"Supabase Login Error: Email logins are disabled","timestamp":"2025-09-29 09:59:08"}
+{"level":"\u001b[31merror\u001b[39m","message":"Supabase Login Error: Email logins are disabled","timestamp":"2025-09-29 10:03:16"}
+{"level":"\u001b[31merror\u001b[39m","message":"Supabase Login Error: Email logins are disabled","timestamp":"2025-09-29 10:03:23"}
+{"level":"\u001b[31merror\u001b[39m","message":"Supabase Signup Error: Email signups are disabled","timestamp":"2025-09-29 10:05:15"}
+{"level":"\u001b[31merror\u001b[39m","message":"Supabase Login Error: Invalid login credentials","timestamp":"2025-09-29 10:06:03"}
+{"level":"\u001b[31merror\u001b[39m","message":"Supabase Login Error: Invalid login credentials","timestamp":"2025-09-29 10:11:15"}
+{"level":"\u001b[31merror\u001b[39m","message":"Supabase Login Error: Invalid login credentials","timestamp":"2025-09-29 10:11:23"}
+{"level":"\u001b[31merror\u001b[39m","message":"Supabase Login Error: Email not confirmed","timestamp":"2025-09-29 10:21:38"}
+{"level":"\u001b[31merror\u001b[39m","message":"Supabase Login Error: Email not confirmed","timestamp":"2025-09-29 10:21:51"}
+{"level":"\u001b[31merror\u001b[39m","message":"Supabase Login Error: Invalid login credentials","timestamp":"2025-09-29 10:21:59"}
+{"level":"\u001b[31merror\u001b[39m","message":"Supabase Login Error: Invalid login credentials","timestamp":"2025-09-29 10:22:01"}
+{"level":"\u001b[31merror\u001b[39m","message":"Supabase Login Error: Invalid login credentials","timestamp":"2025-09-29 10:22:02"}
+{"level":"\u001b[31merror\u001b[39m","message":"Supabase Login Error: Invalid login credentials","timestamp":"2025-09-29 10:22:58"}
+{"level":"\u001b[31merror\u001b[39m","message":"Supabase Login Error: Invalid login credentials","timestamp":"2025-09-29 10:25:07"}
+{"level":"\u001b[31merror\u001b[39m","message":"Supabase Login Error: Invalid login credentials","timestamp":"2025-09-29 10:25:09"}
+{"level":"\u001b[31merror\u001b[39m","message":"Supabase Login Error: Invalid login credentials","timestamp":"2025-09-29 10:25:17"}
+{"level":"\u001b[31merror\u001b[39m","message":"Supabase Login Error: Invalid login credentials","timestamp":"2025-09-29 10:25:30"}
+{"level":"\u001b[32minfo\u001b[39m","message":"✅ Database connection successful.","timestamp":"2025-09-29 11:05:34"}
+{"level":"\u001b[32minfo\u001b[39m","message":"🚀 Server is running on http://localhost:3001","timestamp":"2025-09-29 11:05:34"}
+{"level":"\u001b[32minfo\u001b[39m","message":"✅ Database connection successful.","timestamp":"2025-09-29 11:07:57"}
+{"level":"\u001b[32minfo\u001b[39m","message":"🚀 Server is running on http://localhost:3001","timestamp":"2025-09-29 11:07:57"}
+{"level":"\u001b[32minfo\u001b[39m","message":"✅ Database connection successful.","timestamp":"2025-09-29 11:28:26"}
+{"level":"\u001b[32minfo\u001b[39m","message":"🚀 Server is running on http://localhost:3001","timestamp":"2025-09-29 11:28:26"}
+{"level":"\u001b[32minfo\u001b[39m","message":"✅ Database connection successful.","timestamp":"2025-09-29 11:28:28"}
+{"level":"\u001b[32minfo\u001b[39m","message":"🚀 Server is running on http://localhost:3001","timestamp":"2025-09-29 11:28:28"}
+{"level":"\u001b[32minfo\u001b[39m","message":"✅ Database connection successful.","timestamp":"2025-09-29 11:28:38"}
+{"level":"\u001b[32minfo\u001b[39m","message":"🚀 Server is running on http://localhost:3001","timestamp":"2025-09-29 11:28:38"}
+{"level":"\u001b[32minfo\u001b[39m","message":"✅ Database connection successful.","timestamp":"2025-09-29 11:29:28"}
+{"level":"\u001b[32minfo\u001b[39m","message":"🚀 Server is running on http://localhost:3001","timestamp":"2025-09-29 11:29:28"}
+{"level":"\u001b[32minfo\u001b[39m","message":"✅ Database connection successful.","timestamp":"2025-09-29 11:29:31"}
+{"level":"\u001b[32minfo\u001b[39m","message":"🚀 Server is running on http://localhost:3001","timestamp":"2025-09-29 11:29:31"}
+{"level":"\u001b[32minfo\u001b[39m","message":"✅ Database connection successful.","timestamp":"2025-09-29 11:29:59"}
+{"level":"\u001b[32minfo\u001b[39m","message":"🚀 Server is running on http://localhost:3001","timestamp":"2025-09-29 11:29:59"}
+{"level":"\u001b[32minfo\u001b[39m","message":"✅ Database connection successful.","timestamp":"2025-09-29 11:36:05"}
+{"level":"\u001b[32minfo\u001b[39m","message":"🚀 Server is running on http://localhost:3001","timestamp":"2025-09-29 11:36:05"}
+{"level":"\u001b[32minfo\u001b[39m","message":"✅ Database connection successful.","timestamp":"2025-09-29 11:36:29"}
+{"level":"\u001b[32minfo\u001b[39m","message":"🚀 Server is running on http://localhost:3001","timestamp":"2025-09-29 11:36:29"}
+{"level":"\u001b[31merror\u001b[39m","message":"Failed to get user stats: select \"status\" from \"reports\" where \"user_id\" = $1 - invalid input syntax for type integer: \"da24fa59-afa4-4da9-aae8-45f73cdf875a\"","timestamp":"2025-09-29 11:50:07"}
+{"level":"\u001b[31merror\u001b[39m","message":"Failed to get user reports: select * from \"reports\" where \"user_id\" = $1 order by \"created_at\" desc - invalid input syntax for type integer: \"da24fa59-afa4-4da9-aae8-45f73cdf875a\"","timestamp":"2025-09-29 11:50:08"}
+{"level":"\u001b[31merror\u001b[39m","message":"Failed to get user stats: select \"status\" from \"reports\" where \"user_id\" = $1 - invalid input syntax for type integer: \"da24fa59-afa4-4da9-aae8-45f73cdf875a\"","timestamp":"2025-09-29 11:50:08"}
+{"level":"\u001b[31merror\u001b[39m","message":"Failed to get user reports: select * from \"reports\" where \"user_id\" = $1 order by \"created_at\" desc - invalid input syntax for type integer: \"da24fa59-afa4-4da9-aae8-45f73cdf875a\"","timestamp":"2025-09-29 11:50:08"}
+{"level":"\u001b[31merror\u001b[39m","message":"Failed to get user stats: select \"status\" from \"reports\" where \"user_id\" = $1 - invalid input syntax for type integer: \"da24fa59-afa4-4da9-aae8-45f73cdf875a\"","timestamp":"2025-09-29 11:50:33"}
+{"level":"\u001b[31merror\u001b[39m","message":"Failed to get user reports: select * from \"reports\" where \"user_id\" = $1 order by \"created_at\" desc - invalid input syntax for type integer: \"da24fa59-afa4-4da9-aae8-45f73cdf875a\"","timestamp":"2025-09-29 11:50:33"}
+{"level":"\u001b[31merror\u001b[39m","message":"Failed to get user stats: select \"status\" from \"reports\" where \"user_id\" = $1 - invalid input syntax for type integer: \"da24fa59-afa4-4da9-aae8-45f73cdf875a\"","timestamp":"2025-09-29 11:50:34"}
+{"level":"\u001b[31merror\u001b[39m","message":"Failed to get user reports: select * from \"reports\" where \"user_id\" = $1 order by \"created_at\" desc - invalid input syntax for type integer: \"da24fa59-afa4-4da9-aae8-45f73cdf875a\"","timestamp":"2025-09-29 11:50:34"}
+{"level":"\u001b[31merror\u001b[39m","message":"Failed to get user reports: select * from \"reports\" where \"user_id\" = $1 order by \"created_at\" desc - invalid input syntax for type integer: \"da24fa59-afa4-4da9-aae8-45f73cdf875a\"","timestamp":"2025-09-29 11:50:36"}
+{"level":"\u001b[31merror\u001b[39m","message":"Failed to get user stats: select \"status\" from \"reports\" where \"user_id\" = $1 - invalid input syntax for type integer: \"da24fa59-afa4-4da9-aae8-45f73cdf875a\"","timestamp":"2025-09-29 11:50:36"}
+{"level":"\u001b[31merror\u001b[39m","message":"Failed to get user stats: select \"status\" from \"reports\" where \"user_id\" = $1 - invalid input syntax for type integer: \"da24fa59-afa4-4da9-aae8-45f73cdf875a\"","timestamp":"2025-09-29 11:50:36"}
+{"level":"\u001b[31merror\u001b[39m","message":"Failed to get user reports: select * from \"reports\" where \"user_id\" = $1 order by \"created_at\" desc - invalid input syntax for type integer: \"da24fa59-afa4-4da9-aae8-45f73cdf875a\"","timestamp":"2025-09-29 11:50:36"}
+{"level":"\u001b[31merror\u001b[39m","message":"Failed to get user reports: select * from \"reports\" where \"user_id\" = $1 order by \"created_at\" desc - invalid input syntax for type integer: \"da24fa59-afa4-4da9-aae8-45f73cdf875a\"","timestamp":"2025-09-29 11:50:41"}
+{"level":"\u001b[31merror\u001b[39m","message":"Failed to get user stats: select \"status\" from \"reports\" where \"user_id\" = $1 - invalid input syntax for type integer: \"da24fa59-afa4-4da9-aae8-45f73cdf875a\"","timestamp":"2025-09-29 11:50:41"}
+{"level":"\u001b[31merror\u001b[39m","message":"Failed to get user reports: select * from \"reports\" where \"user_id\" = $1 order by \"created_at\" desc - invalid input syntax for type integer: \"da24fa59-afa4-4da9-aae8-45f73cdf875a\"","timestamp":"2025-09-29 11:50:41"}
+{"level":"\u001b[31merror\u001b[39m","message":"Failed to get user stats: select \"status\" from \"reports\" where \"user_id\" = $1 - invalid input syntax for type integer: \"da24fa59-afa4-4da9-aae8-45f73cdf875a\"","timestamp":"2025-09-29 11:50:41"}
+{"level":"\u001b[31merror\u001b[39m","message":"Failed to get validation reports: select * from \"reports\" where not \"user_id\" = $1 and \"status\" = $2 order by \"created_at\" asc limit $3 - invalid input syntax for type integer: \"da24fa59-afa4-4da9-aae8-45f73cdf875a\"","timestamp":"2025-09-29 11:50:45"}
+{"level":"\u001b[31merror\u001b[39m","message":"Failed to get validation reports: select * from \"reports\" where not \"user_id\" = $1 and \"status\" = $2 order by \"created_at\" asc limit $3 - invalid input syntax for type integer: \"da24fa59-afa4-4da9-aae8-45f73cdf875a\"","timestamp":"2025-09-29 11:50:45"}
+{"level":"\u001b[31merror\u001b[39m","message":"Failed to get user reports: select * from \"reports\" where \"user_id\" = $1 order by \"created_at\" desc - invalid input syntax for type integer: \"da24fa59-afa4-4da9-aae8-45f73cdf875a\"","timestamp":"2025-09-29 11:51:06"}
+{"level":"\u001b[31merror\u001b[39m","message":"Failed to get user stats: select \"status\" from \"reports\" where \"user_id\" = $1 - invalid input syntax for type integer: \"da24fa59-afa4-4da9-aae8-45f73cdf875a\"","timestamp":"2025-09-29 11:51:06"}
+{"level":"\u001b[31merror\u001b[39m","message":"Failed to get user stats: select \"status\" from \"reports\" where \"user_id\" = $1 - invalid input syntax for type integer: \"da24fa59-afa4-4da9-aae8-45f73cdf875a\"","timestamp":"2025-09-29 11:51:06"}
+{"level":"\u001b[31merror\u001b[39m","message":"Failed to get user reports: select * from \"reports\" where \"user_id\" = $1 order by \"created_at\" desc - invalid input syntax for type integer: \"da24fa59-afa4-4da9-aae8-45f73cdf875a\"","timestamp":"2025-09-29 11:51:06"}
+{"level":"\u001b[31merror\u001b[39m","message":"Failed to get user reports: select * from \"reports\" where \"user_id\" = $1 order by \"created_at\" desc - invalid input syntax for type integer: \"da24fa59-afa4-4da9-aae8-45f73cdf875a\"","timestamp":"2025-09-29 11:51:22"}
+{"level":"\u001b[31merror\u001b[39m","message":"Failed to get user stats: select \"status\" from \"reports\" where \"user_id\" = $1 - invalid input syntax for type integer: \"da24fa59-afa4-4da9-aae8-45f73cdf875a\"","timestamp":"2025-09-29 11:51:22"}
+{"level":"\u001b[31merror\u001b[39m","message":"Failed to get user reports: select * from \"reports\" where \"user_id\" = $1 order by \"created_at\" desc - invalid input syntax for type integer: \"da24fa59-afa4-4da9-aae8-45f73cdf875a\"","timestamp":"2025-09-29 11:51:22"}
+{"level":"\u001b[31merror\u001b[39m","message":"Failed to get user stats: select \"status\" from \"reports\" where \"user_id\" = $1 - invalid input syntax for type integer: \"da24fa59-afa4-4da9-aae8-45f73cdf875a\"","timestamp":"2025-09-29 11:51:22"}
+{"level":"\u001b[31merror\u001b[39m","message":"Report submission failed: insert into \"reports\" (\"description\", \"latitude\", \"longitude\", \"photo_url\", \"report_id\", \"report_type\", \"status\", \"user_id\") values ($1, DEFAULT, DEFAULT, $2, $3, DEFAULT, $4, $5) returning * - column \"photo_url\" of relation \"reports\" does not exist","timestamp":"2025-09-29 11:51:48"}
+{"level":"\u001b[32minfo\u001b[39m","message":"✅ Database connection successful.","timestamp":"2025-09-29 12:00:58"}
+{"level":"\u001b[32minfo\u001b[39m","message":"🚀 Server is running on http://localhost:3001","timestamp":"2025-09-29 12:00:58"}
+{"level":"\u001b[31merror\u001b[39m","message":"Failed to get user reports: select * from \"reports\" where \"user_id\" = $1 order by \"created_at\" desc - invalid input syntax for type integer: \"da24fa59-afa4-4da9-aae8-45f73cdf875a\"","timestamp":"2025-09-29 12:02:16"}
+{"level":"\u001b[31merror\u001b[39m","message":"Failed to get user stats: select \"status\" from \"reports\" where \"user_id\" = $1 - invalid input syntax for type integer: \"da24fa59-afa4-4da9-aae8-45f73cdf875a\"","timestamp":"2025-09-29 12:02:16"}
+{"level":"\u001b[31merror\u001b[39m","message":"Failed to get user reports: select * from \"reports\" where \"user_id\" = $1 order by \"created_at\" desc - invalid input syntax for type integer: \"da24fa59-afa4-4da9-aae8-45f73cdf875a\"","timestamp":"2025-09-29 12:02:16"}
+{"level":"\u001b[31merror\u001b[39m","message":"Failed to get user stats: select \"status\" from \"reports\" where \"user_id\" = $1 - invalid input syntax for type integer: \"da24fa59-afa4-4da9-aae8-45f73cdf875a\"","timestamp":"2025-09-29 12:02:16"}
+{"level":"\u001b[31merror\u001b[39m","message":"Report submission failed: insert into \"reports\" (\"description\", \"latitude\", \"longitude\", \"photo_url\", \"report_id\", \"report_type\", \"status\", \"user_id\") values ($1, DEFAULT, DEFAULT, $2, $3, DEFAULT, $4, $5) returning * - column \"photo_url\" of relation \"reports\" does not exist","timestamp":"2025-09-29 12:02:39"}
+{"level":"\u001b[31merror\u001b[39m","message":"Report submission failed: insert into \"reports\" (\"description\", \"latitude\", \"longitude\", \"photo_url\", \"report_id\", \"report_type\", \"status\", \"user_id\") values ($1, DEFAULT, DEFAULT, $2, $3, DEFAULT, $4, $5) returning * - column \"photo_url\" of relation \"reports\" does not exist","timestamp":"2025-09-29 12:02:56"}
+{"level":"\u001b[32minfo\u001b[39m","message":"✅ Database connection successful.","timestamp":"2025-09-29 12:49:02"}
+{"level":"\u001b[32minfo\u001b[39m","message":"🚀 Server is running on http://localhost:3001","timestamp":"2025-09-29 12:49:02"}
+{"level":"\u001b[31merror\u001b[39m","message":"Report submission failed: insert into \"reports\" (\"description\", \"latitude\", \"longitude\", \"photo_url\", \"report_id\", \"report_type\", \"status\", \"user_id\") values ($1, DEFAULT, DEFAULT, $2, $3, DEFAULT, $4, $5) returning * - invalid input syntax for type uuid: \"RPT-1759130393981\"","timestamp":"2025-09-29 12:49:54"}
+{"level":"\u001b[32minfo\u001b[39m","message":"✅ Database connection successful.","timestamp":"2025-09-29 12:55:41"}
+{"level":"\u001b[32minfo\u001b[39m","message":"🚀 Server is running on http://localhost:3001","timestamp":"2025-09-29 12:55:41"}
+{"level":"\u001b[31merror\u001b[39m","message":"Report submission failed: insert into \"reports\" (\"address\", \"description\", \"latitude\", \"longitude\", \"photo_url\", \"report_type\", \"status\", \"user_id\") values ($1, $2, DEFAULT, DEFAULT, $3, $4, $5, $6) returning * - null value in column \"title\" of relation \"reports\" violates not-null constraint","timestamp":"2025-09-29 12:55:48"}
+{"level":"\u001b[31merror\u001b[39m","message":"Report submission failed: insert into \"reports\" (\"address\", \"description\", \"latitude\", \"longitude\", \"photo_url\", \"report_type\", \"status\", \"user_id\") values ($1, $2, DEFAULT, DEFAULT, $3, $4, $5, $6) returning * - null value in column \"title\" of relation \"reports\" violates not-null constraint","timestamp":"2025-09-29 12:56:12"}
+{"level":"\u001b[32minfo\u001b[39m","message":"✅ Database connection successful.","timestamp":"2025-09-29 12:58:07"}
+{"level":"\u001b[32minfo\u001b[39m","message":"🚀 Server is running on http://localhost:3001","timestamp":"2025-09-29 12:58:07"}
+{"level":"\u001b[32minfo\u001b[39m","message":"✅ Database connection successful.","timestamp":"2025-09-29 13:12:25"}
+{"level":"\u001b[32minfo\u001b[39m","message":"🚀 Server is running on http://localhost:3001","timestamp":"2025-09-29 13:12:25"}
+{"level":"\u001b[32minfo\u001b[39m","message":"✅ Database connection successful.","timestamp":"2025-09-29 13:12:32"}
+{"level":"\u001b[32minfo\u001b[39m","message":"🚀 Server is running on http://localhost:3001","timestamp":"2025-09-29 13:12:32"}
+{"level":"\u001b[32minfo\u001b[39m","message":"✅ Database connection successful.","timestamp":"2025-09-29 13:12:38"}
+{"level":"\u001b[32minfo\u001b[39m","message":"🚀 Server is running on http://localhost:3001","timestamp":"2025-09-29 13:12:38"}

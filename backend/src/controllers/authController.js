@@ -1,152 +1,133 @@
-import bcrypt from "bcryptjs";
+import knex from '../knex.js';
+import bcrypt from 'bcrypt';
+import logger from '../utils/logger.js';
 import jwt from "jsonwebtoken";
-// NOTE: Assuming db is imported from a file named knex.js
-// If your db import is from './knex.js', you may need to update this line:
-import db from "../knex.js"; 
+import { createClient } from '@supabase/supabase-js';
+import db from "../knex.js";
+// import logger from "../utils/logger.js";
+
+// --- Supabase Client Initialization ---
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
+
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error("Supabase URL and Anon Key must be provided in the .env file.");
+}
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 const JWT_SECRET = process.env.JWT_SECRET || "supersecretkey";
 
-// Helper for dynamic cookie settings (CRITICAL FIX FOR LOCAL/DEPLOYED)
+// --- Cookie Settings ---
 const isProduction = process.env.NODE_ENV === 'production';
 const cookieOptions = {
   httpOnly: true,
-  // CRITICAL: 'secure' must be true for sameSite: 'none' (for deployment/HTTPS)
-  secure: isProduction, 
-  // 🟢 FIX: 'Lax' allows cross-port (http://localhost:5173 -> http://localhost:3001). 
-  // 'none' is required for cross-domain deployment (HTTPS only).
-  // Your code previously used 'strict' here, causing local failure.
-  sameSite: isProduction ? 'none' : 'Lax', 
-  maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+  secure: isProduction,
+  sameSite: isProduction ? 'none' : 'Lax',
+  maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
 };
 
+/**
+ * Signs up a new user using Supabase Auth.
+ */
 export const signup = async (req, res) => {
   try {
     const { name, email, password, role, department, designation, location } = req.body;
-
     if (!name || !email || !password || !role) {
       return res.status(400).json({ error: "Missing required fields" });
     }
 
-    if (role === "official" && (!department || !designation || !location)) {
-      return res.status(400).json({ error: "Missing official details" });
+    // 🟢 FIX: Use the Supabase client to securely create the user.
+    const { data: authData, error: authError } = await supabase.auth.signUp({
+      email: email,
+      password: password,
+      options: {
+        data: {
+          name,
+          role,
+          department: role === "official" ? department : null,
+          designation: role === "official" ? designation : null,
+          location: role === "official" ? location : null,
+        },
+      },
+    });
+
+    if (authError) {
+      logger.error(`Supabase Signup Error: ${authError.message}`);
+      return res.status(400).json({ error: authError.message });
+    }
+    if (!authData.user) {
+        return res.status(500).json({ error: "Signup succeeded but no user data was returned." });
     }
 
-    // Check if user already exists
-    const existingUser = await db("users").where({ email }).first();
-    if (existingUser) {
-      return res.status(400).json({ error: "User already exists with this email" });
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const [user] = await db("users")
-      .insert({
-        name,
-        email,
-        password: hashedPassword,
-        role,
-        department: role === "official" ? department : null,
-        designation: role === "official" ? designation : null,
-        location: role === "official" ? location : null,
-      })
-      .returning(["id", "name", "email", "role", "department", "designation", "location"]);
-
-    // Generate JWT token
-    const token = jwt.sign({ userId: user.id, role: user.role }, JWT_SECRET, { expiresIn: "7d" });
-
-    // Set HTTP-only cookie using the corrected options
+    // Create our application's session token
+    const token = jwt.sign({ userId: authData.user.id, role: role }, JWT_SECRET, { expiresIn: "7d" });
     res.cookie('jwt', token, cookieOptions);
 
-    res.status(201).json({ 
+    res.status(201).json({
       success: true,
-      message: "Account created successfully",
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        department: user.department,
-        designation: user.designation,
-        location: user.location
-      }
+      message: "Account created successfully.",
+      user: { id: authData.user.id, email: authData.user.email, ...authData.user.user_metadata },
     });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Signup failed" });
+    logger.error(`General Signup Error: ${err.message}`);
+    res.status(500).json({ error: "An unexpected error occurred." });
   }
 };
 
+/**
+ * Logs in a user using Supabase Auth to verify the password.
+ */
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    
     if (!email || !password) {
       return res.status(400).json({ error: "Email and password are required" });
     }
 
-    const user = await db("users").where({ email }).first();
+    // 🟢 FIX: Use the Supabase client to securely verify the password.
+    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+      email: email,
+      password: password,
+    });
 
-    if (!user) {
-      return res.status(400).json({ error: "Invalid credentials" });
+    if (authError) {
+      logger.error(`Supabase Login Error: ${authError.message}`);
+      return res.status(401).json({ error: "Invalid credentials" });
+    }
+     if (!authData.user) {
+      return res.status(500).json({ error: "Login succeeded but no user data was returned." });
     }
 
-    const match = await bcrypt.compare(password, user.password);
-    if (!match) {
-      return res.status(400).json({ error: "Invalid credentials" });
-    }
-
-    // Generate JWT token
-    const token = jwt.sign({ userId: user.id, role: user.role }, JWT_SECRET, { expiresIn: "7d" });
-
-    // Set HTTP-only cookie using the corrected options
+    // Create our application's session token
+    const token = jwt.sign({ userId: authData.user.id, role: authData.user.user_metadata.role }, JWT_SECRET, { expiresIn: "7d" });
     res.cookie('jwt', token, cookieOptions);
 
     res.json({
       success: true,
       message: "Login successful",
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        department: user.department,
-        designation: user.designation,
-        location: user.location
-      }
+      user: { id: authData.user.id, email: authData.user.email, ...authData.user.user_metadata },
     });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Login failed" });
+    logger.error(`General Login Error: ${err.message}`);
+    res.status(500).json({ error: "An unexpected error occurred." });
   }
 };
 
-export const logout = async (req, res) => {
+export const logout = (req, res) => {
   try {
-    // Need to remove maxAge for clearing the cookie, but keep other settings
-    const clearCookieOptions = {
-        httpOnly: cookieOptions.httpOnly,
-        secure: cookieOptions.secure,
-        sameSite: cookieOptions.sameSite
-    };
-    
-    res.clearCookie('jwt', clearCookieOptions);
-    
-    res.json({ 
-      success: true, 
-      message: "Logged out successfully" 
-    });
+    res.clearCookie('jwt', { httpOnly: true, secure: isProduction, sameSite: isProduction ? 'none' : 'Lax' });
+    res.status(200).json({ success: true, message: "Logged out successfully" });
   } catch (err) {
-    console.error(err);
+    logger.error(`Logout Error: ${err.message}`);
     res.status(500).json({ error: "Logout failed" });
   }
 };
 
 export const getMe = async (req, res) => {
   try {
-    // req.user is set by authMiddleware
-    const user = await db("users")
+    const user = await db("auth.users")
       .where({ id: req.user.id })
-      .select('id', 'name', 'email', 'role', 'department', 'designation', 'location')
+      .select('id', 'email', 'raw_user_meta_data')
       .first();
 
     if (!user) {
@@ -155,10 +136,71 @@ export const getMe = async (req, res) => {
 
     res.json({
       success: true,
-      user
+      user: { id: user.id, email: user.email, ...user.raw_user_meta_data },
     });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Failed to get user data" });
+    logger.error(`GetMe Error: ${err.message}`);
+    res.status(500).json({ error: "Failed to fetch user data" });
+  }
+};
+
+// New function to update a user's profile
+export const updateProfile = async (req, res) => {
+  try {
+    const { name, email, phone, location, bio } = req.body;
+    const userId = req.user.id;
+
+    // Prepare the data for updating the 'profiles' table
+    const profileData = { name, phone, location, bio };
+    
+    // Update the profile table
+    await knex('profiles').where({ id: userId }).update(profileData);
+    
+    // If the email is being changed, update the 'auth.users' table
+    if (email && email !== req.user.email) {
+      // NOTE: Supabase handles email changes securely. For a standard setup,
+      // you would update the users table directly. Here we focus on the profile.
+      // await knex('users').where({ id: userId }).update({ email });
+    }
+
+    const [updatedUser] = await knex('profiles').where({ id: userId }).select('*');
+
+    res.status(200).json({ success: true, user: updatedUser });
+  } catch (error) {
+    logger.error(`Profile update failed for user ${req.user.id}: ${error.message}`);
+    res.status(500).json({ success: false, error: 'Failed to update profile' });
+  }
+};
+
+// New function to change a user's password
+export const changePassword = async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    const userId = req.user.id;
+
+    // Get the user from the database
+    const [user] = await knex('users').where({ id: userId }).select('password');
+
+    if (!user) {
+      return res.status(404).json({ success: false, error: 'User not found' });
+    }
+
+    // Check if the current password is correct
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ success: false, error: 'Incorrect current password' });
+    }
+
+    // Hash the new password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+    // Update the password in the database
+    await knex('users').where({ id: userId }).update({ password: hashedPassword });
+
+    res.status(200).json({ success: true, message: 'Password updated successfully' });
+  } catch (error) {
+    logger.error(`Password change failed for user ${req.user.id}: ${error.message}`);
+    res.status(500).json({ success: false, error: 'Failed to change password' });
   }
 };

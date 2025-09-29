@@ -20,12 +20,12 @@ import {
   Play,
   Pause,
   Maximize2,
-  Minimize2
+  Minimize2,
+  LocateFixed // New Icon for the live location button
 } from 'lucide-react'
 import MapPicker from '../components/MapPicker'
-import apiClient from '../config/api'
-// import { useNavigate } from 'react-router-dom' // <-- REMOVED: Incompatible with custom router
 import imageCompression from 'browser-image-compression'
+import { submitReport } from '../services/apiServices';
 
 // CRITICAL FIX: Custom navigation function to trigger App.jsx's router logic
 const navigate = (path) => {
@@ -36,7 +36,6 @@ const navigate = (path) => {
 }
 
 const ReportForm = () => {
-  // const navigate = useNavigate() // <-- REMOVED
   const fileInputRef = useRef(null)
   const mediaRecorderRef = useRef(null)
   const audioChunksRef = useRef([])
@@ -48,7 +47,7 @@ const ReportForm = () => {
     location: null,
     photo: null,
     audioRecording: null
-  })
+  });
 
   const [loading, setLoading] = useState(false)
   const [preview, setPreview] = useState(null)
@@ -68,9 +67,9 @@ const ReportForm = () => {
     { value: 'streetlight', label: 'Streetlight Outage', icon: Lightbulb },
     { value: 'water_leak', label: 'Water Leak/Pipe Burst', icon: Droplets },
     { value: 'other', label: 'Other Infrastructure Issue', icon: MoreHorizontal }
-  ]
+  ];
 
-  const totalSteps = 4
+  const totalSteps = 4;
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
@@ -82,11 +81,49 @@ const ReportForm = () => {
     setLocationAddress(address)
   }
 
+  // **NEW**: Function to get the user's current location
+   const handleGetCurrentLocation = () => {
+    if (navigator.geolocation) {
+      setLoading(true); // Indicate that we are fetching the location
+      
+      // Options to request the most accurate position available
+      const options = {
+        enableHighAccuracy: true,
+        timeout: 10000, // Wait up to 10 seconds
+        maximumAge: 0 // Don't use a cached location
+      };
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          // The MapPicker will automatically fetch the address for these new coordinates
+          handleLocationChange({ lat: latitude, lng: longitude }, "Fetching address...");
+          setLoading(false);
+        },
+        (error) => {
+          console.error("Error getting location:", error);
+          let alertMessage = "Could not retrieve your location. Please enable location services and try again.";
+          if (error.code === error.PERMISSION_DENIED) {
+            alertMessage = "Location access was denied. Please enable it in your browser settings.";
+          } else if (error.code === error.POSITION_UNAVAILABLE) {
+            alertMessage = "Location information is unavailable from your current position.";
+          } else if (error.code === error.TIMEOUT) {
+            alertMessage = "Request for user location timed out. Please try again.";
+          }
+          alert(alertMessage);
+          setLoading(false);
+        },
+        options // Pass the high-accuracy options to the function
+      );
+    } else {
+      alert("Geolocation is not supported by your browser.");
+    }
+  };
   const compressImage = async (file) => {
     const options = {
-      maxSizeMB: 1, // Max file size in MB
-      maxWidthOrHeight: 1920, // Max width or height
-      useWebWorker: true // Use web worker for performance
+      maxSizeMB: 1,
+      maxWidthOrHeight: 1920,
+      useWebWorker: true
     }
     try {
       const compressedFile = await imageCompression(file, options)
@@ -105,51 +142,46 @@ const ReportForm = () => {
         const compressedFile = await compressImage(file)
         setFormData((prev) => ({ ...prev, photo: compressedFile }))
         setPreview(URL.createObjectURL(compressedFile))
-      } else {
-        // Handle other file types if needed, though multer limits handle this on the backend
       }
     }
   }
 
-  // Audio recording logic (omitted for brevity, assume correct functionality)
-  const startRecording = async () => { /* ... */ }
-  const stopRecording = () => { /* ... */ }
-  const pauseRecording = () => { /* ... */ }
-  const resumeRecording = () => { /* ... */ }
-  const clearRecording = () => { /* ... */ }
+  const startRecording = async () => { /* ... Your existing audio logic ... */ }
+  const stopRecording = () => { /* ... Your existing audio logic ... */ }
+  const pauseRecording = () => { /* ... Your existing audio logic ... */ }
+  const resumeRecording = () => { /* ... Your existing audio logic ... */ }
+  const clearRecording = () => { /* ... Your existing audio logic ... */ }
   
   const renderAudioRecorder = () => (
     <div className="border p-4 rounded-lg space-y-3 bg-gray-50">
       <label className="block text-sm font-medium text-gray-700">Voice Recording (Optional - Max 1 min)</label>
       <div className="flex items-center space-x-3">
-        {/* Simplified buttons based on state */}
         {!isRecording && !audioBlob && (
-          <button onClick={startRecording} className="btn btn-sm btn-primary flex items-center">
+          <button type="button" onClick={startRecording} className="btn btn-sm btn-primary flex items-center">
             <Mic className="w-4 h-4 mr-1" /> Start Recording
           </button>
         )}
         {isRecording && !isPaused && (
-          <button onClick={pauseRecording} className="btn btn-sm btn-warning flex items-center">
+          <button type="button" onClick={pauseRecording} className="btn btn-sm btn-warning flex items-center">
             <Pause className="w-4 h-4 mr-1" /> Pause
           </button>
         )}
         {isRecording && isPaused && (
-          <button onClick={resumeRecording} className="btn btn-sm btn-success flex items-center">
+          <button type="button" onClick={resumeRecording} className="btn btn-sm btn-success flex items-center">
             <Play className="w-4 h-4 mr-1" /> Resume
           </button>
         )}
         {isRecording && (
-          <button onClick={stopRecording} className="btn btn-sm btn-danger flex items-center">
+          <button type="button" onClick={stopRecording} className="btn btn-sm btn-danger flex items-center">
             <MicOff className="w-4 h-4 mr-1" /> Stop
           </button>
         )}
         {audioBlob && (
-          <button onClick={clearRecording} className="btn btn-sm btn-secondary flex items-center">
+          <button type="button" onClick={clearRecording} className="btn btn-sm btn-secondary flex items-center">
             <X className="w-4 h-4 mr-1" /> Clear Recording
           </button>
         )}
       </div>
-      {/* Display duration or status */}
       <p className="text-xs text-gray-500">
         {isRecording ? `Recording: ${recordingDuration}s` : audioBlob ? `Recorded: ${Math.round(recordingDuration)}s` : 'Max 60 seconds.'}
       </p>
@@ -158,7 +190,6 @@ const ReportForm = () => {
       )}
     </div>
   )
-
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -171,7 +202,8 @@ const ReportForm = () => {
     form.append('address', locationAddress)
 
     if (formData.location) {
-      form.append('location', JSON.stringify({ lat: formData.location.lat, lng: formData.location.lng }))
+      form.append('latitude', formData.location.lat);
+      form.append('longitude', formData.location.lng);
     }
 
     if (formData.photo) {
@@ -179,24 +211,16 @@ const ReportForm = () => {
     }
 
     if (audioBlob) {
-      // Audio field name must match backend's `upload.fields` config ('audio')
       form.append('audio', audioBlob, `audio-${Date.now()}.webm`) 
     }
 
     try {
-      const response = await apiClient.post('/reports', form) // Use configured apiClient
-
-      if (response.ok) {
-        setSubmitted(true)
-        // FIX: Use custom navigate for client-side routing
-        setTimeout(() => navigate('/status'), 3000) 
-      } else {
-        const errorData = await response.json()
-        throw new Error(errorData.error || 'Failed to submit report')
-      }
+      await submitReport(form)
+      setSubmitted(true)
+      setTimeout(() => navigate('/my-reports'), 3000) 
     } catch (error) {
       console.error('Submission Error:', error)
-      alert(`Error submitting report: ${error.message}`)
+      alert(`Error submitting report: ${error.error || 'Failed to submit report'}`)
       setLoading(false)
     }
   }
@@ -210,7 +234,7 @@ const ReportForm = () => {
       case 3:
         return true
       case 4:
-        return true // Final step is always valid
+        return true
       default:
         return false
     }
@@ -220,7 +244,7 @@ const ReportForm = () => {
     if (isStepValid() && currentStep < totalSteps) {
       setCurrentStep(currentStep + 1)
     } else if (currentStep === totalSteps && isStepValid()) {
-      handleSubmit({ preventDefault: () => {} }) // Manually call submit with mock event
+      handleSubmit({ preventDefault: () => {} })
     }
   }
 
@@ -229,7 +253,6 @@ const ReportForm = () => {
       setCurrentStep(currentStep - 1)
     }
   }
-
 
   if (submitted) {
     return (
@@ -255,7 +278,6 @@ const ReportForm = () => {
         </div>
 
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
-          {/* Progress Indicator */}
           <div className="flex justify-between items-center p-4 border-b border-gray-200">
             {Array.from({ length: totalSteps }, (_, index) => {
               const step = index + 1
@@ -275,14 +297,12 @@ const ReportForm = () => {
           </div>
 
           <div className="p-6 sm:p-8 min-h-[400px]">
-            {/* Step 1: Details */}
             {currentStep === 1 && (
               <div className="space-y-6">
                 <h2 className="text-2xl font-semibold text-gray-800 flex items-center">
                   <FileText className="w-6 h-6 mr-2 text-blue-600" /> Report Details
                 </h2>
                 <p className="text-gray-600">Provide a clear title and description for the issue you are reporting.</p>
-
                 <div>
                   <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">Title *</label>
                   <input
@@ -296,7 +316,6 @@ const ReportForm = () => {
                     required
                   />
                 </div>
-
                 <div>
                   <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">Description *</label>
                   <textarea
@@ -310,8 +329,6 @@ const ReportForm = () => {
                     required
                   />
                 </div>
-
-                {/* Category Selection */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Select Category</label>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -339,17 +356,26 @@ const ReportForm = () => {
               </div>
             )}
 
-            {/* Step 2: Location */}
             {currentStep === 2 && (
               <div className="space-y-6">
-                <h2 className="text-2xl font-semibold text-gray-800 flex items-center">
-                  <MapPin className="w-6 h-6 mr-2 text-blue-600" /> Report Location
-                </h2>
-                <p className="text-gray-600">Drag the marker on the map to pinpoint the exact location of the issue.</p>
+                <div className="flex justify-between items-center flex-wrap gap-4">
+                    <h2 className="text-2xl font-semibold text-gray-800 flex items-center">
+                        <MapPin className="w-6 h-6 mr-2 text-blue-600" /> Report Location
+                    </h2>
+                    <button
+                        onClick={handleGetCurrentLocation}
+                        disabled={loading}
+                        className="flex items-center px-4 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        <LocateFixed className="w-4 h-4 mr-2" />
+                        {loading ? 'Getting Location...' : 'Use My Current Location'}
+                    </button>
+                </div>
+                <p className="text-gray-600">Click on the map to place a pin, or use your current location.</p>
                 
                 <div className="rounded-lg overflow-hidden border border-gray-300 h-96">
                   <MapPicker 
-                    defaultLocation={formData.location} 
+                    initialLocation={formData.location} 
                     onLocationSelect={handleLocationChange}
                   />
                 </div>
@@ -371,17 +397,14 @@ const ReportForm = () => {
               </div>
             )}
             
-            {/* Step 3: Media */}
             {currentStep === 3 && (
               <div className="space-y-6">
                 <h2 className="text-2xl font-semibold text-gray-800 flex items-center">
                   <Camera className="w-6 h-6 mr-2 text-blue-600" /> Media Attachments
                 </h2>
-                <p className="text-gray-600">Attach an image (required) and an optional voice recording to support your report.</p>
-
-                {/* Photo Upload */}
+                <p className="text-gray-600">Attach an image and an optional voice recording to support your report.</p>
                 <div className="border p-4 rounded-lg">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Photo (Required - Max 5MB)</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Photo (Optional - Max 5MB)</label>
                   <input
                     type="file"
                     accept="image/*"
@@ -398,6 +421,7 @@ const ReportForm = () => {
                     <div className="mt-4 relative w-40 h-40">
                       <img src={preview} alt="Photo Preview" className="w-full h-full object-cover rounded-lg border border-gray-300" />
                       <button
+                        type="button"
                         onClick={() => { setPreview(null); setFormData(prev => ({ ...prev, photo: null })); if (fileInputRef.current) fileInputRef.current.value = ""; }}
                         className="absolute -top-2 -right-2 p-1 bg-red-500 rounded-full text-white hover:bg-red-600 transition-colors"
                         aria-label="Remove photo"
@@ -406,36 +430,24 @@ const ReportForm = () => {
                       </button>
                     </div>
                   )}
-                  {!preview && formData.photo && (
-                    <div className="mt-4 bg-yellow-50 border-l-4 border-yellow-500 p-3 text-sm text-yellow-800">
-                      Photo attached: {formData.photo.name}
-                    </div>
-                  )}
                 </div>
-
-                {/* Audio Recording */}
                 {renderAudioRecorder()}
               </div>
             )}
             
-            {/* Step 4: Review and Submit */}
             {currentStep === 4 && (
               <div className="space-y-6">
                 <h2 className="text-2xl font-semibold text-gray-800 flex items-center">
                   <CheckCircle className="w-6 h-6 mr-2 text-blue-600" /> Final Review
                 </h2>
                 <p className="text-gray-600">Please review your submission details before finalizing the report.</p>
-
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* Summary Details */}
-                  <div className="card p-5 space-y-3">
+                  <div className="bg-white border border-gray-200 rounded-lg p-5 space-y-3">
                     <h3 className="text-lg font-bold text-gray-800 mb-3">Report Overview</h3>
                     <p><span className="font-medium">Title:</span> {formData.title || 'N/A'}</p>
                     <p><span className="font-medium">Category:</span> {categories.find(c => c.value === formData.category)?.label || 'N/A'}</p>
                   </div>
-                  
-                  {/* Location Summary */}
-                  <div className="card p-5 space-y-3">
+                  <div className="bg-white border border-gray-200 rounded-lg p-5 space-y-3">
                     <h3 className="text-lg font-bold text-gray-800 mb-3">Location</h3>
                     <p className="flex items-start"><MapPin className="w-4 h-4 mr-2 mt-1 flex-shrink-0" />
                       <span className="break-words">{locationAddress || 'No Address Identified'}</span>
@@ -443,14 +455,11 @@ const ReportForm = () => {
                     <p><span className="font-medium">Coordinates:</span> {formData.location ? `${formData.location.lat.toFixed(5)}, ${formData.location.lng.toFixed(5)}` : 'N/A'}</p>
                   </div>
                 </div>
-
-                <div className="card p-5">
+                <div className="bg-white border border-gray-200 rounded-lg p-5">
                     <h3 className="text-lg font-bold text-gray-800 mb-3">Description</h3>
                     <p className="text-gray-600 whitespace-pre-wrap">{formData.description || 'No description provided.'}</p>
                 </div>
-                
-                {/* Media Summary */}
-                <div className="card p-5">
+                <div className="bg-white border border-gray-200 rounded-lg p-5">
                     <h3 className="text-lg font-bold text-gray-800 mb-3">Attachments</h3>
                     <div className="flex space-x-4">
                         {preview ? (
@@ -464,7 +473,6 @@ const ReportForm = () => {
                             <div className="flex items-center space-x-2 bg-green-50 p-3 rounded-lg">
                                 <Mic className="w-5 h-5 text-green-700" />
                                 <span className="text-sm text-green-700">Audio Recorded ({Math.round(recordingDuration)}s)</span>
-                                {/* <audio controls src={audioUrl} className="h-8"></audio> */}
                             </div>
                         ) : (
                             <div className="flex items-center space-x-2 bg-gray-100 p-3 rounded-lg">
@@ -476,10 +484,8 @@ const ReportForm = () => {
                 </div>
               </div>
             )}
-
           </div>
 
-          {/* Navigation Footer */}
           <div className="bg-gray-50 px-6 py-4 sm:px-8 border-t border-gray-200">
             <div className="flex justify-between">
               <button
@@ -489,13 +495,12 @@ const ReportForm = () => {
               >
                 Back
               </button>
-
               <button
                 onClick={nextStep}
                 disabled={!isStepValid() || loading}
                 className="inline-flex items-center px-6 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {loading ? (
+                {loading && currentStep !== 2 ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                     Submitting...
