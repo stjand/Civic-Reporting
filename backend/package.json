@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "nodemon -r dotenv/config src/index.js",
-    "start": "node -r dotenv/config index.js",
+    "start": "node -r dotenv/config src/index.js",
     "build": "echo 'Build complete'",
     "test": "node -r dotenv/config jest",
     "migrate": "node -r dotenv/config run_migrations.js",
