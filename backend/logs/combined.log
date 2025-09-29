@@ -1554,3 +1554,24 @@
 {"level":"\u001b[32minfo\u001b[39m","message":"🚀 Server is running on http://localhost:3001","timestamp":"2025-09-29 13:12:32"}
 {"level":"\u001b[32minfo\u001b[39m","message":"✅ Database connection successful.","timestamp":"2025-09-29 13:12:38"}
 {"level":"\u001b[32minfo\u001b[39m","message":"🚀 Server is running on http://localhost:3001","timestamp":"2025-09-29 13:12:38"}
+{"level":"\u001b[32minfo\u001b[39m","message":"✅ Database connection successful.","timestamp":"2025-09-29 13:15:47"}
+{"level":"\u001b[32minfo\u001b[39m","message":"🚀 Server is running on http://localhost:3001","timestamp":"2025-09-29 13:15:47"}
+{"level":"\u001b[31merror\u001b[39m","message":"Supabase Signup Error: Email address \"surya567teja@mail.com\" is invalid","timestamp":"2025-09-29 14:14:01"}
+{"level":"\u001b[31merror\u001b[39m","message":"Authentication error: select \"id\", \"email\", \"raw_user_meta_data\" from \"auth\".\"users\" where \"id\" = $1 limit $2 - Connection terminated unexpectedly","timestamp":"2025-09-29 14:52:34"}
+{"level":"\u001b[31merror\u001b[39m","message":"Authentication error: select \"id\", \"email\", \"raw_user_meta_data\" from \"auth\".\"users\" where \"id\" = $1 limit $2 - Connection terminated unexpectedly","timestamp":"2025-09-29 14:52:34"}
+{"level":"\u001b[31merror\u001b[39m","message":"Supabase Login Error: fetch failed","timestamp":"2025-09-29 16:02:23"}
+{"level":"\u001b[31merror\u001b[39m","message":"Supabase Login Error: fetch failed","timestamp":"2025-09-29 16:02:31"}
+{"level":"\u001b[31merror\u001b[39m","message":"Supabase Login Error: fetch failed","timestamp":"2025-09-29 16:02:49"}
+{"level":"\u001b[31merror\u001b[39m","message":"Supabase Login Error: fetch failed","timestamp":"2025-09-29 16:02:53"}
+{"level":"\u001b[31merror\u001b[39m","message":"Supabase Login Error: fetch failed","timestamp":"2025-09-29 16:02:57"}
+{"level":"\u001b[31merror\u001b[39m","message":"Supabase Login Error: fetch failed","timestamp":"2025-09-29 16:03:31"}
+{"level":"\u001b[31merror\u001b[39m","message":"Supabase Login Error: fetch failed","timestamp":"2025-09-29 16:03:33"}
+{"level":"\u001b[31merror\u001b[39m","message":"Supabase Login Error: fetch failed","timestamp":"2025-09-29 16:03:33"}
+{"level":"\u001b[31merror\u001b[39m","message":"Supabase Login Error: fetch failed","timestamp":"2025-09-29 16:04:57"}
+{"level":"\u001b[31merror\u001b[39m","message":"Supabase Login Error: fetch failed","timestamp":"2025-09-29 16:05:01"}
+{"level":"\u001b[31merror\u001b[39m","message":"Supabase Login Error: fetch failed","timestamp":"2025-09-29 16:05:20"}
+{"level":"\u001b[31merror\u001b[39m","message":"Supabase Login Error: fetch failed","timestamp":"2025-09-29 16:05:22"}
+{"level":"\u001b[32minfo\u001b[39m","message":"✅ Database connection successful.","timestamp":"2025-09-29 17:48:49"}
+{"level":"\u001b[32minfo\u001b[39m","message":"🚀 Server is running on http://localhost:3001","timestamp":"2025-09-29 17:48:49"}
+{"level":"\u001b[32minfo\u001b[39m","message":"✅ Database connection successful.","timestamp":"2025-09-29 17:49:03"}
+{"level":"\u001b[32minfo\u001b[39m","message":"🚀 Server is running on http://localhost:3001","timestamp":"2025-09-29 17:49:03"}

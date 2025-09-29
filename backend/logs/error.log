@@ -259,3 +259,18 @@
 {"level":"\u001b[31merror\u001b[39m","message":"Report submission failed: insert into \"reports\" (\"description\", \"latitude\", \"longitude\", \"photo_url\", \"report_id\", \"report_type\", \"status\", \"user_id\") values ($1, DEFAULT, DEFAULT, $2, $3, DEFAULT, $4, $5) returning * - invalid input syntax for type uuid: \"RPT-1759130393981\"","timestamp":"2025-09-29 12:49:54"}
 {"level":"\u001b[31merror\u001b[39m","message":"Report submission failed: insert into \"reports\" (\"address\", \"description\", \"latitude\", \"longitude\", \"photo_url\", \"report_type\", \"status\", \"user_id\") values ($1, $2, DEFAULT, DEFAULT, $3, $4, $5, $6) returning * - null value in column \"title\" of relation \"reports\" violates not-null constraint","timestamp":"2025-09-29 12:55:48"}
 {"level":"\u001b[31merror\u001b[39m","message":"Report submission failed: insert into \"reports\" (\"address\", \"description\", \"latitude\", \"longitude\", \"photo_url\", \"report_type\", \"status\", \"user_id\") values ($1, $2, DEFAULT, DEFAULT, $3, $4, $5, $6) returning * - null value in column \"title\" of relation \"reports\" violates not-null constraint","timestamp":"2025-09-29 12:56:12"}
+{"level":"\u001b[31merror\u001b[39m","message":"Supabase Signup Error: Email address \"surya567teja@mail.com\" is invalid","timestamp":"2025-09-29 14:14:01"}
+{"level":"\u001b[31merror\u001b[39m","message":"Authentication error: select \"id\", \"email\", \"raw_user_meta_data\" from \"auth\".\"users\" where \"id\" = $1 limit $2 - Connection terminated unexpectedly","timestamp":"2025-09-29 14:52:34"}
+{"level":"\u001b[31merror\u001b[39m","message":"Authentication error: select \"id\", \"email\", \"raw_user_meta_data\" from \"auth\".\"users\" where \"id\" = $1 limit $2 - Connection terminated unexpectedly","timestamp":"2025-09-29 14:52:34"}
+{"level":"\u001b[31merror\u001b[39m","message":"Supabase Login Error: fetch failed","timestamp":"2025-09-29 16:02:23"}
+{"level":"\u001b[31merror\u001b[39m","message":"Supabase Login Error: fetch failed","timestamp":"2025-09-29 16:02:31"}
+{"level":"\u001b[31merror\u001b[39m","message":"Supabase Login Error: fetch failed","timestamp":"2025-09-29 16:02:49"}
+{"level":"\u001b[31merror\u001b[39m","message":"Supabase Login Error: fetch failed","timestamp":"2025-09-29 16:02:53"}
+{"level":"\u001b[31merror\u001b[39m","message":"Supabase Login Error: fetch failed","timestamp":"2025-09-29 16:02:57"}
+{"level":"\u001b[31merror\u001b[39m","message":"Supabase Login Error: fetch failed","timestamp":"2025-09-29 16:03:31"}
+{"level":"\u001b[31merror\u001b[39m","message":"Supabase Login Error: fetch failed","timestamp":"2025-09-29 16:03:33"}
+{"level":"\u001b[31merror\u001b[39m","message":"Supabase Login Error: fetch failed","timestamp":"2025-09-29 16:03:33"}
+{"level":"\u001b[31merror\u001b[39m","message":"Supabase Login Error: fetch failed","timestamp":"2025-09-29 16:04:57"}
+{"level":"\u001b[31merror\u001b[39m","message":"Supabase Login Error: fetch failed","timestamp":"2025-09-29 16:05:01"}
+{"level":"\u001b[31merror\u001b[39m","message":"Supabase Login Error: fetch failed","timestamp":"2025-09-29 16:05:20"}
+{"level":"\u001b[31merror\u001b[39m","message":"Supabase Login Error: fetch failed","timestamp":"2025-09-29 16:05:22"}
