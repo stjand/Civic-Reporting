@@ -1,95 +1,66 @@
 // File: frontend/src/components/MapPicker.jsx
-import React, { useRef, useEffect, useState } from 'react'
-import L from 'leaflet'
-import 'leaflet/dist/leaflet.css'
-import { MapPin, Loader2 } from 'lucide-react'
+import React, { useState, useEffect } from 'react';
+import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
+import { MapPin, Loader2 } from 'lucide-react';
 
-// Fix for default markers in Leaflet
-delete L.Icon.Default.prototype._getIconUrl
+// Fix for default icon issue with webpack
+delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
   iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
-})
+});
+
+// A helper component to handle map events like clicks and location found
+const MapEvents = ({ onLocationSelect, initialPosition }) => {
+  const map = useMapEvents({
+    click(e) {
+      const { lat, lng } = e.latlng;
+      onLocationSelect({ lat, lng });
+    },
+    locationfound(e) {
+      onLocationSelect(e.latlng);
+      map.flyTo(e.latlng, map.getZoom());
+    },
+  });
+
+  // This effect will fly to the position if it's updated from the parent
+  useEffect(() => {
+    if (initialPosition) {
+      map.flyTo(initialPosition, map.getZoom());
+    }
+  }, [initialPosition, map]);
+
+  return null;
+};
 
 const MapPicker = ({ onLocationSelect, initialLocation = null, isFullscreen = false }) => {
-  const mapRef = useRef(null)
-  const mapInstanceRef = useRef(null)
-  const markerRef = useRef(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+  const [position, setPosition] = useState(initialLocation);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (!mapRef.current || mapInstanceRef.current) return
+    setPosition(initialLocation);
+    setLoading(false); // Assume loading is done once we have an initial location or null
+  }, [initialLocation]);
 
+  const handleLocationSelect = async (latlng) => {
+    setPosition(latlng);
     try {
-      // Initialize map
-      const map = L.map(mapRef.current).setView([17.4116, 78.4795], 7)
-      mapInstanceRef.current = map
-
-      // Add tile layer
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap contributors'
-      }).addTo(map)
-
-      // Create custom marker icon
-      const customIcon = L.divIcon({
-        className: 'custom-div-icon',
-        html: `<div class="w-8 h-8 bg-blue-600 rounded-full border-4 border-white shadow-lg ${isFullscreen ? 'animate-pulse' : ''}"></div>`,
-        iconSize: [32, 32],
-        iconAnchor: [16, 16],
-        popupAnchor: [0, -12]
-      })
-
-      // Add click event listener
-      map.on('click', (e) => {
-        const { lat, lng } = e.latlng
-        
-        // Remove existing marker
-        if (markerRef.current) {
-          map.removeLayer(markerRef.current)
-        }
-        
-        // Add new marker
-        const marker = L.marker([lat, lng], { icon: customIcon }).addTo(map)
-        markerRef.current = marker
-        
-        // Notify parent component
-        onLocationSelect({ lat, lng })
-      })
-
-      // Set initial location if provided
-      if (initialLocation) {
-        const marker = L.marker([initialLocation.lat, initialLocation.lng], { icon: customIcon }).addTo(map)
-        markerRef.current = marker
-        map.setView([initialLocation.lat, initialLocation.lng], 15)
-      }
-
-      setLoading(false)
+      // Reverse geocode to get the address using Nominatim
+      const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latlng.lat}&lon=${latlng.lng}`);
+      if (!response.ok) throw new Error('Failed to fetch address');
+      const data = await response.json();
+      onLocationSelect(latlng, data.display_name || 'Address not found');
     } catch (err) {
-      console.error('Error initializing map:', err)
-      setError('Failed to load map')
-      setLoading(false)
+      console.error("Reverse geocoding failed:", err);
+      onLocationSelect(latlng, 'Could not fetch address');
+      setError('Could not fetch address details.');
     }
-
-    // Cleanup function
-    return () => {
-      if (mapInstanceRef.current) {
-        mapInstanceRef.current.remove()
-        mapInstanceRef.current = null
-      }
-    }
-  }, [onLocationSelect, initialLocation, isFullscreen])
-
-  // Handle fullscreen resize
-  useEffect(() => {
-    if (mapInstanceRef.current) {
-      setTimeout(() => {
-        mapInstanceRef.current.invalidateSize()
-      }, 100)
-    }
-  }, [isFullscreen])
-
+  };
+  
   if (error) {
     return (
       <div className={`w-full ${isFullscreen ? 'h-full' : 'h-96'} bg-gray-100 rounded-lg flex items-center justify-center`}>
@@ -99,31 +70,34 @@ const MapPicker = ({ onLocationSelect, initialLocation = null, isFullscreen = fa
           <p className="text-sm">{error}</p>
         </div>
       </div>
-    )
+    );
   }
 
   return (
-    <div className={`relative ${isFullscreen ? 'h-full' : ''}`}>
+     <div className={`relative w-full rounded-lg border border-gray-200 shadow-sm ${isFullscreen ? 'h-full' : 'h-96'}`}>
       {loading && (
-        <div className={`absolute inset-0 bg-gray-100 rounded-lg flex items-center justify-center z-10 ${isFullscreen ? 'h-full' : ''}`}>
+        <div className="absolute inset-0 bg-gray-100 rounded-lg flex items-center justify-center z-10">
           <div className="text-center">
             <Loader2 className="w-8 h-8 animate-spin text-blue-600 mx-auto mb-2" />
             <p className="text-gray-600">Loading map...</p>
           </div>
         </div>
       )}
-      <div
-        ref={mapRef}
-        className={`w-full rounded-lg border border-gray-200 shadow-sm ${
-          isFullscreen ? 'h-full' : 'h-96'
-        }`}
-        style={{ minHeight: isFullscreen ? '100%' : '384px' }}
-      />
-      <div className={`${isFullscreen ? 'absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-white px-4 py-2 rounded-full shadow-lg' : 'mt-2'} text-xs text-gray-500 text-center`}>
-        {isFullscreen ? '📍 Tap anywhere on the map to set location' : 'Click on the map to select location'}
-      </div>
+      <MapContainer 
+        center={position || [17.3850, 78.4867]} // Default to Hyderabad if no position
+        zoom={13} 
+        style={{ height: '100%', width: '100%', borderRadius: '0.5rem' }}
+        whenCreated={() => setLoading(false)}
+      >
+        <TileLayer
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        />
+        <MapEvents onLocationSelect={handleLocationSelect} initialPosition={position} />
+        {position && <Marker position={position}></Marker>}
+      </MapContainer>
     </div>
-  )
-}
+  );
+};
 
-export default MapPicker
+export default MapPicker;

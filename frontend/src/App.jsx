@@ -1,74 +1,120 @@
-import React, { Suspense, lazy } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
-import Layout from './components/Layout';
+import React, { Suspense, lazy, useState, useEffect } from 'react';
+import { AuthProvider, useAuth } from './context/AuthContext';
 
-// Lazy load components for better performance
+// Lazy load components
 const Home = lazy(() => import('./pages/Home'));
+const Login = lazy(() => import('./pages/Login'));
+const Register = lazy(() => import('./pages/Register'));
 const ReportForm = lazy(() => import('./pages/ReportForm'));
 const ReportStatus = lazy(() => import('./pages/ReportStatus'));
 const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
-const Login = lazy(() => import('./pages/Login'));
+const CitizenHomepage = lazy(() => import('./pages/CitizenHomepage'));
+const MyReports = lazy(() => import('./pages/MyReports'));
+const ValidateReports = lazy(() => import('./pages/ValidateReports'));
+const Profile = lazy(() => import('./pages/Profile'));
 
-// Simple loading component
 const LoadingFallback = () => (
-  <div className="flex items-center justify-center min-h-[200px]">
-    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+  <div className="flex items-center justify-center min-h-screen">
+    <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-600"></div>
   </div>
 );
 
-/**
- * Main Application Component
- * Handles routing with lazy loading and clean structure
- */
+// Custom Navigation Hook
+const useNavigation = () => {
+  const [currentPath, setCurrentPath] = useState(window.location.pathname);
+  useEffect(() => {
+    const onNavigate = () => setCurrentPath(window.location.pathname);
+    window.addEventListener('navigate', onNavigate);
+    window.addEventListener('popstate', onNavigate);
+    return () => {
+      window.removeEventListener('navigate', onNavigate);
+      window.removeEventListener('popstate', onNavigate);
+    };
+  }, []);
+  // We get the navigate function from AuthContext now
+  return { currentPath };
+};
+
+// Main Router Component
+function AppRouter() {
+  const { isLoading, isAuthenticated, user, getRedirectPath, navigate } = useAuth();
+  const { currentPath } = useNavigation();
+
+  useEffect(() => {
+    // 🟢 FIX: If the user is not logged in and lands on the homepage, redirect to signup
+    if (!isLoading && !isAuthenticated && currentPath === '/') {
+      window.history.replaceState({}, '', '/register');
+      window.dispatchEvent(new Event('navigate'));
+    }
+  }, [isLoading, isAuthenticated, currentPath, navigate]);
+  
+  if (isLoading) {
+    return <LoadingFallback />;
+  }
+  
+  // Public routes accessible to everyone
+  if (!isAuthenticated) {
+    switch (currentPath) {
+      case '/login': return <Login />;
+      case '/register': return <Register />;
+      case '/': 
+        // This case is now a fallback while the useEffect redirect happens
+        return <LoadingFallback />; 
+      default:
+        // If trying to access any other page, redirect to register
+        navigate('/register');
+        return <LoadingFallback />;
+    }
+  }
+
+  // Authenticated Routes (Private)
+  const role = user?.role?.toLowerCase();
+
+  switch (role) {
+    case 'citizen':
+      const citizenRoutes = {
+        '/citizen': <CitizenHomepage />,
+        '/report': <ReportForm />,
+        '/my-reports': <MyReports />,
+        '/validate-reports': <ValidateReports />,
+        '/profile': <Profile />,
+      };
+      // Allow citizens to see the report status page too
+      if (currentPath.startsWith('/status')) {
+        return <ReportStatus />;
+      }
+      if (citizenRoutes[currentPath]) {
+        return citizenRoutes[currentPath];
+      }
+      break;
+    
+    case 'admin':
+    case 'official':
+      const adminRoutes = {
+        '/admin': <AdminDashboard />,
+      };
+      if (adminRoutes[currentPath]) {
+        return adminRoutes[currentPath];
+      }
+      break;
+      
+    default:
+      navigate('/login');
+      return <LoadingFallback />;
+  }
+
+  // If no route has matched for an authenticated user, redirect them to their dashboard
+  navigate(getRedirectPath());
+  return <LoadingFallback />;
+}
+
 function App() {
   return (
-    <Layout>
+    <AuthProvider>
       <Suspense fallback={<LoadingFallback />}>
-        <Routes>
-          {/* Public Routes */}
-          <Route 
-            path="/" 
-            element={<Home />} 
-          />
-          <Route 
-            path="/login" 
-            element={<Login />} 
-          />
-          <Route 
-            path="/report" 
-            element={<ReportForm />} 
-          />
-          <Route 
-            path="/status/:id" 
-            element={<ReportStatus />} 
-          />
-          
-          {/* Protected Admin Route */}
-          <Route 
-            path="/admin" 
-            element={<AdminDashboard />} 
-          />
-          
-          {/* Redirect /home to / for consistency */}
-          <Route 
-            path="/home" 
-            element={<Navigate to="/" replace />} 
-          />
-          
-          {/* 404 Fallback - you can create a NotFound component later */}
-          <Route 
-            path="*" 
-            element={
-              <div className="flex flex-col items-center justify-center min-h-[400px] text-center">
-                <h1 className="text-4xl font-bold text-gray-800 mb-4">404</h1>
-                <p className="text-gray-600 mb-6">Page not found</p>
-                <Navigate to="/" replace />
-              </div>
-            } 
-          />
-        </Routes>
+        <AppRouter />
       </Suspense>
-    </Layout>
+    </AuthProvider>
   );
 }
 

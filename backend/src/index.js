@@ -5,251 +5,74 @@ import logger from './utils/logger.js';
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
+import cookieParser from 'cookie-parser';
+import authMiddleware, { roleMiddleware } from './middleware/authMiddleware.js';
+
+// --- ROUTE IMPORTS ---
+import authRoutes from './routes/authRoutes.js';
+import adminRoutes from './routes/adminRoutes.js';
+import reportRoutes from './routes/ReportRoutes.js';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Create uploads directory
+// Create uploads directory if it doesn't exist
 const uploadsDir = path.join(process.cwd(), 'uploads');
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
 
-// Configure multer for file uploads
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, uploadsDir);
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
-  }
-});
-
-const upload = multer({ 
-  storage: storage,
-  limits: {
-    fileSize: 10 * 1024 * 1024 // 10MB limit
-  },
-  fileFilter: function (req, file, cb) {
-    if (file.fieldname === 'photo' && !file.mimetype.startsWith('image/')) {
-      return cb(new Error('Only image files are allowed for photos'), false);
+// --- CORS CONFIGURATION (Crucial for Frontend Communication) ---
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://127.0.0.1:5173',
+  // Add your deployed frontend URL here for production
+];
+const corsOptions = {
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
     }
-    if (file.fieldname === 'audio' && !file.mimetype.startsWith('audio/')) {
-      return cb(new Error('Only audio files are allowed for audio'), false);
-    }
-    cb(null, true);
-  }
-});
-
-// Enable CORS
-app.use(cors({
-  origin: '*',
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
-
-// Middleware
-app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ extended: true, limit: '50mb' }));
-app.use('/uploads', express.static('uploads'));
-
-// Logger middleware
-app.use((req, res, next) => {
-  logger.info(`Received a ${req.method} request for ${req.url}`);
-  next();
-});
-
-// DB check
-const testDatabaseConnection = async () => {
-  try {
-    await knex.raw('SELECT 1');
-    logger.info('✅ Database connection successful');
-    const tables = await knex.raw("SELECT tablename FROM pg_tables WHERE schemaname = 'public'");
-    logger.info(`📊 Found ${tables.rows.length} tables in database`);
-  } catch (error) {
-    logger.error(`❌ Database connection failed: ${error.message}`);
-    process.exit(1);
-  }
+  },
+  credentials: true,
 };
 
-// Root route
-app.get('/', (req, res) => {
-  res.status(200).json({
-    message: 'Welcome to the Civic Reporting Backend API',
-    timestamp: new Date().toISOString(),
-    endpoints: {
-      health: '/health',
-      reports: '/api/reports',
-      admin: '/api/admin/dashboard'
-    }
-  });
-});
+// --- CORE MIDDLEWARE ---
+app.use(cors(corsOptions));
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+app.use(cookieParser());
+app.use('/uploads', express.static(uploadsDir)); // Serve uploaded files
 
-// Health
-app.get('/health', async (req, res) => {
-  try {
-    await knex.raw('SELECT 1');
-    res.status(200).json({ status: 'OK', timestamp: new Date().toISOString(), database: 'Connected', uptime: process.uptime() });
-  } catch (error) {
-    logger.error(`Health check failed: ${error.message}`);
-    res.status(500).json({ status: 'ERROR', database: 'Disconnected', error: error.message });
-  }
-});
+// --- API ROUTES ---
+app.use('/api/auth', authRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/reports', reportRoutes);
 
-// Departments
-app.get('/api/departments', async (req, res) => {
-  try {
-    const departments = await knex('departments').select('*');
-    res.status(200).json({ success: true, data: departments });
-  } catch (error) {
-    logger.error(`Failed to retrieve departments: ${error.message}`);
-    res.status(500).json({ success: false, error: 'Failed to retrieve departments', details: error.message });
-  }
-});
-
-// Reports list
-app.get('/api/reports', async (req, res) => {
-  try {
-    const allReports = await knex('reports').select('*').orderBy('created_at', 'desc');
-    const processedReports = allReports.map(report => ({
-      ...report,
-      location: report.latitude && report.longitude ? { lat: parseFloat(report.latitude), lng: parseFloat(report.longitude) } : null
-    }));
-    res.status(200).json({ success: true, data: processedReports, total: processedReports.length });
-  } catch (error) {
-    logger.error(`Failed to retrieve reports: ${error.message}`);
-    res.status(500).json({ success: false, error: 'Failed to retrieve reports', details: error.message });
-  }
-});
-
-// Report submission
-app.post('/api/reports', upload.fields([{ name: 'photo', maxCount: 5 }, { name: 'audio', maxCount: 1 }]), async (req, res) => {
-  try {
-    const { title, description, category, location, address, user_name, urgency_score, priority } = req.body;
-
-    let parsedLocation = null;
-    if (location) {
-      try { parsedLocation = typeof location === 'string' ? JSON.parse(location) : location; } catch (e) { logger.error('Failed to parse location:', e); }
-    }
-
-    const imageUrls = (req.files?.photo || []).map(file => `/uploads/${file.filename}`);
-    const audioUrl = req.files?.audio?.[0] ? `/uploads/${req.files.audio[0].filename}` : null;
-
-    const categoryToDepartmentMap = {
-      pothole: 'Roads & Infrastructure',
-      garbage: 'Sanitation',
-      streetlight: 'Electrical',
-      water_leak: 'Water Supply',
-      other: 'Roads & Infrastructure'
-    };
-    const departmentName = categoryToDepartmentMap[category] || 'Roads & Infrastructure';
-    const department = await knex('departments').where({ name: departmentName }).first();
-    const departmentId = department ? department.id : null;
-
-    if (!departmentId) throw new Error(`Department not found for category: ${category}`);
-
-    const newReport = {
-      title: title || 'Untitled Report',
-      description: description || '',
-      category: category || 'other',
-      status: 'new',
-      latitude: parsedLocation ? parseFloat(parsedLocation.lat) : null,
-      longitude: parsedLocation ? parseFloat(parsedLocation.lng) : null,
-      address: address || 'Location not specified',
-      user_name: user_name || 'Anonymous',
-      urgency_score: parseInt(urgency_score) || 5,
-      priority: priority || 'medium',
-      image_urls: JSON.stringify(imageUrls),
-      audio_url: audioUrl,
-      user_id: null,
-      department_id: departmentId,
-      created_at: new Date(),
-      updated_at: new Date()
-    };
-
-    const [insertedReport] = await knex('reports').insert(newReport).returning('*');
-    res.status(201).json({ success: true, message: 'Report submitted successfully', data: insertedReport });
-  } catch (error) {
-    logger.error(`❌ Failed to add report: ${error.message}`);
-    res.status(500).json({ success: false, error: 'Failed to add report', details: error.message });
-  }
-});
-
-// Single report
-app.get('/api/reports/:id', async (req, res) => {
-  try {
-    const report = await knex('reports').where('id', req.params.id).first();
-    if (!report) return res.status(404).json({ success: false, error: 'Report not found' });
-    res.status(200).json({ success: true, data: report });
-  } catch (error) {
-    logger.error(`Failed to retrieve report: ${error.message}`);
-    res.status(500).json({ success: false, error: 'Failed to retrieve report' });
-  }
-});
-
-// PATCH update
-app.patch('/api/reports/:id', async (req, res) => {
-  try {
-    const [updatedReport] = await knex('reports').where('id', req.params.id).update({ ...req.body, updated_at: new Date() }).returning('*');
-    if (!updatedReport) return res.status(404).json({ success: false, error: 'Report not found' });
-    res.status(200).json({ success: true, data: updatedReport });
-  } catch (error) {
-    logger.error(`Failed to update report: ${error.message}`);
-    res.status(500).json({ success: false, error: 'Failed to update report' });
-  }
-});
-
-// ✅ PUT update (fix for frontend apiClient.put)
-app.put('/api/reports/:id', async (req, res) => {
-  try {
-    const [updatedReport] = await knex('reports').where('id', req.params.id).update({ ...req.body, updated_at: new Date() }).returning('*');
-    if (!updatedReport) return res.status(404).json({ success: false, error: 'Report not found' });
-    res.status(200).json({ success: true, data: updatedReport });
-  } catch (error) {
-    logger.error(`Failed to update report: ${error.message}`);
-    res.status(500).json({ success: false, error: 'Failed to update report' });
-  }
-});
-
-// Admin dashboard
-app.get('/api/admin/dashboard', async (req, res) => {
-  try {
-    const allReports = await knex('reports').select('*').orderBy('created_at', 'desc');
-    const stats = {
-      total: allReports.length,
-      new: allReports.filter(r => r.status === 'new').length,
-      in_progress: allReports.filter(r => ['acknowledged', 'in_progress'].includes(r.status)).length,
-      resolved: allReports.filter(r => r.status === 'resolved').length
-    };
-    res.status(200).json({ success: true, data: { stats, reports: allReports } });
-  } catch (error) {
-    logger.error(`Failed to retrieve admin dashboard: ${error.message}`);
-    res.status(500).json({ success: false, error: 'Failed to retrieve dashboard data' });
-  }
-});
-
-// Error handler
+// --- GLOBAL ERROR HANDLER ---
 app.use((error, req, res, next) => {
-  logger.error('Express error handler:', error);
+  logger.error('Global Express Error Handler:', error);
   if (error instanceof multer.MulterError && error.code === 'LIMIT_FILE_SIZE') {
     return res.status(400).json({ success: false, error: 'File too large. Maximum size is 10MB.' });
   }
-  res.status(500).json({ success: false, error: 'Internal server error', details: error.message });
+  res.status(500).json({ success: false, error: 'An internal server error occurred', details: error.message });
 });
 
-// Start server
+// --- SERVER STARTUP ---
 const startServer = async () => {
   try {
-    await testDatabaseConnection();
-    app.listen(PORT, '0.0.0.0', () => {
-      logger.info(`🚀 Civic Reporter Backend running at http://localhost:${PORT}`);
+    await knex.raw('select 1+1 as result');
+    logger.info('✅ Database connection successful.');
+    app.listen(PORT, () => {
+      logger.info(`🚀 Server is running on http://localhost:${PORT}`);
     });
   } catch (error) {
-    logger.error('Failed to start server:', error);
+    logger.error('❌ Database connection failed. Server will not start.');
+    logger.error(error.message);
     process.exit(1);
   }
 };
-startServer();
 
-export default app;
+startServer();
