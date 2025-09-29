@@ -26,7 +26,7 @@ if (!fs.existsSync(uploadsDir)) {
 const allowedOrigins = [
   'http://localhost:5173',
   'http://127.0.0.1:5173',
-  // Add your deployed frontend URL here for production
+  'https://civic-reporting-frontend-3xhqz7jvn-stjands-projects.vercel.app'
 ];
 const corsOptions = {
   origin: (origin, callback) => {
