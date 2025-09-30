@@ -1,4 +1,4 @@
-// File: ReportRoutes.js (FIXED FOR AUDIO FILE TYPES)
+// File: ReportRoutes.js (CLEANED OF JSX/FRONTEND COMPONENTS)
 
 import express from 'express';
 import knex from '../knex.js';
@@ -18,29 +18,24 @@ const storage = multer.diskStorage({
   }
 });
 
-// 🟢 FIX: Expanded the allowed audio types to include common mobile formats (.aac, .webm)
 const fileFilter = (req, file, cb) => {
     const allowedImageTypes = /jpeg|jpg|png/;
-    // EXPANDED: added aac and webm to cover most modern mobile recordings
     const allowedAudioTypes = /mp3|mpeg|wav|ogg|m4a|aac|webm/; 
     const extname = path.extname(file.originalname).toLowerCase();
     
-    if (file.fieldname === 'photo') {
+    if (file.fieldname === 'photos') { // Note: Changed to 'photos' to match array upload in frontend
         const isImage = allowedImageTypes.test(file.mimetype) && allowedImageTypes.test(extname);
         if (isImage) return cb(null, true);
         
         cb(new Error('Only JPEG, JPG, or PNG image files are allowed for photo upload.'));
         
     } else if (file.fieldname === 'audio') {
-        // Checking against MIME type (e.g., audio/webm, audio/aac) OR extension
         const isAudio = allowedAudioTypes.test(file.mimetype) || allowedAudioTypes.test(extname);
         if (isAudio) return cb(null, true);
 
-        // Updated error message to reflect new allowed types
         cb(new Error('Only MP3, WAV, OGG, M4A, AAC, or WEBM audio files are allowed for audio upload.'));
         
     } else {
-        // Ignore unexpected fields
         cb(null, false); 
     }
 };
@@ -51,29 +46,26 @@ const upload = multer({
   fileFilter: fileFilter 
 });
 
-// Use fields() to handle multiple, optional fields
+// Use fields() to handle multiple, optional fields (Frontend sends 'photos' array and optional 'audio')
 const uploadMiddleware = upload.fields([
-    { name: 'photo', maxCount: 1 },
+    { name: 'photos', maxCount: 3 }, // Handles array of up to 3 photos
     { name: 'audio', maxCount: 1 } 
 ]);
 
-// 🟢 NEW FUNCTION: Auto-assign priority based on content
+// NEW FUNCTION: Auto-assign priority based on content
 const determinePriority = (title, description) => {
   const content = (title + ' ' + description).toLowerCase();
   
-  // High Priority Keywords (e.g., immediate danger)
   const highKeywords = ['emergency', 'urgent', 'danger', 'fire', 'leak', 'collapse', 'flooding', 'major'];
   if (highKeywords.some(keyword => content.includes(keyword))) {
     return 'high';
   }
 
-  // Medium Priority Keywords (e.g., significant inconvenience)
   const mediumKeywords = ['large', 'broken', 'hazard', 'safety', 'exposed', 'deep', 'burst', 'damaged'];
   if (mediumKeywords.some(keyword => content.includes(keyword))) {
     return 'medium';
   }
   
-  // Default to Low
   return 'low';
 };
 
@@ -82,8 +74,8 @@ router.post('/', authMiddleware, roleMiddleware(['citizen']), uploadMiddleware, 
   try {
     const { title, description, report_type, latitude, longitude, address } = req.body;
     
-    // Safely extract file URLs
-    const photo_url = req.files && req.files.photo ? `/uploads/${req.files.photo[0].filename}` : null;
+    // Safely extract file URLs (Handle multiple photos by taking the first one for simplicity, or storing an array/JSON in a real app)
+    const photo_url = req.files && req.files.photos && req.files.photos.length > 0 ? `/uploads/${req.files.photos[0].filename}` : null;
     const audio_url = req.files && req.files.audio ? `/uploads/${req.files.audio[0].filename}` : null;
     
     // Automatic priority assignment
@@ -109,12 +101,10 @@ router.post('/', authMiddleware, roleMiddleware(['citizen']), uploadMiddleware, 
   } catch (error) {
     logger.error(`Report submission failed: ${error.message}`);
     
-    // Check for file filter error or Multer error
     if (error instanceof multer.MulterError) {
         return res.status(400).json({ success: false, error: `File upload failed: ${error.message}` });
     }
     
-    // Check if the error message is from the file filter (using the detailed message)
     if (error.message.includes('files are allowed')) {
         return res.status(400).json({ success: false, error: error.message });
     }
