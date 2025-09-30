@@ -1,3 +1,5 @@
+// File: ReportRoutes.js (FIXED)
+
 import express from 'express';
 import knex from '../knex.js';
 import logger from '../utils/logger.js';
@@ -28,24 +30,46 @@ const upload = multer({
   }
 });
 
+// 🟢 NEW FUNCTION: Auto-assign priority based on content
+const determinePriority = (title, description) => {
+  const content = (title + ' ' + description).toLowerCase();
+  
+  // High Priority Keywords (e.g., immediate danger)
+  const highKeywords = ['emergency', 'urgent', 'danger', 'fire', 'leak', 'collapse', 'flooding', 'major'];
+  if (highKeywords.some(keyword => content.includes(keyword))) {
+    return 'high';
+  }
+
+  // Medium Priority Keywords (e.g., significant inconvenience)
+  const mediumKeywords = ['large', 'broken', 'hazard', 'safety', 'exposed', 'deep', 'burst', 'damaged'];
+  if (mediumKeywords.some(keyword => content.includes(keyword))) {
+    return 'medium';
+  }
+  
+  // Default to Low
+  return 'low';
+};
+
 // Submit a new report
 router.post('/', authMiddleware, roleMiddleware(['citizen']), upload.single('photo'), async (req, res) => {
   try {
-    // **FIX APPLIED HERE**
-    // We now correctly read 'title' from the request body.
-    const { title, description, category, latitude, longitude, address } = req.body;
+    const { title, description, report_type, latitude, longitude, address } = req.body;
     const photo_url = req.file ? `/uploads/${req.file.filename}` : null;
     
+    // 🟢 CHANGE: Automatic priority assignment
+    const priority = determinePriority(title, description);
+
     const reportData = {
       user_id: req.user.id,
-      title, // <-- And we include it in the data to be saved.
-      report_type: category,
+      title,
+      report_type,
       description,
       latitude,
       longitude,
       address,
       photo_url,
-      status: 'new'
+      status: 'new',
+      priority: priority, // 🟢 CHANGE: Insert auto-assigned priority
     };
     
     const [newReport] = await knex('reports').insert(reportData).returning('*');
@@ -57,7 +81,7 @@ router.post('/', authMiddleware, roleMiddleware(['citizen']), upload.single('pho
   }
 });
 
-// Get current user's reports
+// Get current user's reports (unchanged)
 router.get('/my-reports', authMiddleware, roleMiddleware(['citizen']), async (req, res) => {
   try {
     const reports = await knex('reports')
@@ -71,7 +95,7 @@ router.get('/my-reports', authMiddleware, roleMiddleware(['citizen']), async (re
   }
 });
 
-// Get user statistics
+// Get user statistics (unchanged)
 router.get('/my-stats', authMiddleware, roleMiddleware(['citizen']), async (req, res) => {
   try {
     const reports = await knex('reports')
@@ -92,7 +116,7 @@ router.get('/my-stats', authMiddleware, roleMiddleware(['citizen']), async (req,
   }
 });
 
-// Get report details by ID
+// Get report details by ID (unchanged)
 router.get('/:reportId', authMiddleware, async (req, res) => {
   try {
     const report = await knex('reports')
@@ -110,7 +134,7 @@ router.get('/:reportId', authMiddleware, async (req, res) => {
   }
 });
 
-// Get reports for validation (exclude user's own reports)
+// Get reports for validation (exclude user's own reports) (unchanged)
 router.get('/validate/pending', authMiddleware, roleMiddleware(['citizen']), async (req, res) => {
   try {
     const reports = await knex('reports')

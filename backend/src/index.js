@@ -1,3 +1,5 @@
+// File: index.js
+
 import express from 'express';
 import cors from 'cors';
 import knex from './knex.js';
@@ -12,6 +14,7 @@ import authMiddleware, { roleMiddleware } from './middleware/authMiddleware.js';
 import authRoutes from './routes/authRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 import reportRoutes from './routes/ReportRoutes.js';
+import notificationRoutes from './routes/NotificationRoutes.js'; // 🟢 CHANGE: New Import
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -51,6 +54,7 @@ app.use('/uploads', express.static(uploadsDir)); // Serve uploaded files
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/reports', reportRoutes);
+app.use('/api/notifications', notificationRoutes); // 🟢 CHANGE: New Route Middleware
 
 // --- GLOBAL ERROR HANDLER ---
 app.use((error, req, res, next) => {

@@ -1,3 +1,5 @@
+// File: apiServices.js
+
 import apiClient from '../config/api';
 
 // ============ REPORT SERVICES ============
@@ -52,12 +54,45 @@ export const getValidationReports = async () => {
   }
 };
 
+// ============ NOTIFICATION SERVICES ============
+
+// 🟢 CHANGE: Get current user's notifications
+export const getMyNotifications = async () => {
+  try {
+    const response = await apiClient.get('/notifications/me');
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+// 🟢 CHANGE: Mark a notification as read
+export const markNotificationAsRead = async (notificationId) => {
+  try {
+    const response = await apiClient.put(`/notifications/${notificationId}/read`, {});
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+
 // ============ ADMIN SERVICES ============
 
 // Get admin dashboard data
 export const getAdminDashboard = async () => {
   try {
     const response = await apiClient.get('/admin/dashboard');
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+// 🟢 NEW SERVICE: Get list of officials
+export const getOfficialsList = async () => {
+  try {
+    const response = await apiClient.get('/auth/officials');
     return response.data;
   } catch (error) {
     throw error.response?.data || error;

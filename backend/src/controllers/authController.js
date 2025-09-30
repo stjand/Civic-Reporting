@@ -144,6 +144,32 @@ export const getMe = async (req, res) => {
   }
 };
 
+/**
+ * 🟢 NEW FUNCTION: Gets a list of government officials for report assignment.
+ */
+export const getOfficialsList = async (req, res) => {
+    try {
+        // Query auth.users for users with role 'official'
+        const officials = await db("auth.users")
+          .whereRaw(`raw_user_meta_data->>'role' = ?`, ['official'])
+          .select('id', 'raw_user_meta_data');
+        
+        // Map to a clean list of officials
+        const cleanOfficials = officials.map(user => ({
+            id: user.id,
+            name: user.raw_user_meta_data.name,
+            department: user.raw_user_meta_data.department,
+            designation: user.raw_user_meta_data.designation,
+        }));
+
+        res.status(200).json({ success: true, officials: cleanOfficials });
+
+    } catch (err) {
+        logger.error(`GetOfficialsList Error: ${err.message}`);
+        res.status(500).json({ success: false, error: "Failed to fetch officials list" });
+    }
+};
+
 // New function to update a user's profile
 export const updateProfile = async (req, res) => {
   try {
