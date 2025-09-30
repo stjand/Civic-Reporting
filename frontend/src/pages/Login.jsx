@@ -142,7 +142,7 @@ function Login() {
                     <User className="w-3 h-3 mr-1" />
                     <span className="font-medium">Citizen</span>
                   </div>
-                  <div className="text-gray-600">citizen@demo.com</div>
+                  <div className="text-gray-600">citizen@yopmail.com</div>
                   <div className="text-gray-600">password123</div>
                 </div>
                 <div className="bg-gray-50 p-3 rounded-lg">
@@ -150,7 +150,7 @@ function Login() {
                     <Shield className="w-3 h-3 mr-1" />
                     <span className="font-medium">Official</span>
                   </div>
-                  <div className="text-gray-600">official@demo.com</div>
+                  <div className="text-gray-600">official@yopmail.com</div>
                   <div className="text-gray-600">password123</div>
                 </div>
               </div>
