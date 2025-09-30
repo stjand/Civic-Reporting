@@ -1,4 +1,4 @@
-// File: ReportRoutes.js (FIXED)
+// File: ReportRoutes.js (FIXED FOR AUDIO FILE TYPES)
 
 import express from 'express';
 import knex from '../knex.js';
@@ -18,17 +18,44 @@ const storage = multer.diskStorage({
   }
 });
 
+// 🟢 FIX: Expanded the allowed audio types to include common mobile formats (.aac, .webm)
+const fileFilter = (req, file, cb) => {
+    const allowedImageTypes = /jpeg|jpg|png/;
+    // EXPANDED: added aac and webm to cover most modern mobile recordings
+    const allowedAudioTypes = /mp3|mpeg|wav|ogg|m4a|aac|webm/; 
+    const extname = path.extname(file.originalname).toLowerCase();
+    
+    if (file.fieldname === 'photo') {
+        const isImage = allowedImageTypes.test(file.mimetype) && allowedImageTypes.test(extname);
+        if (isImage) return cb(null, true);
+        
+        cb(new Error('Only JPEG, JPG, or PNG image files are allowed for photo upload.'));
+        
+    } else if (file.fieldname === 'audio') {
+        // Checking against MIME type (e.g., audio/webm, audio/aac) OR extension
+        const isAudio = allowedAudioTypes.test(file.mimetype) || allowedAudioTypes.test(extname);
+        if (isAudio) return cb(null, true);
+
+        // Updated error message to reflect new allowed types
+        cb(new Error('Only MP3, WAV, OGG, M4A, AAC, or WEBM audio files are allowed for audio upload.'));
+        
+    } else {
+        // Ignore unexpected fields
+        cb(null, false); 
+    }
+};
+
 const upload = multer({
   storage: storage,
   limits: { fileSize: 10 * 1024 * 1024 },
-  fileFilter: (req, file, cb) => {
-    const allowedTypes = /jpeg|jpg|png/;
-    const mimetype = allowedTypes.test(file.mimetype);
-    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
-    if (mimetype && extname) return cb(null, true);
-    cb(new Error('Only image files are allowed'));
-  }
+  fileFilter: fileFilter 
 });
+
+// Use fields() to handle multiple, optional fields
+const uploadMiddleware = upload.fields([
+    { name: 'photo', maxCount: 1 },
+    { name: 'audio', maxCount: 1 } 
+]);
 
 // 🟢 NEW FUNCTION: Auto-assign priority based on content
 const determinePriority = (title, description) => {
@@ -51,12 +78,15 @@ const determinePriority = (title, description) => {
 };
 
 // Submit a new report
-router.post('/', authMiddleware, roleMiddleware(['citizen']), upload.single('photo'), async (req, res) => {
+router.post('/', authMiddleware, roleMiddleware(['citizen']), uploadMiddleware, async (req, res) => {
   try {
     const { title, description, report_type, latitude, longitude, address } = req.body;
-    const photo_url = req.file ? `/uploads/${req.file.filename}` : null;
     
-    // 🟢 CHANGE: Automatic priority assignment
+    // Safely extract file URLs
+    const photo_url = req.files && req.files.photo ? `/uploads/${req.files.photo[0].filename}` : null;
+    const audio_url = req.files && req.files.audio ? `/uploads/${req.files.audio[0].filename}` : null;
+    
+    // Automatic priority assignment
     const priority = determinePriority(title, description);
 
     const reportData = {
@@ -68,8 +98,9 @@ router.post('/', authMiddleware, roleMiddleware(['citizen']), upload.single('pho
       longitude,
       address,
       photo_url,
+      audio_url, 
       status: 'new',
-      priority: priority, // 🟢 CHANGE: Insert auto-assigned priority
+      priority: priority, 
     };
     
     const [newReport] = await knex('reports').insert(reportData).returning('*');
@@ -77,6 +108,17 @@ router.post('/', authMiddleware, roleMiddleware(['citizen']), upload.single('pho
     res.status(201).json({ success: true, report: newReport });
   } catch (error) {
     logger.error(`Report submission failed: ${error.message}`);
+    
+    // Check for file filter error or Multer error
+    if (error instanceof multer.MulterError) {
+        return res.status(400).json({ success: false, error: `File upload failed: ${error.message}` });
+    }
+    
+    // Check if the error message is from the file filter (using the detailed message)
+    if (error.message.includes('files are allowed')) {
+        return res.status(400).json({ success: false, error: error.message });
+    }
+    
     res.status(500).json({ success: false, error: 'Failed to submit report' });
   }
 });
