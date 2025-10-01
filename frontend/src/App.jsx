@@ -1,3 +1,5 @@
+// File: App.jsx
+
 import React, { Suspense, lazy, useState, useEffect } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 
@@ -41,9 +43,9 @@ function AppRouter() {
   const { currentPath } = useNavigation();
 
   useEffect(() => {
-    // 🟢 FIX: If the user is not logged in and lands on the homepage, redirect to signup
+    // 🟢 FIX: If the user is not logged in and lands on the homepage, redirect to LOGIN, not register
     if (!isLoading && !isAuthenticated && currentPath === '/') {
-      window.history.replaceState({}, '', '/register');
+      window.history.replaceState({}, '', '/login');
       window.dispatchEvent(new Event('navigate'));
     }
   }, [isLoading, isAuthenticated, currentPath, navigate]);
@@ -58,11 +60,12 @@ function AppRouter() {
       case '/login': return <Login />;
       case '/register': return <Register />;
       case '/': 
-        // This case is now a fallback while the useEffect redirect happens
-        return <LoadingFallback />; 
+        // This case is now a fallback while the useEffect redirect happens.
+        // Explicitly return Login to prevent brief LoadingFallback flash
+        return <Login />; 
       default:
-        // If trying to access any other page, redirect to register
-        navigate('/register');
+        // If trying to access any other page, redirect to login
+        navigate('/login');
         return <LoadingFallback />;
     }
   }
