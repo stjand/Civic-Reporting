@@ -73,11 +73,11 @@ app.get('/api/geocode/reverse', async (req, res) => {
     });
 
     if (!response.ok) {
-      logger.error(`Nominatim API Error: ${response.status} ${response.statusText}`);
-      return res.status(response.status).json({ 
-        success: false, 
-        error: `External geocoding failed: ${response.statusText}` 
-      });
+        logger.error(`Nominatim API Error: ${response.status} ${response.statusText}`);
+        return res.status(response.status).json({ 
+            success: false, 
+            error: `External geocoding failed: ${response.statusText}` 
+        });
     }
 
     const data = await response.json();

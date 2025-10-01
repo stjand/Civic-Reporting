@@ -651,53 +651,54 @@ const ModernReportForm = () => {
 										)}
 									</div>
 									
-									{/* Photo Upload */}
 									<div>
-										<label className="block text-sm font-bold text-gray-900 mb-3">
-											Photo Evidence ({formData.photos.length}/{MAX_PHOTOS})
-										</label>
-										
-										<div className="grid grid-cols-3 gap-3">
-											{formData.photos.map((photo, index) => (
-												<div key={index} className="relative aspect-square group">
-													<img 
-														src={photo.preview} 
-														alt={`Preview ${index + 1}`} 
-														className="w-full h-full object-cover rounded-xl border-2 border-gray-200"
-													/>
-													<button 
-														onClick={() => removePhoto(index)}
-														className="absolute -top-2 -right-2 p-1.5 bg-red-500 text-white rounded-full shadow-lg hover:bg-red-600 transition-colors z-10"
-														aria-label="Remove photo"
-													>
-														<X className="w-4 h-4" />
-													</button>
-													<div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 rounded-xl transition-colors" />
-												</div>
-											))}
-											
-											{formData.photos.length < MAX_PHOTOS && (
-												<button 
-													type="button" 
-													onClick={() => fileInputRef.current?.click()}
-													className="aspect-square border-2 border-dashed border-gray-300 rounded-xl hover:border-blue-500 hover:bg-blue-50 flex flex-col items-center justify-center gap-2 transition-all group"
-												>
-													<Camera className="w-8 h-8 text-gray-400 group-hover:text-blue-500 transition-colors" />
-													<span className="text-xs text-gray-500 group-hover:text-blue-600 font-medium">Add Photo</span>
-												</button>
-											)}
-										</div>
-										
-										<input 
-											ref={fileInputRef} 
-											type="file" 
-											accept="image/*" 
-											multiple 
-											onChange={handleFileChange} 
-											className="hidden" 
-										/>
-										<p className="mt-2 text-xs text-gray-500">Upload up to 3 photos to help document the issue</p>
-									</div>
+    <label className="block text-sm font-bold text-gray-900 mb-3">
+        Photo Evidence ({formData.photos.length}/{MAX_PHOTOS})
+    </label>
+    
+    <div className="grid grid-cols-3 gap-3">
+        {formData.photos.map((photo, index) => (
+            <div key={index} className="relative aspect-square group">
+                <img 
+                    src={photo.preview} 
+                    alt={`Preview ${index + 1}`} 
+                    className="w-full h-full object-cover rounded-xl border-2 border-gray-200"
+                />
+                <button 
+                    onClick={() => removePhoto(index)}
+                    className="absolute -top-2 -right-2 p-1.5 bg-red-500 text-white rounded-full shadow-lg hover:bg-red-600 transition-colors z-10"
+                    aria-label="Remove photo"
+                >
+                    <X className="w-4 h-4" />
+                </button>
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 rounded-xl transition-colors" />
+            </div>
+        ))}
+        
+        {formData.photos.length < MAX_PHOTOS && (
+            <button 
+                type="button" 
+                onClick={() => fileInputRef.current?.click()}
+                className="aspect-square border-2 border-dashed border-gray-300 rounded-xl hover:border-blue-500 hover:bg-blue-50 flex flex-col items-center justify-center gap-2 transition-all group"
+            >
+                <Camera className="w-8 h-8 text-gray-400 group-hover:text-blue-500 transition-colors" />
+                <span className="text-xs text-gray-500 group-hover:text-blue-600 font-medium">Add Photo</span>
+            </button>
+        )}
+    </div>
+    
+    <input 
+    ref={fileInputRef} 
+    type="file" 
+    accept="image/*" 
+    // 🟢 ADDED: 'capture="environment"' to trigger the mobile device's camera (usually the back camera)
+    capture="environment" 
+    multiple 
+    onChange={handleFileChange} 
+    className="hidden" 
+/>
+<p className="mt-2 text-xs text-gray-500">Upload up to 3 photos to help document the issue</p>
+</div>
 										
 										{/* Voice Note */}
 										<div>

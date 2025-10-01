@@ -48,8 +48,8 @@ const upload = multer({
 
 // Use fields() to handle multiple, optional fields (Frontend sends 'photos' array and optional 'audio')
 const uploadMiddleware = upload.fields([
-    { name: 'photos', maxCount: 3 }, // Handles array of up to 3 photos
-    { name: 'audio', maxCount: 1 } 
+    { name: 'photos', maxCount: 3 }, // Matches submitData.append('photos', ...)
+    { name: 'audio', maxCount: 1 }   // Matches submitData.append('audio', ...)
 ]);
 
 // NEW FUNCTION: Auto-assign priority based on content
