@@ -42,11 +42,9 @@ const allowedOrigins = [
 ];
 
 const corsOptions = {
-  origin: function (origin, callback) {
-    // Allow requests with no origin (e.g., mobile apps or curl)
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) return callback(null, true);
-    return callback(new Error(`CORS: Origin ${origin} not allowed`));
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
+    callback(new Error(`CORS: Origin ${origin} not allowed`));
   },
   credentials: true, // Allows cookies / Authorization headers
 };
@@ -63,11 +61,8 @@ app.use('/uploads', express.static(uploadsDir));
 // --- Reverse Geocoding Proxy Endpoint (Nominatim) ---
 app.get('/api/geocode/reverse', async (req, res) => {
   const { lat, lon } = req.query;
-
   if (!lat || !lon) {
-    return res
-      .status(400)
-      .json({ success: false, error: 'Latitude and longitude are required.' });
+    return res.status(400).json({ success: false, error: 'Latitude and longitude are required.' });
   }
 
   const nominatimUrl = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`;
@@ -91,9 +86,7 @@ app.get('/api/geocode/reverse', async (req, res) => {
     return res.json({ success: true, address: data.display_name, data });
   } catch (error) {
     logger.error('Proxy fetch failed:', error.message);
-    res
-      .status(500)
-      .json({ success: false, error: 'Failed to reach external geocoding service.' });
+    res.status(500).json({ success: false, error: 'Failed to reach external geocoding service.' });
   }
 });
 
@@ -107,20 +100,16 @@ app.use('/api/notifications', notificationRoutes);
 app.use((error, req, res, next) => {
   logger.error('Global Express Error Handler:', error);
   if (error instanceof multer.MulterError && error.code === 'LIMIT_FILE_SIZE') {
-    return res
-      .status(400)
-      .json({ success: false, error: 'File too large. Maximum size is 10MB.' });
+    return res.status(400).json({ success: false, error: 'File too large. Maximum size is 10MB.' });
   }
-  res
-    .status(500)
-    .json({ success: false, error: 'An internal server error occurred', details: error.message });
+  res.status(500).json({ success: false, error: 'An internal server error occurred', details: error.message });
 });
 
 // --- Server Startup ---
 const startServer = async () => {
   try {
-    // Ensure database connection
-    await knex.raw('select 1+1 as result');
+    // Test database connection
+    await knex.raw('SELECT 1+1 AS result');
     logger.info('✅ Database connection successful.');
 
     app.listen(PORT, () => {
