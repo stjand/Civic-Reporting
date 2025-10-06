@@ -31,15 +31,13 @@ export default {
     migrations: { directory: path.join(__dirname, 'migrations') },
   },
   production: {
-    client: 'pg',
-    connection: {
-      connectionString: process.env.DATABASE_URL,
-      keepAlive: true,
-      statement_timeout: 15000,
-      ssl: { rejectUnauthorized: false }, // ✅ Required for Supabase remote connection
-    },
-    pool: { min: 2, max: 20, idleTimeoutMillis: 30000 },
-    migrations: { directory: path.join(__dirname, 'migrations') },
-    seeds: { directory: path.join(__dirname, 'seeds') },
+  client: 'pg',
+  connection: {
+    connectionString: process.env.DATABASE_URL,
+    ssl: { rejectUnauthorized: false }, // Required for Supabase
   },
+  pool: { min: 2, max: 20, idleTimeoutMillis: 30000 },
+  migrations: { directory: path.join(__dirname, 'migrations') },
+  seeds: { directory: path.join(__dirname, 'seeds') },
+}
 };
