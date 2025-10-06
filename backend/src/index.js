@@ -72,21 +72,50 @@ app.use((err, req, res, next) => {
 // Start Server
 const startServer = async () => {
   try {
+    console.log('='.repeat(50));
     console.log('Attempting database connection...');
     console.log('Environment:', process.env.NODE_ENV);
     console.log('Database URL exists:', !!process.env.DATABASE_URL);
     
-    const result = await knex.raw('SELECT 1+1 AS result');
-    logger.info('✅ Database connected successfully', result);
+    // Mask password in logs
+    const dbUrl = process.env.DATABASE_URL;
+    if (dbUrl) {
+      const urlParts = dbUrl.match(/postgresql:\/\/([^:]+):([^@]+)@([^/]+)(\/.*)?/);
+      if (urlParts) {
+        const [, user, , host, db] = urlParts;
+        console.log('DB User:', user);
+        console.log('DB Host:', host);
+        console.log('DB Name:', db || '/postgres');
+      } else {
+        console.log('DB URL format:', dbUrl.substring(0, 20) + '...');
+      }
+    }
+    console.log('='.repeat(50));
     
-    app.listen(PORT, () => logger.info(`🚀 Server running on port ${PORT}`));
+    const result = await knex.raw('SELECT 1+1 AS result');
+    logger.info('✅ Database connected successfully');
+    console.log('✅ Test query result:', result.rows);
+    
+    app.listen(PORT, () => {
+      logger.info(`🚀 Server running on port ${PORT}`);
+      console.log(`🚀 Server is live at http://localhost:${PORT}`);
+    });
   } catch (error) {
     logger.error('❌ Database connection failed:', {
       message: error.message,
       code: error.code,
-      detail: error.detail
+      detail: error.detail,
+      hint: error.hint
     });
-    process.exit(1); // Exit instead of continuing without DB
+    console.error('Full error:', error);
+    console.log('='.repeat(50));
+    console.log('Troubleshooting tips:');
+    console.log('1. Verify DATABASE_URL is correct in Render environment');
+    console.log('2. Check Supabase connection pooler is enabled');
+    console.log('3. Ensure password does not contain special characters');
+    console.log('4. Try using direct connection instead of pooler');
+    console.log('='.repeat(50));
+    process.exit(1);
   }
 };
 
