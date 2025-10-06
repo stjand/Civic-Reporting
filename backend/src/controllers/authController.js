@@ -1,10 +1,8 @@
 import knex from '../knex.js';
 import bcrypt from 'bcrypt';
 import logger from '../utils/logger.js';
-import jwt from "jsonwebtoken";
+import jwt from 'jsonwebtoken';
 import { createClient } from '@supabase/supabase-js';
-import db from "../knex.js";
-// import logger from "../utils/logger.js";
 
 // --- Supabase Client Initialization ---
 const supabaseUrl = process.env.SUPABASE_URL;
@@ -13,11 +11,10 @@ const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
 if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error("Supabase URL and Anon Key must be provided in the .env file.");
 }
+
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 const JWT_SECRET = process.env.JWT_SECRET || "supersecretkey";
-
-// --- Cookie Settings ---
 const isProduction = process.env.NODE_ENV === 'production';
 const cookieOptions = {
   httpOnly: true,
@@ -27,7 +24,7 @@ const cookieOptions = {
 };
 
 /**
- * Signs up a new user using Supabase Auth.
+ * Signup a new user
  */
 export const signup = async (req, res) => {
   try {
@@ -36,10 +33,10 @@ export const signup = async (req, res) => {
       return res.status(400).json({ error: "Missing required fields" });
     }
 
-    // 🟢 FIX: Use the Supabase client to securely create the user.
+    // Supabase signup
     const { data: authData, error: authError } = await supabase.auth.signUp({
-      email: email,
-      password: password,
+      email,
+      password,
       options: {
         data: {
           name,
@@ -56,11 +53,11 @@ export const signup = async (req, res) => {
       return res.status(400).json({ error: authError.message });
     }
     if (!authData.user) {
-        return res.status(500).json({ error: "Signup succeeded but no user data was returned." });
+      return res.status(500).json({ error: "Signup succeeded but no user data was returned." });
     }
 
-    // Create our application's session token
-    const token = jwt.sign({ userId: authData.user.id, role: role }, JWT_SECRET, { expiresIn: "7d" });
+    // Generate JWT
+    const token = jwt.sign({ userId: authData.user.id, role }, JWT_SECRET, { expiresIn: "7d" });
     res.cookie('jwt', token, cookieOptions);
 
     res.status(201).json({
@@ -75,30 +72,23 @@ export const signup = async (req, res) => {
 };
 
 /**
- * Logs in a user using Supabase Auth to verify the password.
+ * Login user
  */
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    if (!email || !password) {
-      return res.status(400).json({ error: "Email and password are required" });
-    }
+    if (!email || !password) return res.status(400).json({ error: "Email and password are required" });
 
-    // 🟢 FIX: Use the Supabase client to securely verify the password.
-    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-      email: email,
-      password: password,
-    });
+    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({ email, password });
 
     if (authError) {
       logger.error(`Supabase Login Error: ${authError.message}`);
       return res.status(401).json({ error: "Invalid credentials" });
     }
-     if (!authData.user) {
+    if (!authData.user) {
       return res.status(500).json({ error: "Login succeeded but no user data was returned." });
     }
 
-    // Create our application's session token
     const token = jwt.sign({ userId: authData.user.id, role: authData.user.user_metadata.role }, JWT_SECRET, { expiresIn: "7d" });
     res.cookie('jwt', token, cookieOptions);
 
@@ -113,9 +103,12 @@ export const login = async (req, res) => {
   }
 };
 
+/**
+ * Logout user
+ */
 export const logout = (req, res) => {
   try {
-    res.clearCookie('jwt', { httpOnly: true, secure: isProduction, sameSite: isProduction ? 'none' : 'Lax' });
+    res.clearCookie('jwt', cookieOptions);
     res.status(200).json({ success: true, message: "Logged out successfully" });
   } catch (err) {
     logger.error(`Logout Error: ${err.message}`);
@@ -123,16 +116,17 @@ export const logout = (req, res) => {
   }
 };
 
+/**
+ * Get current user profile
+ */
 export const getMe = async (req, res) => {
   try {
-    const user = await db("auth.users")
+    const user = await knex("auth.users")
       .where({ id: req.user.id })
-      .select('id', 'email', 'raw_user_meta_data')
+      .select("id", "email", "raw_user_meta_data")
       .first();
 
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
-    }
+    if (!user) return res.status(404).json({ error: "User not found" });
 
     res.json({
       success: true,
@@ -145,88 +139,69 @@ export const getMe = async (req, res) => {
 };
 
 /**
- * 🟢 NEW FUNCTION: Gets a list of government officials for report assignment.
+ * Get list of officials
  */
 export const getOfficialsList = async (req, res) => {
-    try {
-        // Query auth.users for users with role 'official'
-        const officials = await db("auth.users")
-          .whereRaw(`raw_user_meta_data->>'role' = ?`, ['official'])
-          .select('id', 'raw_user_meta_data');
-        
-        // Map to a clean list of officials
-        const cleanOfficials = officials.map(user => ({
-            id: user.id,
-            name: user.raw_user_meta_data.name,
-            department: user.raw_user_meta_data.department,
-            designation: user.raw_user_meta_data.designation,
-        }));
+  try {
+    const officials = await knex("auth.users")
+      .whereRaw(`raw_user_meta_data->>'role' = ?`, ["official"])
+      .select("id", "raw_user_meta_data");
 
-        res.status(200).json({ success: true, officials: cleanOfficials });
+    const cleanOfficials = officials.map(u => ({
+      id: u.id,
+      name: u.raw_user_meta_data.name,
+      department: u.raw_user_meta_data.department,
+      designation: u.raw_user_meta_data.designation,
+    }));
 
-    } catch (err) {
-        logger.error(`GetOfficialsList Error: ${err.message}`);
-        res.status(500).json({ success: false, error: "Failed to fetch officials list" });
-    }
+    res.status(200).json({ success: true, officials: cleanOfficials });
+  } catch (err) {
+    logger.error(`GetOfficialsList Error: ${err.message}`);
+    res.status(500).json({ success: false, error: "Failed to fetch officials list" });
+  }
 };
 
-// New function to update a user's profile
+/**
+ * Update user profile
+ */
 export const updateProfile = async (req, res) => {
   try {
     const { name, email, phone, location, bio } = req.body;
     const userId = req.user.id;
 
-    // Prepare the data for updating the 'profiles' table
     const profileData = { name, phone, location, bio };
-    
-    // Update the profile table
-    await knex('profiles').where({ id: userId }).update(profileData);
-    
-    // If the email is being changed, update the 'auth.users' table
-    if (email && email !== req.user.email) {
-      // NOTE: Supabase handles email changes securely. For a standard setup,
-      // you would update the users table directly. Here we focus on the profile.
-      // await knex('users').where({ id: userId }).update({ email });
-    }
 
-    const [updatedUser] = await knex('profiles').where({ id: userId }).select('*');
+    await knex("profiles").where({ id: userId }).update(profileData);
+
+    const [updatedUser] = await knex("profiles").where({ id: userId }).select("*");
 
     res.status(200).json({ success: true, user: updatedUser });
-  } catch (error) {
-    logger.error(`Profile update failed for user ${req.user.id}: ${error.message}`);
-    res.status(500).json({ success: false, error: 'Failed to update profile' });
+  } catch (err) {
+    logger.error(`Profile update failed: ${err.message}`);
+    res.status(500).json({ success: false, error: "Failed to update profile" });
   }
 };
 
-// New function to change a user's password
+/**
+ * Change user password
+ */
 export const changePassword = async (req, res) => {
   try {
     const { currentPassword, newPassword } = req.body;
     const userId = req.user.id;
 
-    // Get the user from the database
-    const [user] = await knex('users').where({ id: userId }).select('password');
+    const [user] = await knex("users").where({ id: userId }).select("password");
+    if (!user) return res.status(404).json({ success: false, error: "User not found" });
 
-    if (!user) {
-      return res.status(404).json({ success: false, error: 'User not found' });
-    }
-
-    // Check if the current password is correct
     const isMatch = await bcrypt.compare(currentPassword, user.password);
-    if (!isMatch) {
-      return res.status(400).json({ success: false, error: 'Incorrect current password' });
-    }
+    if (!isMatch) return res.status(400).json({ success: false, error: "Incorrect current password" });
 
-    // Hash the new password
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(newPassword, salt);
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await knex("users").where({ id: userId }).update({ password: hashedPassword });
 
-    // Update the password in the database
-    await knex('users').where({ id: userId }).update({ password: hashedPassword });
-
-    res.status(200).json({ success: true, message: 'Password updated successfully' });
-  } catch (error) {
-    logger.error(`Password change failed for user ${req.user.id}: ${error.message}`);
-    res.status(500).json({ success: false, error: 'Failed to change password' });
+    res.status(200).json({ success: true, message: "Password updated successfully" });
+  } catch (err) {
+    logger.error(`Password change failed: ${err.message}`);
+    res.status(500).json({ success: false, error: "Failed to change password" });
   }
 };

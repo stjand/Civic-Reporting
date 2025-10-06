@@ -291,3 +291,25 @@
 {"level":"\u001b[31merror\u001b[39m","message":"Authentication error: getaddrinfo ENOTFOUND aws-1-ap-south-1.pooler.supabase.com","timestamp":"2025-10-01 16:53:54"}
 {"level":"\u001b[31merror\u001b[39m","message":"Supabase Login Error: Invalid login credentials","timestamp":"2025-10-06 13:41:50"}
 {"level":"\u001b[31merror\u001b[39m","message":"Supabase Login Error: Invalid login credentials","timestamp":"2025-10-06 13:41:55"}
+{"level":"\u001b[31merror\u001b[39m","message":"❌ Database connection failed. Server will not start.","timestamp":"2025-10-06 14:14:36"}
+{"level":"\u001b[31merror\u001b[39m","message":"Tenant or user not found","timestamp":"2025-10-06 14:14:36"}
+{"level":"\u001b[31merror\u001b[39m","message":"❌ Database connection failed. Server will not start.","timestamp":"2025-10-06 14:14:58"}
+{"level":"\u001b[31merror\u001b[39m","message":"Tenant or user not found","timestamp":"2025-10-06 14:14:58"}
+{"level":"\u001b[31merror\u001b[39m","message":"❌ Database connection failed. Server will not start.","timestamp":"2025-10-06 14:16:25"}
+{"level":"\u001b[31merror\u001b[39m","message":"Tenant or user not found","timestamp":"2025-10-06 14:16:25"}
+{"level":"\u001b[31merror\u001b[39m","message":"❌ Database connection failed. Server will not start.","timestamp":"2025-10-06 14:16:58"}
+{"level":"\u001b[31merror\u001b[39m","message":"Tenant or user not found","timestamp":"2025-10-06 14:16:58"}
+{"level":"\u001b[31merror\u001b[39m","message":"❌ Database connection failed. Server will not start.","timestamp":"2025-10-06 14:17:30"}
+{"level":"\u001b[31merror\u001b[39m","message":"Tenant or user not found","timestamp":"2025-10-06 14:17:30"}
+{"level":"\u001b[31merror\u001b[39m","message":"❌ Database connection failed. Server will not start.","timestamp":"2025-10-06 14:31:46"}
+{"level":"\u001b[31merror\u001b[39m","message":"Tenant or user not found","timestamp":"2025-10-06 14:31:46"}
+{"level":"\u001b[31merror\u001b[39m","message":"❌ Database connection failed. Server will not start.","timestamp":"2025-10-06 14:31:49"}
+{"level":"\u001b[31merror\u001b[39m","message":"Tenant or user not found","timestamp":"2025-10-06 14:31:49"}
+{"level":"\u001b[31merror\u001b[39m","message":"❌ Database connection failed. Server will not start.","timestamp":"2025-10-06 14:35:27"}
+{"level":"\u001b[31merror\u001b[39m","message":"Tenant or user not found","timestamp":"2025-10-06 14:35:27"}
+{"level":"\u001b[31merror\u001b[39m","message":"❌ Database connection failed:","timestamp":"2025-10-06 14:35:40"}
+{"level":"\u001b[31merror\u001b[39m","message":"❌ Database connection failed. Server will not start.","timestamp":"2025-10-06 14:35:43"}
+{"level":"\u001b[31merror\u001b[39m","message":"Tenant or user not found","timestamp":"2025-10-06 14:35:43"}
+{"level":"\u001b[31merror\u001b[39m","message":"❌ Database connection failed:","timestamp":"2025-10-06 14:37:22"}
+{"level":"\u001b[31merror\u001b[39m","message":"❌ Database connection failed:","timestamp":"2025-10-06 14:38:35"}
+{"level":"\u001b[31merror\u001b[39m","message":"❌ Database connection failed:","timestamp":"2025-10-06 14:38:37"}
