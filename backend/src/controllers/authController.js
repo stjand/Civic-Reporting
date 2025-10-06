@@ -14,7 +14,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-const JWT_SECRET = process.env.JWT_SECRET || "supersecretkey";
+const JWT_SECRET = process.env.JWT_SECRET || "supersecretkey@12345678@^*^";
 const isProduction = process.env.NODE_ENV === 'production';
 const cookieOptions = {
   httpOnly: true,

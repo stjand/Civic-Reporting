@@ -2,7 +2,17 @@ import jwt from 'jsonwebtoken';
 import knex from '../knex.js';
 import logger from '../utils/logger.js';
 
-const JWT_SECRET = process.env.JWT_SECRET || "supersecretkey";
+const JWT_SECRET = process.env.JWT_SECRET || "supersecretkey@12345678@^*^";
+
+// 🟢 FIX: Define consistent cookie options for clearing
+const isProduction = process.env.NODE_ENV === 'production';
+const cookieClearOptions = {
+  httpOnly: true,
+  // SameSite must match the setting in authController.js ('Lax' in dev, 'none' in prod) 
+  // to ensure the browser successfully deletes the cookie.
+  sameSite: isProduction ? 'none' : 'Lax', 
+  secure: isProduction,
+};
 
 // --- Authentication Middleware ---
 const authMiddleware = async (req, res, next) => {
@@ -20,7 +30,8 @@ const authMiddleware = async (req, res, next) => {
       .first();
 
     if (!user) {
-      res.clearCookie('jwt', { httpOnly: true, sameSite: 'none', secure: process.env.NODE_ENV === 'production' });
+      // 🟢 FIXED: Use consistent cookie options
+      res.clearCookie('jwt', cookieClearOptions);
       return res.status(401).json({ success: false, error: 'User not found' });
     }
 
@@ -33,7 +44,8 @@ const authMiddleware = async (req, res, next) => {
     next();
   } catch (error) {
     logger.error(`Authentication error: ${error.message}`);
-    res.clearCookie('jwt', { httpOnly: true, sameSite: 'none', secure: process.env.NODE_ENV === 'production' });
+    // 🟢 FIXED: Use consistent cookie options
+    res.clearCookie('jwt', cookieClearOptions);
     return res.status(401).json({ success: false, error: 'Invalid or expired token' });
   }
 };

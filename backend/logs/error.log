@@ -323,3 +323,5 @@
 {"level":"\u001b[31merror\u001b[39m","message":"❌ Database connection failed:","timestamp":"2025-10-06 16:05:15"}
 {"code":"XX000","level":"\u001b[31merror\u001b[39m","message":"❌ Database connection failed: Tenant or user not found","timestamp":"2025-10-06 16:05:29"}
 {"code":"XX000","level":"\u001b[31merror\u001b[39m","message":"❌ Database connection failed: Tenant or user not found","timestamp":"2025-10-06 16:10:43"}
+{"code":"XX000","level":"\u001b[31merror\u001b[39m","message":"❌ Database connection failed: Tenant or user not found","timestamp":"2025-10-06 17:12:40"}
+{"code":"XX000","level":"\u001b[31merror\u001b[39m","message":"❌ Database connection failed: Tenant or user not found","timestamp":"2025-10-06 17:15:14"}
