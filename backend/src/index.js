@@ -72,11 +72,21 @@ app.use((err, req, res, next) => {
 // Start Server
 const startServer = async () => {
   try {
-    await knex.raw('SELECT 1+1 AS result');
-    logger.info('✅ Database connected.');
+    console.log('Attempting database connection...');
+    console.log('Environment:', process.env.NODE_ENV);
+    console.log('Database URL exists:', !!process.env.DATABASE_URL);
+    
+    const result = await knex.raw('SELECT 1+1 AS result');
+    logger.info('✅ Database connected successfully', result);
+    
     app.listen(PORT, () => logger.info(`🚀 Server running on port ${PORT}`));
   } catch (error) {
-    logger.error('❌ Database connection failed:', error.message);
+    logger.error('❌ Database connection failed:', {
+      message: error.message,
+      code: error.code,
+      detail: error.detail
+    });
+    process.exit(1); // Exit instead of continuing without DB
   }
 };
 

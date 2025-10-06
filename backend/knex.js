@@ -1,21 +1,25 @@
 import knexLib from 'knex';
-import knexConfig from './knexfile.js'; // go up one level from src/
+import knexConfig from './knexfile.js';
 
 const environment = process.env.NODE_ENV || 'development';
 
 let config = knexConfig[environment];
 
-// For production (Render + Supabase), override connection with DATABASE_URL
+// For production with Supabase connection pooler
 if (environment === 'production' && process.env.DATABASE_URL) {
   config = {
     ...config,
     connection: {
       connectionString: process.env.DATABASE_URL,
-      ssl: {
-        rejectUnauthorized: false, // Required for Supabase
-      },
+      ssl: { rejectUnauthorized: false }
     },
-    pool: { min: 0, max: 10 }, // optional, tune pool as needed
+    pool: { 
+      min: 0, 
+      max: 10,
+      acquireTimeoutMillis: 30000,
+      idleTimeoutMillis: 30000,
+      createTimeoutMillis: 30000
+    },
   };
 }
 
