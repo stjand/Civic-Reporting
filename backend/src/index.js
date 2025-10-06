@@ -118,7 +118,8 @@ const startServer = async () => {
   } catch (error) {
     logger.error('❌ Database connection failed. Server will not start.');
     logger.error(error.message);
-    process.exit(1);
+    // COMMENTED OUT process.exit to prevent Render from killing the service
+    // process.exit(1);
   }
 };
 
