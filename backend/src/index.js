@@ -28,10 +28,11 @@ const allowedOrigins = [
 
 app.use(cors({
   origin: (origin, callback) => {
+    // allow requests with no origin (like mobile apps, Postman)
     if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
     callback(new Error(`CORS: Origin ${origin} not allowed`));
   },
-  credentials: true,
+  credentials: true, // ✅ allow cookies
 }));
 
 // Core Middleware

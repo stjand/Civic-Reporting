@@ -23,8 +23,8 @@ export default {
     client: 'pg',
     connection: process.env.DATABASE_URL, // Remove ?sslmode=require
     pool: { 
-      min: 2, 
-      max: 20, 
+      min: 1, 
+      max: 1, 
       idleTimeoutMillis: 30000,
       acquireTimeoutMillis: 30000,
       createTimeoutMillis: 30000

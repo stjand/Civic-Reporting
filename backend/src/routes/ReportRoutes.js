@@ -7,11 +7,18 @@ import { supabase, BUCKET_NAME } from '../utils/supabase.js';
 
 const router = express.Router();
 
-// Multer memory storage
+// -------------------- Multer setup --------------------
 const storage = multer.memoryStorage();
 const upload = multer({
   storage,
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith('image/') || file.mimetype.startsWith('audio/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Invalid file type'));
+    }
+  }
 });
 
 const uploadMiddleware = upload.fields([
@@ -19,127 +26,139 @@ const uploadMiddleware = upload.fields([
   { name: 'audio', maxCount: 1 },
 ]);
 
-// Helper: Upload file to Supabase
-const uploadFileToSupabase = async (file) => {
-  const ext = file.originalname.split('.').pop();
-  const fileName = `${Date.now()}-${Math.round(Math.random() * 1e9)}.${ext}`;
+// -------------------- Helper functions --------------------
+const uploadFileToSupabase = async (file, accessToken) => {
+  try {
+    const ext = file.originalname.split('.').pop();
+    const fileName = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}.${ext}`;
 
-  const { error } = await supabase.storage
-    .from(BUCKET_NAME)
-    .upload(fileName, file.buffer, { contentType: file.mimetype });
+    // Use user access token to satisfy RLS
+    const { error } = await supabase.storage
+      .from(BUCKET_NAME)
+      .upload(fileName, file.buffer, {
+        contentType: file.mimetype,
+        cacheControl: '3600',
+        upsert: false,
+        options: { headers: { Authorization: `Bearer ${accessToken}` } }
+      });
 
-  if (error) throw new Error(error.message);
+    if (error) throw error;
 
-  const { data } = supabase.storage.from(BUCKET_NAME).getPublicUrl(fileName);
-  return data.publicUrl;
+    const { data: publicData } = supabase.storage.from(BUCKET_NAME).getPublicUrl(fileName);
+    return publicData.publicUrl;
+  } catch (error) {
+    logger.error(`Upload failed: ${error.message}`);
+    throw error;
+  }
 };
 
-// Auto-assign priority
 const determinePriority = (title, description) => {
   const content = (title + ' ' + description).toLowerCase();
-  const highKeywords = ['emergency', 'urgent', 'danger', 'fire', 'leak', 'collapse', 'flooding', 'major'];
-  const mediumKeywords = ['large', 'broken', 'hazard', 'safety', 'exposed', 'deep', 'burst', 'damaged'];
-
-  if (highKeywords.some(k => content.includes(k))) return 'high';
-  if (mediumKeywords.some(k => content.includes(k))) return 'medium';
+  if (/emergency|urgent|danger|fire|collapse/i.test(content)) return 'high';
+  if (/large|broken|hazard|safety/i.test(content)) return 'medium';
   return 'low';
 };
 
-// Submit a new report
+// -------------------- Routes --------------------
+
+// POST /api/reports - submit report
 router.post('/', authMiddleware, roleMiddleware(['citizen']), uploadMiddleware, async (req, res) => {
   try {
     const { title, description, report_type, latitude, longitude, address } = req.body;
 
-    // Upload files to Supabase
-    const photo_url = req.files.photos ? await uploadFileToSupabase(req.files.photos[0]) : null;
-    const audio_url = req.files.audio ? await uploadFileToSupabase(req.files.audio[0]) : null;
+    if (!title || !description || !report_type) {
+      return res.status(400).json({ success: false, error: 'Missing required fields' });
+    }
 
-    const priority = determinePriority(title, description);
+    // Extract user JWT from headers
+    const accessToken = req.headers.authorization?.split(' ')[1];
+    if (!accessToken) {
+      return res.status(401).json({ success: false, error: 'Missing auth token' });
+    }
+
+    // Upload files in parallel
+    const uploads = [];
+    if (req.files?.photos?.[0]) uploads.push(uploadFileToSupabase(req.files.photos[0], accessToken));
+    if (req.files?.audio?.[0]) uploads.push(uploadFileToSupabase(req.files.audio[0], accessToken));
+
+    const [photo_url, audio_url] = await Promise.all(uploads);
 
     const reportData = {
-      user_id: req.user.id,
-      title,
+      user_id: req.user.id, // UUID, matches Supabase auth.uid()
+      title: title.trim(),
       report_type,
-      description,
-      latitude,
-      longitude,
-      address,
-      photo_url,
-      audio_url,
+      description: description.trim(),
+      latitude: latitude ? parseFloat(latitude) : null,
+      longitude: longitude ? parseFloat(longitude) : null,
+      address: address || null,
+      photo_url: photo_url || null,
+      audio_url: audio_url || null,
       status: 'new',
-      priority,
+      priority: determinePriority(title, description),
+      created_at: new Date(),
+      updated_at: new Date()
     };
 
     const [newReport] = await knex('reports').insert(reportData).returning('*');
     res.status(201).json({ success: true, report: newReport });
+
   } catch (error) {
     logger.error(`Report submission failed: ${error.message}`);
-    res.status(500).json({ success: false, error: error.message });
+    res.status(500).json({ success: false, error: 'Failed to submit report' });
   }
 });
 
-// Get current user's reports
+// GET /api/reports/my-reports - list user's reports
 router.get('/my-reports', authMiddleware, roleMiddleware(['citizen']), async (req, res) => {
   try {
     const reports = await knex('reports')
       .where({ user_id: req.user.id })
-      .orderBy('created_at', 'desc');
+      .select('report_id', 'title', 'status', 'priority', 'created_at', 'report_type')
+      .orderBy('created_at', 'desc')
+      .limit(100);
+
     res.status(200).json({ success: true, reports });
   } catch (error) {
-    logger.error(`Failed to get user reports: ${error.message}`);
-    res.status(500).json({ success: false, error: error.message });
+    logger.error(`Failed to get reports: ${error.message}`);
+    res.status(500).json({ success: false, error: 'Failed to fetch reports' });
   }
 });
 
-// Get user statistics
+// GET /api/reports/my-stats - summary stats
 router.get('/my-stats', authMiddleware, roleMiddleware(['citizen']), async (req, res) => {
   try {
-    const reports = await knex('reports')
+    const result = await knex('reports')
       .where({ user_id: req.user.id })
-      .select('status');
+      .select(
+        knex.raw('COUNT(*) as "reportsSubmitted"'),
+        knex.raw('SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) as "reportsResolved"', ['resolved']),
+        knex.raw('SUM(CASE WHEN status IN (?, ?) THEN 1 ELSE 0 END) as "reportsInProgress"', ['acknowledged', 'in_progress']),
+        knex.raw('SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) as "reportsNew"', ['new'])
+      )
+      .first();
 
-    const stats = {
-      reportsSubmitted: reports.length,
-      reportsResolved: reports.filter(r => r.status === 'resolved').length,
-      reportsInProgress: reports.filter(r => ['acknowledged', 'in_progress'].includes(r.status)).length,
-      reportsNew: reports.filter(r => r.status === 'new').length,
-    };
-
-    res.status(200).json({ success: true, stats });
+    res.status(200).json({ success: true, stats: result });
   } catch (error) {
-    logger.error(`Failed to get user stats: ${error.message}`);
-    res.status(500).json({ success: false, error: error.message });
+    logger.error(`Failed to get stats: ${error.message}`);
+    res.status(500).json({ success: false, error: 'Failed to fetch stats' });
   }
 });
 
-// Get report details
+// GET /api/reports/:reportId - fetch single report
 router.get('/:reportId', authMiddleware, async (req, res) => {
   try {
     const report = await knex('reports')
       .where({ report_id: req.params.reportId })
       .first();
 
-    if (!report) return res.status(404).json({ success: false, error: 'Report not found' });
+    if (!report) {
+      return res.status(404).json({ success: false, error: 'Report not found' });
+    }
+
     res.status(200).json({ success: true, report });
   } catch (error) {
-    logger.error(`Failed to get report details: ${error.message}`);
-    res.status(500).json({ success: false, error: error.message });
-  }
-});
-
-// Get reports for validation
-router.get('/validate/pending', authMiddleware, roleMiddleware(['citizen']), async (req, res) => {
-  try {
-    const reports = await knex('reports')
-      .whereNot({ user_id: req.user.id })
-      .where({ status: 'new' })
-      .orderBy('created_at', 'asc')
-      .limit(10);
-
-    res.status(200).json({ success: true, reports });
-  } catch (error) {
-    logger.error(`Failed to get validation reports: ${error.message}`);
-    res.status(500).json({ success: false, error: error.message });
+    logger.error(`Failed to get report: ${error.message}`);
+    res.status(500).json({ success: false, error: 'Failed to fetch report' });
   }
 });
 

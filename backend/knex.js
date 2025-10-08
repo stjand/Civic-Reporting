@@ -2,24 +2,25 @@ import knexLib from 'knex';
 import knexConfig from './knexfile.js';
 
 const environment = process.env.NODE_ENV || 'development';
-
 let config = knexConfig[environment];
 
-// For production with Supabase connection pooler
+// ✅ Production fix for Supabase
 if (environment === 'production' && process.env.DATABASE_URL) {
   config = {
-    ...config,
+    client: 'pg',
     connection: {
       connectionString: process.env.DATABASE_URL,
-      ssl: { rejectUnauthorized: false }
+      ssl: { rejectUnauthorized: false }, // important for Supabase
     },
     pool: { 
-      min: 0, 
+      min: 2, 
       max: 10,
-      acquireTimeoutMillis: 30000,
-      idleTimeoutMillis: 30000,
-      createTimeoutMillis: 30000
+      acquireTimeoutMillis: 60000,
+      idleTimeoutMillis: 600000,
+      createTimeoutMillis: 30000,
+      propagateCreateError: false
     },
+    acquireConnectionTimeout: 60000,
   };
 }
 

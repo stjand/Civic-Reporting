@@ -325,3 +325,35 @@
 {"code":"XX000","level":"\u001b[31merror\u001b[39m","message":"❌ Database connection failed: Tenant or user not found","timestamp":"2025-10-06 16:10:43"}
 {"code":"XX000","level":"\u001b[31merror\u001b[39m","message":"❌ Database connection failed: Tenant or user not found","timestamp":"2025-10-06 17:12:40"}
 {"code":"XX000","level":"\u001b[31merror\u001b[39m","message":"❌ Database connection failed: Tenant or user not found","timestamp":"2025-10-06 17:15:14"}
+{"level":"\u001b[31merror\u001b[39m","message":"Authentication error: select \"id\", \"email\", \"raw_user_meta_data\" from \"auth\".\"users\" where \"id\" = $1 limit $2 - Connection terminated unexpectedly","timestamp":"2025-10-06 17:40:46"}
+{"level":"\u001b[31merror\u001b[39m","message":"Authentication error: select \"id\", \"email\", \"raw_user_meta_data\" from \"auth\".\"users\" where \"id\" = $1 limit $2 - Connection terminated unexpectedly","timestamp":"2025-10-06 17:40:46"}
+{"level":"\u001b[31merror\u001b[39m","message":"Report submission failed: new row violates row-level security policy","timestamp":"2025-10-06 17:42:05"}
+{"level":"\u001b[31merror\u001b[39m","message":"Authentication error: getaddrinfo ENOTFOUND aws-1-ap-south-1.pooler.supabase.com","timestamp":"2025-10-06 18:24:25"}
+{"level":"\u001b[31merror\u001b[39m","message":"Authentication error: getaddrinfo ENOTFOUND aws-1-ap-south-1.pooler.supabase.com","timestamp":"2025-10-06 18:24:25"}
+{"level":"\u001b[31merror\u001b[39m","message":"Report submission failed: new row violates row-level security policy","timestamp":"2025-10-06 18:27:50"}
+{"level":"\u001b[31merror\u001b[39m","message":"Report submission failed: new row violates row-level security policy","timestamp":"2025-10-06 18:32:41"}
+{"level":"\u001b[31merror\u001b[39m","message":"Authentication error: select \"id\", \"email\", \"raw_user_meta_data\" from \"auth\".\"users\" where \"id\" = $1 limit $2 - Connection terminated unexpectedly","timestamp":"2025-10-06 18:38:59"}
+{"level":"\u001b[31merror\u001b[39m","message":"Authentication error: select \"id\", \"email\", \"raw_user_meta_data\" from \"auth\".\"users\" where \"id\" = $1 limit $2 - Connection terminated unexpectedly","timestamp":"2025-10-06 18:39:12"}
+{"level":"\u001b[31merror\u001b[39m","message":"Report submission failed: new row violates row-level security policy","timestamp":"2025-10-06 18:39:56"}
+{"level":"\u001b[31merror\u001b[39m","message":"Report submission failed: new row violates row-level security policy","timestamp":"2025-10-08 16:54:17"}
+{"level":"\u001b[31merror\u001b[39m","message":"Report submission failed: fetch failed","timestamp":"2025-10-08 17:00:45"}
+{"level":"\u001b[31merror\u001b[39m","message":"Report submission failed: Unexpected token '<', \"<html>\r\n<h\"... is not valid JSON","timestamp":"2025-10-08 17:02:45"}
+{"level":"\u001b[31merror\u001b[39m","message":"Authentication error: select \"id\", \"email\", \"raw_user_meta_data\" from \"auth\".\"users\" where \"id\" = $1 limit $2 - Connection terminated unexpectedly","timestamp":"2025-10-08 17:16:23"}
+{"level":"\u001b[31merror\u001b[39m","message":"Supabase Login Error: Invalid login credentials","timestamp":"2025-10-08 17:22:58"}
+{"level":"\u001b[31merror\u001b[39m","message":"Supabase Login Error: Invalid login credentials","timestamp":"2025-10-08 17:23:04"}
+{"level":"\u001b[31merror\u001b[39m","message":"Supabase Login Error: Invalid login credentials","timestamp":"2025-10-08 17:23:12"}
+{"level":"\u001b[31merror\u001b[39m","message":"Supabase Login Error: Invalid login credentials","timestamp":"2025-10-08 17:24:09"}
+{"level":"\u001b[31merror\u001b[39m","message":"Supabase Login Error: Invalid login credentials","timestamp":"2025-10-08 17:24:36"}
+{"level":"\u001b[31merror\u001b[39m","message":"Supabase Login Error: Invalid login credentials","timestamp":"2025-10-08 17:25:05"}
+{"level":"\u001b[31merror\u001b[39m","message":"Supabase Login Error: Invalid login credentials","timestamp":"2025-10-08 17:25:06"}
+{"level":"\u001b[31merror\u001b[39m","message":"Supabase Login Error: Invalid login credentials","timestamp":"2025-10-08 17:25:29"}
+{"level":"\u001b[31merror\u001b[39m","message":"Supabase Login Error: Invalid login credentials","timestamp":"2025-10-08 17:25:31"}
+{"level":"\u001b[31merror\u001b[39m","message":"Supabase Login Error: Invalid login credentials","timestamp":"2025-10-08 17:28:04"}
+{"level":"\u001b[31merror\u001b[39m","message":"Supabase Login Error: Invalid login credentials","timestamp":"2025-10-08 17:28:11"}
+{"level":"\u001b[31merror\u001b[39m","message":"Supabase Login Error: Invalid login credentials","timestamp":"2025-10-08 18:03:03"}
+{"level":"\u001b[31merror\u001b[39m","message":"Supabase Login Error: Invalid login credentials","timestamp":"2025-10-08 18:03:16"}
+{"level":"\u001b[31merror\u001b[39m","message":"Supabase Login Error: Invalid login credentials","timestamp":"2025-10-08 18:14:13"}
+{"level":"\u001b[31merror\u001b[39m","message":"Upload failed: new row violates row-level security policy","timestamp":"2025-10-08 18:28:00"}
+{"level":"\u001b[31merror\u001b[39m","message":"Report submission failed: new row violates row-level security policy","timestamp":"2025-10-08 18:28:00"}
+{"level":"\u001b[31merror\u001b[39m","message":"Upload failed: new row violates row-level security policy","timestamp":"2025-10-08 18:28:18"}
+{"level":"\u001b[31merror\u001b[39m","message":"Report submission failed: new row violates row-level security policy","timestamp":"2025-10-08 18:28:18"}
