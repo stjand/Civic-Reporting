@@ -12,9 +12,10 @@ This guide addresses communication issues between:
 Navigate to your Render dashboard → Service → Environment tab:
 
 ```bash
-# Database Configuration
-DATABASE_URL=postgresql://username:password@host:port/database
-# Example: postgresql://postgres.abc123:password@aws-0-us-west-1.pooler.supabase.com:5432/postgres
+# Database Configuration - Use Supabase TRANSACTION MODE connection string
+DATABASE_URL=postgresql://postgres.abc123:[YOUR-PASSWORD]@aws-0-us-west-1.pooler.supabase.com:6543/postgres?pgbouncer=true
+# IMPORTANT: Use port 6543 (transaction mode), NOT 5432
+# Get this from: Supabase Dashboard → Settings → Database → Connection String → Transaction Mode
 
 # Server Configuration
 NODE_ENV=production
@@ -47,10 +48,22 @@ VITE_MAPBOX_TOKEN=your-mapbox-token
 ```
 
 ### Supabase Configuration
-In Supabase dashboard → Settings → Database:
-- Copy the connection string
-- Ensure connection pooling is enabled
-- Verify SSL mode is set to `require`
+In Supabase dashboard → Settings → Database → Connection String:
+
+**CRITICAL: Use "Transaction" mode, NOT "Session" mode**
+1. Select **Transaction** tab (uses port 6543)
+2. Copy the connection string
+3. Add `?pgbouncer=true` to the end
+4. SSL is automatically enabled
+
+Example format:
+```
+postgresql://postgres.[PROJECT-REF]:[PASSWORD]@aws-0-[REGION].pooler.supabase.com:6543/postgres?pgbouncer=true
+```
+
+**Why Transaction mode?**
+- Session mode (port 5432) may not work with Render's network configuration
+- Transaction mode (port 6543) uses PgBouncer which is more compatible with serverless platforms
 
 ## 2. API Endpoint Testing
 

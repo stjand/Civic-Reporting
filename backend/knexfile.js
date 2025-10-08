@@ -21,13 +21,17 @@ export default {
   },
   production: {
     client: 'pg',
-    connection: process.env.DATABASE_URL, // Remove ?sslmode=require
-    pool: { 
-      min: 1, 
-      max: 1, 
+    connection: {
+      connectionString: process.env.DATABASE_URL,
+      ssl: { rejectUnauthorized: false }
+    },
+    pool: {
+      min: 1,
+      max: 5,
       idleTimeoutMillis: 30000,
-      acquireTimeoutMillis: 30000,
-      createTimeoutMillis: 30000
+      acquireTimeoutMillis: 60000,
+      createTimeoutMillis: 30000,
+      propagateCreateError: false
     },
     migrations: { directory: path.join(__dirname, 'migrations') },
     seeds: { directory: path.join(__dirname, 'seeds') },
