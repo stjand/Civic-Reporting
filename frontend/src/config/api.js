@@ -11,9 +11,22 @@ const apiClient = axios.create({
   withCredentials: true,
 });
 
+// Helper function to get JWT from cookies
+const getTokenFromCookie = () => {
+  const cookies = document.cookie.split(';');
+  const jwtCookie = cookies.find(cookie => cookie.trim().startsWith('jwt='));
+  return jwtCookie ? jwtCookie.split('=')[1] : null;
+};
+
 // Request interceptor
 apiClient.interceptors.request.use(
-  (config) => config,
+  (config) => {
+    const token = getTokenFromCookie();
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
   (error) => Promise.reject(error)
 );
 
