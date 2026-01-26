@@ -28,7 +28,7 @@ const cookieOptions = {
 export const signup = async (req, res) => {
   try {
     const { name, email, password, role, department, designation, location } = req.body;
-    
+
     if (!name || !email || !password || !role) {
       return res.status(400).json({ success: false, error: "Missing required fields" });
     }
@@ -65,12 +65,12 @@ export const signup = async (req, res) => {
 
     // ✅ Generate JWT with proper expiration
     const token = jwt.sign(
-      { 
-        userId: authData.user.id, 
+      {
+        userId: authData.user.id,
         role,
-        email: authData.user.email 
-      }, 
-      JWT_SECRET, 
+        email: authData.user.email
+      },
+      JWT_SECRET,
       { expiresIn: "7d" }
     );
 
@@ -79,12 +79,12 @@ export const signup = async (req, res) => {
     res.status(201).json({
       success: true,
       message: "Account created successfully",
-      user: { 
-        id: authData.user.id, 
-        email: authData.user.email, 
+      user: {
+        id: authData.user.id,
+        email: authData.user.email,
         name,
         role,
-        ...authData.user.user_metadata 
+        ...authData.user.user_metadata
       },
     });
   } catch (err) {
@@ -96,14 +96,14 @@ export const signup = async (req, res) => {
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    
+
     if (!email || !password) {
       return res.status(400).json({ success: false, error: "Email and password required" });
     }
 
-    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({ 
-      email, 
-      password 
+    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+      email,
+      password
     });
 
     if (authError) {
@@ -118,12 +118,12 @@ export const login = async (req, res) => {
     const userRole = authData.user.user_metadata?.role || 'citizen';
 
     const token = jwt.sign(
-      { 
-        userId: authData.user.id, 
+      {
+        userId: authData.user.id,
         role: userRole,
-        email: authData.user.email 
-      }, 
-      JWT_SECRET, 
+        email: authData.user.email
+      },
+      JWT_SECRET,
       { expiresIn: "7d" }
     );
 
@@ -132,11 +132,11 @@ export const login = async (req, res) => {
     res.json({
       success: true,
       message: "Login successful",
-      user: { 
-        id: authData.user.id, 
-        email: authData.user.email, 
+      user: {
+        id: authData.user.id,
+        email: authData.user.email,
         role: userRole,
-        ...authData.user.user_metadata 
+        ...authData.user.user_metadata
       },
     });
   } catch (err) {
@@ -157,21 +157,20 @@ export const logout = (req, res) => {
 
 export const getMe = async (req, res) => {
   try {
-    const user = await knex("auth.users")
-      .where({ id: req.user.id })
-      .select("id", "email", "raw_user_meta_data")
-      .first();
+    // Use the user ID from the middleware to fetch data via Supabase Admin client
+    const { data: { user }, error } = await supabase.auth.admin.getUserById(req.user.id);
 
-    if (!user) {
+    if (error || !user) {
       return res.status(404).json({ success: false, error: "User not found" });
     }
 
     res.json({
       success: true,
-      user: { 
-        id: user.id, 
-        email: user.email, 
-        ...user.raw_user_meta_data 
+      user: {
+        id: user.id,
+        email: user.email,
+        role: user.user_metadata?.role || 'citizen',
+        ...user.user_metadata
       },
     });
   } catch (err) {
@@ -182,18 +181,21 @@ export const getMe = async (req, res) => {
 
 export const getOfficialsList = async (req, res) => {
   try {
-    const officials = await knex("auth.users")
-      .whereRaw(`raw_user_meta_data->>'role' = ?`, ["official"])
-      .select("id", "raw_user_meta_data");
+    // Supabase admin listing users - we filter for officials
+    const { data: { users }, error } = await supabase.auth.admin.listUsers();
 
-    const cleanOfficials = officials.map(u => ({
-      id: u.id,
-      name: u.raw_user_meta_data?.name,
-      department: u.raw_user_meta_data?.department,
-      designation: u.raw_user_meta_data?.designation,
-    }));
+    if (error) throw error;
 
-    res.status(200).json({ success: true, officials: cleanOfficials });
+    const officials = users
+      .filter(u => u.user_metadata?.role === 'official')
+      .map(u => ({
+        id: u.id,
+        name: u.user_metadata?.name,
+        department: u.user_metadata?.department,
+        designation: u.user_metadata?.designation,
+      }));
+
+    res.status(200).json({ success: true, officials });
   } catch (err) {
     logger.error(`GetOfficialsList Error: ${err.message}`);
     res.status(500).json({ success: false, error: "Failed to fetch officials" });

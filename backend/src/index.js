@@ -26,21 +26,27 @@ const allowedOrigins = [
   'https://civic-reporting-frontend-4vkpnoniy-stjands-projects.vercel.app',
 ];
 
+// More robust CORS configuration
 app.use(cors({
   origin: (origin, callback) => {
     // allow requests with no origin (like mobile apps, Postman)
     if (!origin) return callback(null, true);
-    
-    // Check exact match
-    if (allowedOrigins.includes(origin)) return callback(null, true);
-    
-    // Check wildcard for Vercel preview deployments
-    if (origin.endsWith('.vercel.app')) return callback(null, true);
-    
-    callback(new Error(`CORS: Origin ${origin} not allowed`));
+
+    const isAllowed = allowedOrigins.includes(origin) || origin.endsWith('.vercel.app');
+
+    if (isAllowed) {
+      callback(null, true);
+    } else {
+      callback(null, false); // Blocked by CORS but no Express error
+    }
   },
-  credentials: true, // ✅ allow cookies
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin']
 }));
+
+// Robustly handle preflight requests for all routes
+app.options('*', cors());
 
 // Core Middleware
 app.use(express.json({ limit: '10mb' }));
@@ -52,7 +58,7 @@ app.get('/health', async (req, res) => {
   try {
     const startTime = process.uptime();
     const dbCheck = await knex.raw('SELECT 1+1 AS result');
-    
+
     res.status(200).json({
       status: 'OK',
       timestamp: new Date().toISOString(),
@@ -107,7 +113,7 @@ const startServer = async () => {
     console.log('Attempting database connection...');
     console.log('Environment:', process.env.NODE_ENV);
     console.log('Database URL exists:', !!process.env.DATABASE_URL);
-    
+
     // Mask password in logs
     const dbUrl = process.env.DATABASE_URL;
     if (dbUrl) {
@@ -122,11 +128,11 @@ const startServer = async () => {
       }
     }
     console.log('='.repeat(50));
-    
+
     const result = await knex.raw('SELECT 1+1 AS result');
     logger.info('✅ Database connected successfully');
     console.log('✅ Test query result:', result.rows);
-    
+
     app.listen(PORT, () => {
       logger.info(`🚀 Server running on port ${PORT}`);
       console.log(`🚀 Server is live at http://localhost:${PORT}`);
